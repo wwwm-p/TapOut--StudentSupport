@@ -1,42 +1,66 @@
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
   font-family: sans-serif;
   text-align: center;
-  background: #fffcf5; /* sky blue background */
-  overflow-x: hidden;
+  background: #85082d;
+  overflow: hidden;
 }
 
-/* A fixed container the same size as your Canva design */
+/* Full-screen wrapper */
+.wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Canva-sized page (design reference) */
 .page {
-  display: none;
   position: relative;
-  width: 1366px;   /* set to the exact width of your Canva screenshot */
-  height: 768px;   /* set to the exact height of your Canva screenshot */
-  margin: 0 auto;  /* keeps it centered */
-}
-
-.page img {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 1366px;
   height: 768px;
+  display: none;
+
+  /* SCALE TO SCREEN */
+  transform: scale(
+    min(
+      calc(100vw / 1366),
+      calc(100vh / 768)
+    )
+  );
+  transform-origin: top left;
 }
 
+/* Active page */
 .page.active {
   display: block;
 }
 
-/* Hotspot (invisible buttons) */
+/* Background image */
+.page img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* fills screen correctly */
+}
+
+/* Hotspots */
 .hotspot {
   position: absolute;
-  background: rgba(255, 0, 0, 0); /* invisible */
+  background: rgba(255, 0, 0, 0);
   border: none;
   cursor: pointer;
 }
 
-
-/* Example positions for Page 1 (adjust as needed) */
+/* PAGE 1 HOTSPOTS */
 .academic { top: 195px; left: 110px; width: 190px; height: 100px; }
 .anxiety { top: 220px; left: 410px; width: 190px; height: 100px; }
 .depression { top: 240px; left: 760px; width: 190px; height: 100px; }
@@ -47,35 +71,21 @@ body {
 .talk { top: 570px; left: 780px; width: 190px; height: 100px; }
 .unsure { top: 520px; left: 1140px; width: 190px; height: 100px; }
 
-/* Page 2 buttons */
+/* PAGE 2 BUTTONS */
 .fine { top: 310px; left: 90px; width: 200px; height: 180px; }
 .littleoff { top: 310px; left: 460px; width: 200px; height: 180px; }
 .coping { top: 310px; left: 810px; width: 200px; height: 180px; }
 .crisis { top: 310px; left: 1160px; width: 200px; height: 180px; }
 
-/* Page 3 buttons (visible email buttons) */
-.counselor1, .counselor2, .counselor3, .counselor4, .counselor5, .counselor6 {
-  position: absolute;
-  left: 650px;
-  width: 200px;
-  height: 50px;
-  background: white;
-  border: 2px solid #000;
-  border-radius: 25px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Counselor grid (2 columns × 3 rows) */
+/* Counselor grid */
 .counselor-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
   position: absolute;
-  top: 275px;   /* adjust to match your white bubbles */
-  left: 500px;  /* adjust to center on your template */
-  width: 800px; /* total width for two columns */
+  top: 275px;
+  left: 500px;
+  width: 800px;
 }
 
 .counselor-grid button {
@@ -86,6 +96,6 @@ body {
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  width: 100%;   /* each button fills its grid cell */
+  width: 100%;
   height: 60px;
 }
