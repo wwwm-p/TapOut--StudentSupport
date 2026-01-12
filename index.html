@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Support</title>
   <link rel="stylesheet" href="style.css" />
-</head>
-
+</head> 
 <body>
 
   <div class="wrapper">
 
-    <!-- Page 1: Reason Selection -->
+    <!-- Page 1: Reason -->
     <div class="page active" id="page1">
       <img src="page1.png" alt="Welcome Page">
 
@@ -25,7 +24,7 @@
       <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
     </div>
 
-    <!-- Page 2: Urgency Selection -->
+    <!-- Page 2: Urgency -->
     <div class="page" id="page2">
       <img src="page2.png" alt="Urgency Page">
 
@@ -37,7 +36,7 @@
       <button class="back-button" onclick="goToPage('page1')">Back</button>
     </div>
 
-    <!-- Page 3: Counselor Selection + Name Input -->
+    <!-- Page 3: Counselor + Student Info -->
     <div class="page" id="page3">
       <img src="page3.png" alt="Counselor Page">
 
@@ -47,17 +46,28 @@
       </div>
 
       <div class="counselor-grid">
-        <button onclick="sendEmail('miap2k10@gmail.com')">miap2k10@gmail.com</button>
-        <button onclick="sendEmail('kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
-        <button onclick="sendEmail('gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
-        <button onclick="sendEmail('apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
-        <button onclick="sendEmail('aturner@smpanthers.org')">aturner@smpanthers.org</button>
-        <button onclick="sendEmail('cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
+        <button onclick="openEmailOptions('miap2k10@gmail.com')">miap2k10@gmail.com</button>
+        <button onclick="openEmailOptions('kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
+        <button onclick="openEmailOptions('gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
+        <button onclick="openEmailOptions('apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
+        <button onclick="openEmailOptions('aturner@smpanthers.org')">aturner@smpanthers.org</button>
+        <button onclick="openEmailOptions('cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
       </div>
 
       <button class="back-button" onclick="goToPage('page2')">Back</button>
     </div>
 
+  </div>
+
+  <!-- Email Choice Modal -->
+  <div id="emailModal" class="modal">
+    <div class="modal-content">
+      <h3>Send Email With</h3>
+      <button onclick="sendWithDefaultMail()">Default Mail App</button>
+      <button onclick="sendWithGmail()">Gmail</button>
+      <button onclick="sendWithYahoo()">Yahoo Mail</button>
+      <button class="cancel" onclick="closeModal()">Cancel</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
