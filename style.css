@@ -1,124 +1,101 @@
-* {
+html, body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  width: 100%;
+  height: 100%;
 }
 
 body {
-  background: #f4f4f4;
+  font-family: sans-serif;
+  text-align: center;
+  background: #fffcf5;
+  overflow: hidden;
 }
 
+/* Full-screen wrapper */
 .wrapper {
-  max-width: 500px;
-  margin: auto;
-  position: relative;
-}
-
-.page {
-  display: none;
-  position: relative;
-}
-
-.page.active {
-  display: block;
-}
-
-.page img {
-  width: 100%;
-}
-
-.hotspot {
-  position: absolute;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-/* Example hotspot positioning – adjust to match images */
-.academic { top: 20%; left: 10%; width: 80%; height: 8%; }
-.anxiety { top: 30%; left: 10%; width: 80%; height: 8%; }
-.depression { top: 40%; left: 10%; width: 80%; height: 8%; }
-
-.back-button {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  padding: 10px 15px;
-  background: #333;
-  color: white;
-  border: none;
-  border-radius: 6px;
-}
-
-.input-container {
-  position: absolute;
-  top: 15%;
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.input-container input {
-  padding: 10px;
-  width: 40%;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-.counselor-grid {
-  position: absolute;
-  top: 35%;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 0 20px;
-}
-
-.counselor-grid button {
-  padding: 12px;
-  background: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-/* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
   justify-content: center;
   align-items: center;
 }
 
-.modal-content {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  text-align: center;
-  width: 80%;
-  max-width: 300px;
+/* Canva-sized page (design reference) */
+.page {
+  position: relative;
+  width: 1366px;
+  height: 768px;
+  display: none;
+
+  /* SCALE TO SCREEN */
+  transform: scale(
+    min(
+      calc(100vw / 1366),
+      calc(100vh / 768)
+    )
+  );
+  transform-origin: top left;
 }
 
-.modal-content h3 {
-  margin-bottom: 15px;
+/* Active page */
+.page.active {
+  display: block;
 }
 
-.modal-content button {
+/* Background image */
+.page img {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  margin: 6px 0;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  background: #1976d2;
-  color: white;
+  height: 100%;
+  object-fit: cover; /* fills screen correctly */
 }
 
-.modal-content .cancel {
-  background: #888;
+/* Hotspots */
+.hotspot {
+  position: absolute;
+  background: rgba(255, 0, 0, 0);
+  border: none;
+  cursor: pointer;
+}
+
+/* PAGE 1 HOTSPOTS */
+.academic { top: 195px; left: 110px; width: 190px; height: 100px; }
+.anxiety { top: 220px; left: 410px; width: 190px; height: 100px; }
+.depression { top: 240px; left: 760px; width: 190px; height: 100px; }
+.family { top: 250px; left: 1130px; width: 190px; height: 100px; }
+
+.relationship { top: 550px; left: 80px; width: 200px; height: 100px; }
+.bullying { top: 560px; left: 420px; width: 190px; height: 100px; }
+.talk { top: 570px; left: 780px; width: 190px; height: 100px; }
+.unsure { top: 520px; left: 1140px; width: 190px; height: 100px; }
+
+/* PAGE 2 BUTTONS */
+.fine { top: 310px; left: 90px; width: 200px; height: 180px; }
+.littleoff { top: 310px; left: 460px; width: 200px; height: 180px; }
+.coping { top: 310px; left: 810px; width: 200px; height: 180px; }
+.crisis { top: 310px; left: 1160px; width: 200px; height: 180px; }
+
+/* Counselor grid */
+.counselor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  position: absolute;
+  top: 275px;
+  left: 500px;
+  width: 800px;
+}
+
+.counselor-grid button {
+  padding: 15px;
+  background: white;
+  border: 2px solid #000;
+  border-radius: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  height: 60px;
 }
