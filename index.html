@@ -5,60 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Support</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 
 <body>
-  <!-- Page 1: Reason Selection -->
-  <div class="page active" id="page1">
-    <img src="page1.png" alt="Welcome Page">
+    <!-- Page 1: Reason Selection -->
+    <div class="page active" id="page1">
+      <img src="page1.png" alt="Welcome Page">
 
-    <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
-    <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
-    <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
-    <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
-    <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
-    <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
-    <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
-    <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
-  </div>
-
-  <!-- Page 2: Urgency Selection -->
-  <div class="page" id="page2">
-    <img src="page2.png" alt="Urgency Page">
-
-    <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
-    <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
-    <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
-    <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
-
-    <button class="back-button" onclick="goToPage('page1')">Back</button>
-  </div>
-
-  <!-- Page 3: Counselor Selection + Name Input -->
-  <div class="page" id="page3">
-    <img src="page3.png" alt="Counselor Page">
-
-    <div class="input-container">
-      <input type="text" id="studentName" placeholder="Your Name" />
-      <input type="text" id="studentGrade" placeholder="Your Grade" />
+      <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
+      <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
+      <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
+      <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
+      <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
+      <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
+      <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
+      <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
     </div>
 
-    <div class="counselor-grid">
-      <button class="counselor1" onclick="sendEmail('miap2k10@gmail.com')">miap2k10@gmail.com</button>
-      <button class="counselor2" onclick="sendEmail('kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
-      <button class="counselor3" onclick="sendEmail('gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
-      <button class="counselor4" onclick="sendEmail('apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
-      <button class="counselor5" onclick="sendEmail('aturner@smpanthers.org')">aturner@smpanthers.org</button>
-      <button class="counselor6" onclick="sendEmail('cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
+    <!-- Page 2: Urgency Selection -->
+    <div class="page" id="page2">
+      <img src="page2.png" alt="Urgency Page">
+
+      <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
+      <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
+      <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
+      <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
+
+      <button class="back-button" onclick="goToPage('page1')">Back</button>
     </div>
 
-    <button class="back-button" onclick="goToPage('page2')">Back</button>
-  </div>
+    <!-- Page 3: Counselor Selection + Name Input -->
+    <div class="page" id="page3">
+      <img src="page3.png" alt="Counselor Page">
 
-  <!-- Script -->
-  <script src="script.js"></script>
+      <div class="input-container">
+        <input type="text" id="studentName" placeholder="Your Name" />
+        <input type="text" id="studentGrade" placeholder="Your Grade" />
+      </div>
+
+      <div class="counselor-grid">
+        <button onclick="sendEmail('miap2k10@gmail.com')">miap2k10@gmail.com</button>
+        <button onclick="sendEmail('kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
+        <button onclick="sendEmail('gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
+        <button onclick="sendEmail('apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
+        <button onclick="sendEmail('aturner@smpanthers.org')">aturner@smpanthers.org</button>
+        <button onclick="sendEmail('cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
+      </div>
+
+      <button class="back-button" onclick="goToPage('page2')">Back</button>
+    </div>
+
+    <script src="script.js"></script>
+
 </body>
 </html>
-
