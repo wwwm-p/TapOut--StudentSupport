@@ -1,12 +1,6 @@
-// ===============================
-// STATE VARIABLES
-// ===============================
 let selectedReason = "";
 let selectedUrgency = "";
 
-// ===============================
-// PAGE NAVIGATION
-// ===============================
 function goToPage(pageId) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(pageId).classList.add("active");
@@ -22,67 +16,23 @@ function chooseUrgency(level) {
   goToPage("page3");
 }
 
-// ===============================
-// FIREBASE CONFIGURATION
-// ===============================
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// ===============================
-// SUBMIT REQUEST TO FIRESTORE
-// ===============================
-function sendRequest(counselorEmail) {
+function sendEmail(counselorEmail) {
   const name = document.getElementById("studentName").value.trim() || "[Your Name]";
   const grade = document.getElementById("studentGrade").value.trim() || "[Your Grade]";
-  const reason = selectedReason || "I need support.";
+  const reason = selectedReason || "I need academic or personal support.";
   const urgency = selectedUrgency || "Moderate";
 
-  if (!name || !grade) {
-    alert("Please enter your name and grade.");
-    return;
-  }
+  const subject = "Support Request from Student";
+  const body = `Hello,
 
-  // Add request to Firestore
-  db.collection("requests").add({
-    student: name,
-    grade: grade,
-    reason: reason,
-    urgency: urgency,
-    counselor: counselorEmail,
-    time: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(() => {
-    alert("Your request has been sent to your counselor!");
-    resetForm();
-  })
-  .catch(err => {
-    console.error("Error submitting request:", err);
-    alert("Failed to submit request. Please try again.");
-  });
-}
+I would like to reach out for support.
 
-// Replace old sendEmail function to keep buttons functional
-function sendEmail(counselorEmail) {
-  sendRequest(counselorEmail);
-}
+Reason: ${reason}
+Urgency: ${urgency}
 
-// ===============================
-// RESET FORM AFTER SUBMISSION
-// ===============================
-function resetForm() {
-  selectedReason = "";
-  selectedUrgency = "";
-  document.getElementById("studentName").value = "";
-  document.getElementById("studentGrade").value = "";
-  goToPage("page1");
+Thank you,
+${name}, ${grade}`;
+
+  const mailtoLink = `mailto:${counselorEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoLink; // Opens default mail app (Apple Mail / Gmail App / Outlook)
 }
