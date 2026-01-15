@@ -1,6 +1,9 @@
 let selectedReason = "";
 let selectedUrgency = "";
 
+// ----------------------
+// PAGE NAVIGATION
+// ----------------------
 function goToPage(pageId) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(pageId).classList.add("active");
@@ -9,21 +12,39 @@ function goToPage(pageId) {
 function chooseReason(reason) {
   selectedReason = reason;
   goToPage("page2");
+  updatePreview();
 }
 
 function chooseUrgency(level) {
   selectedUrgency = level;
   goToPage("page3");
+  updatePreview();
 }
 
-function sendEmail(counselorEmail) {
-  const name = document.getElementById("studentName").value.trim() || "[Your Name]";
-  const grade = document.getElementById("studentGrade").value.trim() || "[Your Grade]";
-  const reason = selectedReason || "I need academic or personal support.";
-  const urgency = selectedUrgency || "Moderate";
+// ----------------------
+// FIREBASE CONFIG
+// ----------------------
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-  const subject = "Support Request from Student";
-  const body = `Hello,
+// ----------------------
+// UPDATE MESSAGE PREVIEW
+// ----------------------
+function updatePreview() {
+  const name = document.getElementById("studentName")?.value || "[Your Name]";
+  const grade = document.getElementById("studentGrade")?.value || "[Your Grade]";
+  const reason = selectedReason || "No reason selected";
+  const urgency = selectedUrgency || "No urgency selected";
+
+  const previewText = `Hello,
 
 I would like to reach out for support.
 
@@ -33,6 +54,54 @@ Urgency: ${urgency}
 Thank you,
 ${name}, ${grade}`;
 
-  const mailtoLink = `mailto:${counselorEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoLink; // Opens default mail app (Apple Mail / Gmail App / Outlook)
+  document.getElementById("previewText").textContent = previewText;
 }
+
+// Add input listeners to live-update preview
+document.getElementById("studentName")?.addEventListener("input", updatePreview);
+document.getElementById("studentGrade")?.addEventListener("input", updatePreview);
+
+// ----------------------
+// SUBMIT REQUEST TO FIRESTORE
+// ----------------------
+function sendRequest(counselorEmail) {
+  const name = document.getElementById("studentName").value.trim() || "[Your Name]";
+  const grade = document.getElementById("studentGrade").value.trim() || "[Your Grade]";
+  const reason = selectedReason || "No reason selected";
+  const urgency = selectedUrgency || "Moderate";
+
+  if (!name || !grade) {
+    alert("Please enter your name and grade.");
+    return;
+  }
+
+  db.collection("requests").add({
+    student: name,
+    grade: grade,
+    reason: reason,
+    urgency: urgency,
+    counselor: counselorEmail,
+    time: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(() => {
+    alert("Your request has been sent!");
+    resetForm();
+  })
+  .catch(err => {
+    console.error("Error submitting request:", err);
+    alert("Failed to submit request. Try again.");
+  });
+}
+
+// ----------------------
+// RESET FORM
+// ----------------------
+function resetForm() {
+  selectedReason = "";
+  selectedUrgency = "";
+  document.getElementById("studentName").value = "";
+  document.getElementById("studentGrade").value = "";
+  document.getElementById("previewText").textContent = "Select a counselor to see your message here.";
+  goToPage("page1");
+}
+
