@@ -16,23 +16,24 @@ function chooseUrgency(level) {
   goToPage("page3");
 }
 
+// 🔹 SAVE DATA INSTEAD OF EMAIL
 function sendEmail(counselorEmail) {
-  const name = document.getElementById("studentName").value.trim() || "[Your Name]";
-  const grade = document.getElementById("studentGrade").value.trim() || "[Your Grade]";
-  const reason = selectedReason || "I need academic or personal support.";
-  const urgency = selectedUrgency || "Moderate";
+  const name = document.getElementById("studentName").value.trim() || "Anonymous";
+  const grade = document.getElementById("studentGrade").value.trim() || "N/A";
 
-  const subject = "Support Request from Student";
-  const body = `Hello,
+  const request = {
+    counselor: counselorEmail,
+    name: name,
+    grade: grade,
+    reason: selectedReason,
+    urgency: selectedUrgency,
+    time: new Date().toLocaleString()
+  };
 
-I would like to reach out for support.
+  let requests = JSON.parse(localStorage.getItem("requests") || "[]");
+  requests.push(request);
+  localStorage.setItem("requests", JSON.stringify(requests));
 
-Reason: ${reason}
-Urgency: ${urgency}
-
-Thank you,
-${name}, ${grade}`;
-
-  const mailtoLink = `mailto:${counselorEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoLink; // Opens default mail app (Apple Mail / Gmail App / Outlook)
+  alert("Your message has been sent to the counselor dashboard.");
+  goToPage("page1"); // reset
 }
