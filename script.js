@@ -1,9 +1,9 @@
 let selectedReason = "";
 let selectedUrgency = "";
 
-function goToPage(id) {
+function goToPage(pageId) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  document.getElementById(pageId).classList.add("active");
 }
 
 function chooseReason(reason) {
@@ -11,43 +11,36 @@ function chooseReason(reason) {
   goToPage("page2");
 }
 
-function chooseUrgency(urgency) {
-  selectedUrgency = urgency;
+function chooseUrgency(level) {
+  selectedUrgency = level;
   goToPage("page3");
   updatePreview();
 }
 
 function updatePreview() {
-  const name = studentName.value || "[Name]";
-  const grade = studentGrade.value || "[Grade]";
-
-  previewText.textContent = 
-`Hello,
-
-I would like to reach out for support.
-
-Reason: ${selectedReason}
-Urgency: ${selectedUrgency}
-
-Thank you,
-${name}, ${grade}`;
+  const box = document.getElementById("previewBox");
+  box.innerHTML = `
+    <strong>Preview:</strong><br>
+    Reason: ${selectedReason}<br>
+    Urgency: ${selectedUrgency}
+  `;
 }
 
-studentName?.addEventListener("input", updatePreview);
-studentGrade?.addEventListener("input", updatePreview);
+function sendRequest(counselorEmail) {
+  const name = studentName.value.trim();
+  const grade = studentGrade.value.trim();
 
-function sendRequest(counselor) {
-  if (!studentName.value || !studentGrade.value) {
-    alert("Enter your name and grade.");
+  if (!name || !grade) {
+    alert("Enter name and grade");
     return;
   }
 
   const requests = JSON.parse(localStorage.getItem("requests") || "[]");
 
   requests.push({
-    counselor,
-    name: studentName.value,
-    grade: studentGrade.value,
+    counselor: counselorEmail,
+    name,
+    grade,
     reason: selectedReason,
     urgency: selectedUrgency,
     time: new Date().toLocaleString()
@@ -55,6 +48,6 @@ function sendRequest(counselor) {
 
   localStorage.setItem("requests", JSON.stringify(requests));
 
-  alert("Request sent!");
+  alert("Message sent to counselor!");
   goToPage("page1");
 }
