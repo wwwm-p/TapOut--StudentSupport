@@ -14,40 +14,25 @@ function chooseReason(reason) {
 function chooseUrgency(level) {
   selectedUrgency = level;
   goToPage("page3");
-  updatePreview();
 }
 
-function updatePreview() {
-  const box = document.getElementById("previewBox");
-  box.innerHTML = `
-    <strong>Preview:</strong><br>
-    Reason: ${selectedReason}<br>
-    Urgency: ${selectedUrgency}
-  `;
-}
+function sendEmail(counselorEmail) {
+  const name = document.getElementById("studentName").value.trim() || "[Your Name]";
+  const grade = document.getElementById("studentGrade").value.trim() || "[Your Grade]";
+  const reason = selectedReason || "I need academic or personal support.";
+  const urgency = selectedUrgency || "Moderate";
 
-function sendRequest(counselorEmail) {
-  const name = studentName.value.trim();
-  const grade = studentGrade.value.trim();
+  const subject = "Support Request from Student";
+  const body = `Hello,
 
-  if (!name || !grade) {
-    alert("Enter name and grade");
-    return;
-  }
+I would like to reach out for support.
 
-  const requests = JSON.parse(localStorage.getItem("requests") || "[]");
+Reason: ${reason}
+Urgency: ${urgency}
 
-  requests.push({
-    counselor: counselorEmail,
-    name,
-    grade,
-    reason: selectedReason,
-    urgency: selectedUrgency,
-    time: new Date().toLocaleString()
-  });
+Thank you,
+${name}, ${grade}`;
 
-  localStorage.setItem("requests", JSON.stringify(requests));
-
-  alert("Message sent to counselor!");
-  goToPage("page1");
+  const mailtoLink = `mailto:${counselorEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoLink; // Opens default mail app (Apple Mail / Gmail App / Outlook)
 }
