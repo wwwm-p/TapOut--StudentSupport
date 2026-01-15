@@ -5,27 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Support</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 
 <body>
-  <!-- Page 1: Reason Selection -->
+
+  <!-- Page 1 -->
   <div class="page active" id="page1">
-    <img src="page1.png" alt="Welcome Page">
+    <img src="page1.png" />
     <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
     <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
     <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
     <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
-    <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
-    <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
-    <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
-    <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
+    <button class="hotspot relationship" onclick="chooseReason('Relationship problems')"></button>
+    <button class="hotspot bullying" onclick="chooseReason('Bullying')"></button>
+    <button class="hotspot talk" onclick="chooseReason('Just need to talk')"></button>
+    <button class="hotspot unsure" onclick="chooseReason('Not ready to say')"></button>
   </div>
 
-  <!-- Page 2: Urgency Selection -->
+  <!-- Page 2 -->
   <div class="page" id="page2">
-    <img src="page2.png" alt="Urgency Page">
+    <img src="page2.png" />
     <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
     <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
     <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
@@ -33,27 +32,25 @@
     <button class="back-button" onclick="goToPage('page1')">Back</button>
   </div>
 
-  <!-- Page 3: Counselor Selection + Preview Message -->
+  <!-- Page 3 -->
   <div class="page" id="page3">
-    <img src="page3.png" alt="Counselor Page">
+    <img src="page3.png" />
 
-    <div class="input-container">
-      <input type="text" id="studentName" placeholder="Your Name" />
-      <input type="text" id="studentGrade" placeholder="Your Grade" />
-    </div>
+    <input id="studentName" placeholder="Your Name" />
+    <input id="studentGrade" placeholder="Your Grade" />
 
-    <div id="messagePreview" style="position:absolute; top:180px; left:500px; width:800px; background:#fff; padding:15px; border-radius:10px; border:2px solid #000;">
+    <div id="previewBox">
       <strong>Message Preview:</strong>
-      <p id="previewText">Select a counselor to see your message here.</p>
+      <pre id="previewText"></pre>
     </div>
 
     <div class="counselor-grid">
-      <button class="counselor1" onclick="sendRequest('miap2k10@gmail.com')">miap2k10@gmail.com</button>
-      <button class="counselor2" onclick="sendRequest('kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
-      <button class="counselor3" onclick="sendRequest('gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
-      <button class="counselor4" onclick="sendRequest('apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
-      <button class="counselor5" onclick="sendRequest('aturner@smpanthers.org')">aturner@smpanthers.org</button>
-      <button class="counselor6" onclick="sendRequest('cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
+      <button onclick="sendRequest('miap2k10@gmail.com')">Mia</button>
+      <button onclick="sendRequest('kmcconnell@smpanthers.org')">McConnell</button>
+      <button onclick="sendRequest('gsorbi@smpanthers.org')">Sorbi</button>
+      <button onclick="sendRequest('apanlilio@smpanthers.org')">Panlilio</button>
+      <button onclick="sendRequest('aturner@smpanthers.org')">Turner</button>
+      <button onclick="sendRequest('cfilson@smpanthers.org')">Filson</button>
     </div>
 
     <button class="back-button" onclick="goToPage('page2')">Back</button>
