@@ -1,5 +1,5 @@
 // ===============================
-// SELECTION VARIABLES
+// STATE VARIABLES
 // ===============================
 let selectedReason = "";
 let selectedUrgency = "";
@@ -23,9 +23,8 @@ function chooseUrgency(level) {
 }
 
 // ===============================
-// FIREBASE CONFIG
+// FIREBASE CONFIGURATION
 // ===============================
-// Replace the following config with your Firebase project details
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -40,7 +39,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ===============================
-// SEND REQUEST FUNCTION
+// SUBMIT REQUEST TO FIRESTORE
 // ===============================
 function sendRequest(counselorEmail) {
   const name = document.getElementById("studentName").value.trim() || "[Your Name]";
@@ -53,7 +52,7 @@ function sendRequest(counselorEmail) {
     return;
   }
 
-  // Save to Firestore
+  // Add request to Firestore
   db.collection("requests").add({
     student: name,
     grade: grade,
@@ -72,6 +71,11 @@ function sendRequest(counselorEmail) {
   });
 }
 
+// Replace old sendEmail function to keep buttons functional
+function sendEmail(counselorEmail) {
+  sendRequest(counselorEmail);
+}
+
 // ===============================
 // RESET FORM AFTER SUBMISSION
 // ===============================
@@ -82,16 +86,3 @@ function resetForm() {
   document.getElementById("studentGrade").value = "";
   goToPage("page1");
 }
-
-// ===============================
-// REPLACE ORIGINAL SEND EMAIL FUNCTION
-// ===============================
-function sendEmail(counselorEmail) {
-  sendRequest(counselorEmail);
-}
-
-// ===============================
-// OPTIONAL: DEBUG LOG
-// ===============================
-console.log("Student submission script loaded. Ready to send requests to counselor dashboards.");
-
