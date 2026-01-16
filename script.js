@@ -16,15 +16,14 @@ function chooseUrgency(level) {
   goToPage("page3");
 }
 
-// 🔹 SAVE DATA INSTEAD OF EMAIL
 function sendEmail(counselorEmail) {
   const name = document.getElementById("studentName").value.trim() || "Anonymous";
   const grade = document.getElementById("studentGrade").value.trim() || "N/A";
 
   const request = {
     counselor: counselorEmail,
-    name: name,
-    grade: grade,
+    name,
+    grade,
     reason: selectedReason,
     urgency: selectedUrgency,
     time: new Date().toLocaleString()
@@ -34,6 +33,6 @@ function sendEmail(counselorEmail) {
   requests.push(request);
   localStorage.setItem("requests", JSON.stringify(requests));
 
-  alert("Your message has been sent to the counselor dashboard.");
-  goToPage("page1"); // reset
+  alert("Message sent to counselor.");
+  goToPage("page1");
 }
