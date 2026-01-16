@@ -33,6 +33,7 @@ function sendEmail(counselorEmail) {
   requests.push(request);
   localStorage.setItem("requests", JSON.stringify(requests));
 
-  alert("Message sent to counselor.");
+  alert("Your message was sent to the counselor.");
   goToPage("page1");
 }
+
