@@ -17,23 +17,21 @@ function chooseUrgency(level) {
 }
 
 function sendEmail(counselorEmail) {
-  const name = document.getElementById("studentName").value.trim() || "Anonymous";
-  const grade = document.getElementById("studentGrade").value.trim() || "N/A";
+  const name = studentName.value || "Anonymous";
+  const grade = studentGrade.value || "N/A";
 
-  const request = {
-    counselor: counselorEmail,
+  const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
+
+  messages.push({
     name,
     grade,
     reason: selectedReason,
     urgency: selectedUrgency,
+    counselor: counselorEmail.split("@")[0],
     time: new Date().toLocaleString()
-  };
+  });
 
-  let requests = JSON.parse(localStorage.getItem("requests") || "[]");
-  requests.push(request);
-  localStorage.setItem("requests", JSON.stringify(requests));
+  localStorage.setItem("studentMessages", JSON.stringify(messages));
 
-  alert("Your message was sent to the counselor.");
-  goToPage("page1");
+  alert("Message sent to counselor dashboard!");
 }
-
