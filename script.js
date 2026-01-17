@@ -1,39 +1,18 @@
-let selectedReason = "";
-let selectedUrgency = "";
+function sendMessage(reason, urgency, counselor) {
+  const name = document.getElementById("studentName").value || "Anonymous";
+  const grade = document.getElementById("studentGrade").value || "N/A";
 
-function goToPage(pageId) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(pageId).classList.add("active");
-}
+  const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
 
-function chooseReason(reason) {
-  selectedReason = reason;
-  goToPage("page2");
-}
-
-function chooseUrgency(level) {
-  selectedUrgency = level;
-  goToPage("page3");
-}
-
-function sendEmail(counselorEmail) {
-  const name = document.getElementById("studentName").value.trim() || "Anonymous";
-  const grade = document.getElementById("studentGrade").value.trim() || "N/A";
-
-  const request = {
-    counselor: counselorEmail,
+  messages.push({
     name,
     grade,
-    reason: selectedReason,
-    urgency: selectedUrgency,
+    reason,
+    urgency,
+    counselor,
     time: new Date().toLocaleString()
-  };
+  });
 
-  let requests = JSON.parse(localStorage.getItem("requests") || "[]");
-  requests.push(request);
-  localStorage.setItem("requests", JSON.stringify(requests));
-
-  alert("Your message was sent to the counselor.");
-  goToPage("page1");
+  localStorage.setItem("studentMessages", JSON.stringify(messages));
+  alert("Message sent to counselor dashboard!");
 }
-
