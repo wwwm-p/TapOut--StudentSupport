@@ -1,14 +1,39 @@
-function sendMessage(reason, urgency, counselor) {
-  const message = {
-    reason,
-    urgency,
-    counselor,
-    message: `Student needs help with: ${reason}`
+let selectedReason = "";
+let selectedUrgency = "";
+
+function goToPage(pageId) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(pageId).classList.add("active");
+}
+
+function chooseReason(reason) {
+  selectedReason = reason;
+  goToPage("page2");
+}
+
+function chooseUrgency(level) {
+  selectedUrgency = level;
+  goToPage("page3");
+}
+
+function sendEmail(counselorEmail) {
+  const name = document.getElementById("studentName").value.trim() || "Anonymous";
+  const grade = document.getElementById("studentGrade").value.trim() || "N/A";
+
+  const request = {
+    counselor: counselorEmail,
+    name,
+    grade,
+    reason: selectedReason,
+    urgency: selectedUrgency,
+    time: new Date().toLocaleString()
   };
 
-  const messages = JSON.parse(localStorage.getItem("studentMessages")) || [];
-  messages.push(message);
-  localStorage.setItem("studentMessages", JSON.stringify(messages));
+  let requests = JSON.parse(localStorage.getItem("requests") || "[]");
+  requests.push(request);
+  localStorage.setItem("requests", JSON.stringify(requests));
 
-  alert("Message sent to counselor dashboard!");
+  alert("Your message was sent to the counselor.");
+  goToPage("page1");
 }
+
