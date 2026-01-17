@@ -1,18 +1,14 @@
 function sendMessage(reason, urgency, counselor) {
-  const name = document.getElementById("studentName").value || "Anonymous";
-  const grade = document.getElementById("studentGrade").value || "N/A";
-
-  const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
-
-  messages.push({
-    name,
-    grade,
+  const message = {
     reason,
     urgency,
     counselor,
-    time: new Date().toLocaleString()
-  });
+    message: `Student needs help with: ${reason}`
+  };
 
+  const messages = JSON.parse(localStorage.getItem("studentMessages")) || [];
+  messages.push(message);
   localStorage.setItem("studentMessages", JSON.stringify(messages));
+
   alert("Message sent to counselor dashboard!");
 }
