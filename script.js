@@ -17,3 +17,4 @@ function sendMessage(reason, urgency, counselor) {
   alert("Message sent to counselor dashboard!");
 }
 
+
