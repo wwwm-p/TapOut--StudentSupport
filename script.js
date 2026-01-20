@@ -18,4 +18,3 @@ function sendMessage(reason, urgency, counselor) {
 }
 
 
-
