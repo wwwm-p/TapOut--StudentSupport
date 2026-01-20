@@ -1,6 +1,8 @@
-function sendMessage(reason, urgency, counselor) {
-  const name = document.getElementById("studentName").value || "Anonymous";
-  const grade = document.getElementById("studentGrade").value || "N/A";
+function sendEmail(counselorEmail) {
+  const name = document.getElementById("studentName").value.trim() || "Anonymous";
+  const grade = document.getElementById("studentGrade").value.trim() || "N/A";
+  const reason = selectedReason || "Not specified";
+  const urgency = selectedUrgency || "Moderate";
 
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
 
@@ -9,12 +11,15 @@ function sendMessage(reason, urgency, counselor) {
     grade,
     reason,
     urgency,
-    counselor,
+    counselor: counselorEmail,
     time: new Date().toLocaleString()
   });
 
   localStorage.setItem("studentMessages", JSON.stringify(messages));
-  alert("Message sent to counselor dashboard!");
+
+  alert("Your message has been sent to the counselor dashboard.");
+  goToPage("page1");
 }
+
 
 
