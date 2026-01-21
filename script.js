@@ -16,7 +16,7 @@ function chooseUrgency(level) {
   goToPage("page3");
 }
 
-function previewMessage(counselorEmail) {
+function previewMessage(counselor) {
   const name = studentName.value || "Student";
   const grade = studentGrade.value || "N/A";
 
@@ -28,27 +28,28 @@ Urgency: ${selectedUrgency}
   `;
 
   if (confirm("Preview Message:\n\n" + message)) {
-    sendToDashboard(counselorEmail, message, name, grade);
+    sendRequest(counselor, message, name, grade);
   }
 }
 
-function sendToDashboard(email, message, name, grade) {
+function sendRequest(counselor, message, name, grade) {
   const requests = JSON.parse(localStorage.getItem("requests") || "[]");
 
   requests.push({
-    counselor: email,
+    counselor,
     student: name,
-    grade: grade,
+    grade,
     reason: selectedReason,
     urgency: selectedUrgency,
-    message: message,
-    time: new Date().toISOString()
+    message,
+    time: new Date().toLocaleString()
   });
 
   localStorage.setItem("requests", JSON.stringify(requests));
-  alert("Message sent!");
-  location.reload();
+  alert("Request sent!");
+  goToPage("page1");
 }
+
 
 
 
