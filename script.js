@@ -16,8 +16,3 @@ function sendMessage(reason, urgency, counselor) {
   localStorage.setItem("studentMessages", JSON.stringify(messages));
   alert("Message sent to counselor dashboard!");
 }
-
-
-
-
-
