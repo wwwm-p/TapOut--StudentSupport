@@ -1,6 +1,11 @@
 let selectedReason = "";
 let selectedUrgency = "";
 
+function goToPage(pageId) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(pageId).classList.add("active");
+}
+
 function chooseReason(reason) {
   selectedReason = reason;
   goToPage("page2");
@@ -11,18 +16,11 @@ function chooseUrgency(urgency) {
   goToPage("page3");
 }
 
-function goToPage(pageId) {
-  document.querySelectorAll(".page").forEach(p => {
-    p.classList.remove("active");
-  });
-  document.getElementById(pageId).classList.add("active");
-}
-
 function sendEmail(counselorEmail) {
   const name = document.getElementById("studentName").value || "Anonymous";
   const grade = document.getElementById("studentGrade").value || "N/A";
 
-  // Extract username from email
+  // ✅ Convert email → counselor username
   const counselorUsername = counselorEmail.split("@")[0];
 
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
@@ -32,14 +30,12 @@ function sendEmail(counselorEmail) {
     grade,
     reason: selectedReason,
     urgency: selectedUrgency,
-    counselor: counselorUsername, // ✅ THIS FIXES THE DASHBOARD
+    counselor: counselorUsername,
     time: new Date().toLocaleString()
   });
 
   localStorage.setItem("studentMessages", JSON.stringify(messages));
 
-  alert("Message sent successfully!");
+  alert("Your message has been sent.");
   location.reload();
 }
-
-
