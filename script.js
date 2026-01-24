@@ -18,9 +18,12 @@ function goToPage(pageId) {
   document.getElementById(pageId).classList.add("active");
 }
 
-function sendEmail(counselor) {
+function sendEmail(counselorEmail) {
   const name = document.getElementById("studentName").value || "Anonymous";
   const grade = document.getElementById("studentGrade").value || "N/A";
+
+  // Extract username from email
+  const counselorUsername = counselorEmail.split("@")[0];
 
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
 
@@ -29,7 +32,7 @@ function sendEmail(counselor) {
     grade,
     reason: selectedReason,
     urgency: selectedUrgency,
-    counselor,
+    counselor: counselorUsername, // ✅ THIS FIXES THE DASHBOARD
     time: new Date().toLocaleString()
   });
 
@@ -38,4 +41,5 @@ function sendEmail(counselor) {
   alert("Message sent successfully!");
   location.reload();
 }
+
 
