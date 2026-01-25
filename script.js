@@ -1,5 +1,6 @@
 let selectedReason = "";
 let selectedUrgency = "";
+let selectedCounselor = "";
 
 function goToPage(pageId) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -16,25 +17,27 @@ function chooseUrgency(urgency) {
   goToPage("page3");
 }
 
-function sendEmail(counselorEmail) {
+function openModal(counselorEmail) {
+  selectedCounselor = counselorEmail;
+  document.getElementById("infoModal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("infoModal").style.display = "none";
+}
+
+function submitMessage() {
   const firstName = document.getElementById("firstName").value.trim();
   const lastName = document.getElementById("lastName").value.trim();
   const grade = document.getElementById("studentGrade").value.trim();
+  const notes = document.getElementById("extraNotes").value.trim();
 
-  // 🔒 REQUIRED FIELD VALIDATION
   if (!firstName || !lastName || !grade) {
-    alert("First name, last name, and grade are required before submitting.");
+    alert("First name, last name, and grade are required.");
     return;
   }
 
-  if (!selectedReason || !selectedUrgency) {
-    alert("Please complete all steps before submitting.");
-    return;
-  }
-
-  // Convert email → counselor username (matches dashboard logic)
-  const counselorUsername = counselorEmail.split("@")[0];
-
+  const counselorUsername = selectedCounselor.split("@")[0];
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
 
   messages.push({
@@ -43,13 +46,13 @@ function sendEmail(counselorEmail) {
     grade,
     reason: selectedReason,
     urgency: selectedUrgency,
+    notes,
     counselor: counselorUsername,
     time: new Date().toLocaleString()
   });
 
   localStorage.setItem("studentMessages", JSON.stringify(messages));
 
-  alert("Your message has been sent to the counselor.");
-
+  alert("Your message has been sent.");
   location.reload();
 }
