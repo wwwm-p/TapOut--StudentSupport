@@ -17,16 +17,29 @@ function chooseUrgency(urgency) {
 }
 
 function sendEmail(counselorEmail) {
-  const name = document.getElementById("studentName").value || "Anonymous";
-  const grade = document.getElementById("studentGrade").value || "N/A";
+  const firstName = document.getElementById("firstName").value.trim();
+  const lastName = document.getElementById("lastName").value.trim();
+  const grade = document.getElementById("studentGrade").value.trim();
 
-  // ✅ Convert email → counselor username
+  // 🔒 REQUIRED FIELD VALIDATION
+  if (!firstName || !lastName || !grade) {
+    alert("First name, last name, and grade are required before submitting.");
+    return;
+  }
+
+  if (!selectedReason || !selectedUrgency) {
+    alert("Please complete all steps before submitting.");
+    return;
+  }
+
+  // Convert email → counselor username (matches dashboard logic)
   const counselorUsername = counselorEmail.split("@")[0];
 
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
 
   messages.push({
-    name,
+    firstName,
+    lastName,
     grade,
     reason: selectedReason,
     urgency: selectedUrgency,
@@ -36,6 +49,7 @@ function sendEmail(counselorEmail) {
 
   localStorage.setItem("studentMessages", JSON.stringify(messages));
 
-  alert("Your message has been sent.");
+  alert("Your message has been sent to the counselor.");
+
   location.reload();
 }
