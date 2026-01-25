@@ -18,12 +18,17 @@ function chooseUrgency(urgency) {
 }
 
 function openModal(counselorEmail) {
+  if (!selectedReason || !selectedUrgency) {
+    alert("Please complete all steps first.");
+    return;
+  }
+
   selectedCounselor = counselorEmail;
-  document.getElementById("infoModal").style.display = "flex";
+  document.getElementById("modalOverlay").style.display = "flex";
 }
 
 function closeModal() {
-  document.getElementById("infoModal").style.display = "none";
+  document.getElementById("modalOverlay").style.display = "none";
 }
 
 function submitMessage() {
@@ -38,6 +43,7 @@ function submitMessage() {
   }
 
   const counselorUsername = selectedCounselor.split("@")[0];
+
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
 
   messages.push({
