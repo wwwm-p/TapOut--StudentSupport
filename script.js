@@ -2,9 +2,9 @@ let selectedReason = "";
 let selectedUrgency = "";
 let selectedCounselor = "";
 
-function goToPage(pageId) {
+function goToPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(pageId).classList.add("active");
+  document.getElementById(id).classList.add("active");
 }
 
 function chooseReason(reason) {
@@ -17,13 +17,8 @@ function chooseUrgency(urgency) {
   goToPage("page3");
 }
 
-function openModal(counselorEmail) {
-  if (!selectedReason || !selectedUrgency) {
-    alert("Please complete all steps first.");
-    return;
-  }
-
-  selectedCounselor = counselorEmail;
+function openModal(email) {
+  selectedCounselor = email.split("@")[0];
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
@@ -42,23 +37,21 @@ function submitMessage() {
     return;
   }
 
-  const counselorUsername = selectedCounselor.split("@")[0];
-
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
 
   messages.push({
     firstName,
     lastName,
     grade,
+    notes,
     reason: selectedReason,
     urgency: selectedUrgency,
-    notes,
-    counselor: counselorUsername,
+    counselor: selectedCounselor,
     time: new Date().toLocaleString()
   });
 
   localStorage.setItem("studentMessages", JSON.stringify(messages));
-
   alert("Your message has been sent.");
   location.reload();
 }
+
