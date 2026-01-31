@@ -1,158 +1,494 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Support</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TapOut – Counselor Dashboard</title>
+<style>
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #fffcf5;
+}
 
-  <style>
-    /* MODAL OVERLAY */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
+/* ---------- LOGIN ---------- */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    /* MODAL BOX */
-    .modal {
-      background: #ffffff;
-      padding: 28px;
-      width: 380px;
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-      text-align: left;
-    }
+.login-box {
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 400px;
+}
 
-    .modal h2 {
-      margin: 0 0 18px;
-      font-size: 22px;
-      text-align: center;
-    }
+.login-box label { font-weight: bold; margin-top: 15px; display: block; }
 
-    .modal label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
+.login-box input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 
-    .modal input,
-    .modal textarea {
-      width: 100%;
-      padding: 10px 12px;
-      margin-bottom: 14px;
-      font-size: 14px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
+.login-box button {
+  margin-top: 25px;
+  float: right;
+  padding: 10px 25px;
+  font-size: 16px;
+  background: #0070c9;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    .modal textarea {
-      resize: none;
-      height: 90px;
-    }
+/* ---------- DASHBOARD ---------- */
+#dashboardScreen { display: none; }
 
-    .modal-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
+.dashboard-header {
+  background: #87CEFA;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .modal-buttons button {
-      padding: 10px 18px;
-      font-size: 14px;
-      border-radius: 20px;
-      cursor: pointer;
-      border: none;
-    }
+.dashboard-title { font-size: 22px; font-weight: bold; }
 
-    .cancel-btn {
-      background: #eee;
-      color: #333;
-    }
+.header-right { display: flex; align-items: center; gap: 10px; }
 
-    .submit-btn {
-      background: #0070c9;
-      color: white;
-    }
+.header-right input { width: 260px; padding: 10px; font-size: 16px; }
 
-    .submit-btn:hover {
-      background: #005fa8;
-    }
-  </style>
+/* ---------- BUTTONS ---------- */
+.calendar-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #0070c9;
+  background: #fff;
+  color: #0070c9;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.calendar-btn:hover { background: #0070c9; color: white; }
+
+.bell-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
+  display: none;
+}
+
+.bell-dropdown {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  width: 260px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  z-index: 1000;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.bell-dropdown div {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.bell-dropdown div:last-child { border-bottom: none; }
+.bell-dropdown div:hover { background: #f1f1f1; }
+
+/* ---------- PROFILE BUBBLE ---------- */
+.profile-bubble {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #0070c9;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ---------- URGENCY ROWS ---------- */
+.urgency-row {
+  display: flex;
+  gap: 16px;
+  margin: 20px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  border-left: 6px solid;
+}
+
+#red-row { border-color: red; }
+#orange-row { border-color: orange; }
+#yellow-row { border-color: gold; }
+#green-row { border-color: green; }
+
+.urgency-left { min-width: 160px; display: flex; flex-direction: column; gap: 10px; }
+.urgency-header { display: flex; align-items: center; gap: 10px; }
+.messages { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.message-card {
+  width: 220px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  line-height: 1.3;
+}
+
+.face { width: 40px; height: 40px; border-radius: 50%; position: relative; }
+.eye { width: 5px; height: 5px; background: black; border-radius: 50%; position: absolute; top: 12px; }
+.eye.left { left: 11px; }
+.eye.right { right: 11px; }
+.mouth { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: 18px; height: 10px; border: 3px solid black; border-color: black transparent transparent transparent; border-radius: 50%; }
+.sad .mouth { transform: translateX(-50%) rotate(180deg); }
+.neutral .mouth { border: none; height: 3px; background: black; width: 18px; }
+
+.red-face { background: red; }
+.orange-face { background: orange; }
+.yellow-face { background: gold; }
+.green-face { background: green; }
+
+.toggle-btn {
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: 2px solid #0070c9;
+  background: #fff;
+  color: #0070c9;
+  cursor: pointer;
+}
+
+/* ---------- CALENDAR ---------- */
+.calendar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.calendar-box {
+  background: white;
+  padding: 20px;
+  width: 420px;
+  border-radius: 14px;
+  position: relative;
+}
+
+.calendar-box h3 { margin: 0; text-align: center; }
+.close-calendar {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.calendar-day {
+  background: #f1f1f1;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; }
+.red { background: red; }
+.orange { background: orange; }
+.yellow { background: gold; }
+.green { background: green; }
+
+</style>
 </head>
-
 <body>
 
-<!-- PAGE 1 -->
-<div class="page active" id="page1">
-  <img src="page1.png">
-  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
-  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
-  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
-  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
-  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
-  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
-  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
-  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
+<!-- LOGIN -->
+<div id="loginScreen" class="login-wrapper">
+  <form id="loginForm" class="login-box">
+    <label>Username</label>
+    <input id="username" required>
+    <label>Password</label>
+    <input id="password" type="password" required>
+    <button type="submit">Sign In</button>
+  </form>
 </div>
 
-<!-- PAGE 2 -->
-<div class="page" id="page2">
-  <img src="page2.png">
-  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
-  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
-  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
-  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
-  <button class="back-button" onclick="goToPage('page1')">Back</button>
-</div>
-
-<!-- PAGE 3 -->
-<div class="page" id="page3">
-  <img src="page3.png">
-  <div class="counselor-grid">
-    <button onclick="openModal('miap2k10@gmail.com')">miap2k10@gmail.com</button>
-    <button onclick="openModal('kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
-    <button onclick="openModal('gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
-    <button onclick="openModal('apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
-    <button onclick="openModal('aturner@smpanthers.org')">aturner@smpanthers.org</button>
-    <button onclick="openModal('cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
-  </div>
-  <button class="back-button" onclick="goToPage('page2')">Back</button>
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h2>Submit Message</h2>
-
-    <label>First Name *</label>
-    <input type="text" id="firstName">
-
-    <label>Last Name *</label>
-    <input type="text" id="lastName">
-
-    <label>Grade *</label>
-    <input type="text" id="studentGrade">
-
-    <label>Additional Notes (optional)</label>
-    <textarea id="extraNotes"></textarea>
-
-    <div class="modal-buttons">
-      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
-      <button class="submit-btn" onclick="submitMessage()">Submit</button>
+<!-- DASHBOARD -->
+<div id="dashboardScreen">
+  <header class="dashboard-header">
+    <div class="dashboard-title">TapOut – Counselor Dashboard</div>
+    <div class="header-right">
+      <input id="searchBar" placeholder="Search students...">
+      <button class="calendar-btn" onclick="openCalendar()">📅</button>
+      <div style="position: relative;">
+        <button class="calendar-btn" id="notifBell">🔔
+          <span class="bell-dot" id="bellDot"></span>
+        </button>
+        <div class="bell-dropdown" id="bellDropdown"></div>
+      </div>
+      <div class="profile-bubble" id="profileBubble" onclick="logout()"></div>
     </div>
+  </header>
+
+  <!-- URGENCY ROWS -->
+  <div class="urgency-row" id="red-row">
+    <div class="urgency-left">
+      <div class="urgency-header">
+        <div class="face red-face sad">
+          <div class="eye left"></div><div class="eye right"></div>
+          <div class="mouth"></div>
+        </div>
+        <h2>High Urgency</h2>
+      </div>
+      <button class="toggle-btn" onclick="toggleMessages('red-row')">Hide Messages</button>
+    </div>
+    <div class="messages"></div>
+  </div>
+
+  <div class="urgency-row" id="orange-row">
+    <div class="urgency-left">
+      <div class="urgency-header">
+        <div class="face orange-face sad">
+          <div class="eye left"></div><div class="eye right"></div>
+          <div class="mouth"></div>
+        </div>
+        <h2>Medium-High</h2>
+      </div>
+      <button class="toggle-btn" onclick="toggleMessages('orange-row')">Hide Messages</button>
+    </div>
+    <div class="messages"></div>
+  </div>
+
+  <div class="urgency-row" id="yellow-row">
+    <div class="urgency-left">
+      <div class="urgency-header">
+        <div class="face yellow-face neutral">
+          <div class="eye left"></div><div class="eye right"></div>
+          <div class="mouth"></div>
+        </div>
+        <h2>Medium-Low</h2>
+      </div>
+      <button class="toggle-btn" onclick="toggleMessages('yellow-row')">Hide Messages</button>
+    </div>
+    <div class="messages"></div>
+  </div>
+
+  <div class="urgency-row" id="green-row">
+    <div class="urgency-left">
+      <div class="urgency-header">
+        <div class="face green-face">
+          <div class="eye left"></div><div class="eye right"></div>
+          <div class="mouth"></div>
+        </div>
+        <h2>Low Urgency</h2>
+      </div>
+      <button class="toggle-btn" onclick="toggleMessages('green-row')">Hide Messages</button>
+    </div>
+    <div class="messages"></div>
   </div>
 </div>
 
-<script src="script.js"></script>
+<!-- CALENDAR -->
+<div class="calendar-overlay" id="calendarOverlay">
+  <div class="calendar-box">
+    <span class="close-calendar" onclick="closeCalendar()">✖</span>
+    <h3 id="monthLabel"></h3>
+    <div class="calendar-grid" id="calendarGrid"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- LOGIN ---------- */
+const counselors = { miap2k10:"1234", kmcconnell:"1234", gsorbi:"1234", apanlilio:"1234", aturner:"1234", cfilson:"1234" };
+
+loginForm.onsubmit = e => {
+  e.preventDefault();
+  if(counselors[username.value]===password.value){
+    localStorage.setItem("loggedInCounselor", username.value);
+    showDashboard();
+  } else alert("Invalid login");
+};
+
+function showDashboard(){
+  loginScreen.style.display="none";
+  dashboardScreen.style.display="block";
+  profileBubble.textContent = localStorage.getItem("loggedInCounselor").slice(0,2).toUpperCase();
+  loadMessages();
+  checkNotifications();
+}
+
+function logout(){ localStorage.removeItem("loggedInCounselor"); location.reload(); }
+
+/* ---------- CALENDAR ---------- */
+const today = new Date();
+const calendarOverlay = document.getElementById("calendarOverlay");
+const calendarGrid = document.getElementById("calendarGrid");
+const monthLabel = document.getElementById("monthLabel");
+
+function openCalendar(){ calendarOverlay.style.display="flex"; renderCalendar(); }
+function closeCalendar(){ calendarOverlay.style.display="none"; }
+
+function renderCalendar(){
+  calendarGrid.innerHTML="";
+  const y=today.getFullYear(), m=today.getMonth();
+  monthLabel.textContent = today.toLocaleString("default",{month:"long",year:"numeric"});
+  const appts = JSON.parse(localStorage.getItem("appointments")||"[]");
+
+  for(let d=1; d<=new Date(y,m+1,0).getDate(); d++){
+    const key=`${y}-${m}-${d}`;
+    const cell = document.createElement("div");
+    cell.className="calendar-day";
+    cell.innerHTML=`<strong>${d}</strong>`;
+    appts.filter(a=>a.date===key).forEach(a=>{
+      const dot = document.createElement("div");
+      dot.className = `dot ${a.urgency}`;
+      cell.appendChild(dot);
+    });
+    cell.onclick = () => addAppt(key);
+    calendarGrid.appendChild(cell);
+  }
+}
+
+function addAppt(date){
+  const urgency = prompt("Urgency (red/orange/yellow/green)");
+  if(!urgency) return;
+  const appts = JSON.parse(localStorage.getItem("appointments")||"[]");
+  appts.push({date,urgency});
+  localStorage.setItem("appointments",JSON.stringify(appts));
+  renderCalendar();
+  checkNotifications();
+}
+
+/* ---------- MESSAGES ---------- */
+function loadMessages(){
+  document.querySelectorAll(".messages").forEach(m=>m.innerHTML="");
+  const counselor = localStorage.getItem("loggedInCounselor");
+  const data = JSON.parse(localStorage.getItem("studentMessages")||"[]");
+
+  const map = {"I’m in Crisis":"red-row","I’m Not Coping Well":"orange-row","Feeling a Little Off":"yellow-row","I’m Doing Fine – Just Curious":"green-row"};
+
+  data.forEach(m=>{
+    if(m.counselor !== counselor) return;
+
+    const rowId = map[m.urgency] || "green-row";
+    const card = document.createElement("div");
+    card.className = "message-card";
+
+    const dateTime = m.dateTime ? `📅 ${m.dateTime}` : "";
+    const notes = m.notes ? `<br><em>Notes: ${m.notes}</em>` : "";
+
+    card.innerHTML = `
+      <strong>${m.firstName} ${m.lastName}</strong><br>
+      Grade: ${m.grade}<br>
+      ${m.reason}<br>
+      ${dateTime}
+      ${notes}
+    `;
+    document.querySelector(`#${rowId} .messages`).appendChild(card);
+  });
+}
+
+/* ---------- SEARCH ---------- */
+searchBar.oninput = () => {
+  const q = searchBar.value.toLowerCase();
+  document.querySelectorAll(".message-card").forEach(c => c.style.display = c.textContent.toLowerCase().includes(q)?"block":"none");
+};
+
+/* ---------- TOGGLE ---------- */
+function toggleMessages(id){
+  const box=document.querySelector(`#${id} .messages`);
+  const btn=document.querySelector(`#${id} .toggle-btn`);
+  const hide = box.style.display!=="none";
+  box.style.display = hide?"none":"flex";
+  btn.textContent = hide?"Show Messages":"Hide Messages";
+}
+
+/* ---------- BELL ---------- */
+const bellDot = document.getElementById("bellDot");
+const bellDropdown = document.getElementById("bellDropdown");
+const notifBell = document.getElementById("notifBell");
+
+function checkNotifications(){
+  const counselor = localStorage.getItem("loggedInCounselor");
+  const students = JSON.parse(localStorage.getItem("studentMessages")||"[]");
+  const appointments = JSON.parse(localStorage.getItem("appointments")||"[]");
+
+  const crisisStudents = students.filter(s=>s.counselor===counselor && s.urgency==="I’m in Crisis");
+  const todayDate = new Date();
+  const todayKey = `${todayDate.getFullYear()}-${todayDate.getMonth()}-${todayDate.getDate()}`;
+  const apptToday = appointments.filter(a=>a.date===todayKey);
+
+  if(crisisStudents.length || apptToday.length){ bellDot.style.display="block"; }
+  else { bellDot.style.display="none"; }
+
+  // Fill dropdown
+  bellDropdown.innerHTML="";
+  crisisStudents.forEach(s=>{
+    const div = document.createElement("div");
+    div.innerHTML = `<strong>Student in Crisis:</strong> ${s.firstName} ${s.lastName}<br>${s.reason}<br>${s.dateTime||""}${s.notes ? "<br><em>Notes: "+s.notes+"</em>":""}`;
+    bellDropdown.appendChild(div);
+  });
+  apptToday.forEach(a=>{
+    const div = document.createElement("div");
+    div.textContent = `Appointment today`;
+    bellDropdown.appendChild(div);
+  });
+}
+
+// Toggle dropdown
+notifBell.onclick = () => {
+  if(bellDropdown.style.display==="flex"){ bellDropdown.style.display="none"; }
+  else { bellDropdown.style.display="flex"; bellDot.style.display="none"; }
+}
+
+setInterval(checkNotifications,5000);
+
+/* ---------- INITIAL ---------- */
+window.onload = ()=>{ if(localStorage.getItem("loggedInCounselor")) showDashboard(); }
+</script>
 </body>
 </html>
+
 
 
 
