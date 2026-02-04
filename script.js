@@ -38,7 +38,6 @@ function submitMessage() {
   }
 
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
-  const sentAt = new Date().toLocaleString();
 
   messages.push({
     firstName,
@@ -48,7 +47,7 @@ function submitMessage() {
     reason: selectedReason,
     urgency: selectedUrgency,
     counselor: selectedCounselor,
-    dateTime: sentAt
+    time: new Date().toLocaleString()
   });
 
   localStorage.setItem("studentMessages", JSON.stringify(messages));
