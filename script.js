@@ -38,6 +38,7 @@ function submitMessage() {
   }
 
   const messages = JSON.parse(localStorage.getItem("studentMessages") || "[]");
+  const sentAt = new Date().toLocaleString();
 
   messages.push({
     firstName,
@@ -47,11 +48,13 @@ function submitMessage() {
     reason: selectedReason,
     urgency: selectedUrgency,
     counselor: selectedCounselor,
-    time: new Date().toLocaleString()
+    dateTime: sentAt, // counselor uses this
+    time: sentAt      // optional: keeps old key too
   });
 
   localStorage.setItem("studentMessages", JSON.stringify(messages));
   alert("Your message has been sent.");
   location.reload();
 }
+
 
