@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* MODAL (clean + modern) */
+    /* MODAL (modern + centered) */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -21,63 +21,40 @@
 
     .modal {
       background: #ffffff;
-      padding: 24px;
-      width: 380px;
-      border-radius: 16px;
-      text-align: left;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-      border: 1px solid #f0f0f0;
+      padding: 28px 26px;
+      width: 360px;
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+      border: 1px solid #eef2f7;
     }
 
-    .modal-header {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:12px;
-    }
-
-    .modal-header h2 {
-      margin:0;
-      font-size:20px;
-    }
-
-    .modal-close {
-      background: #f2f4f7;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .field-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: #555;
-      margin-top: 8px;
-      display:block;
+    .modal h2 {
+      margin: 0 0 14px 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
     }
 
     .modal input,
     .modal textarea {
       width: 100%;
-      padding: 10px 12px;
-      margin-top: 4px;
-      margin-bottom: 10px;
+      padding: 11px 12px;
+      margin-bottom: 12px;
       font-size: 14px;
-      border-radius: 10px;
-      border: 1px solid #e6e6e6;
-      background: #fafafa;
+      border-radius: 12px;
+      border: 1px solid #e6e8ec;
+      background: #f9fafb;
+      text-align: center;
       transition: border 0.2s ease, box-shadow 0.2s ease;
     }
 
     .modal input:focus,
     .modal textarea:focus {
-      outline:none;
-      border:1px solid #0070c9;
-      box-shadow:0 0 0 3px rgba(0,112,201,0.2);
-      background:#fff;
+      outline: none;
+      border: 1px solid #0070c9;
+      box-shadow: 0 0 0 3px rgba(0,112,201,0.2);
+      background: #ffffff;
     }
 
     .modal textarea {
@@ -87,26 +64,27 @@
 
     .modal-buttons {
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 12px;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 6px;
     }
 
-    .btn-secondary {
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid #e0e0e0;
-      background: #f7f7f7;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      padding: 8px 18px;
+    .modal-buttons button {
+      padding: 9px 18px;
       border-radius: 999px;
       border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .modal-buttons button:first-child {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .modal-buttons button:last-child {
       background: #0070c9;
       color: white;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -158,26 +136,16 @@
   <!-- MODAL -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <div class="modal-header">
-        <h2>Submit Message</h2>
-        <button class="modal-close" onclick="closeModal()">✕</button>
-      </div>
+      <h2>Submit Message</h2>
 
-      <label class="field-label">First Name</label>
-      <input type="text" id="firstName" placeholder="Required">
-
-      <label class="field-label">Last Name</label>
-      <input type="text" id="lastName" placeholder="Required">
-
-      <label class="field-label">Grade</label>
-      <input type="text" id="studentGrade" placeholder="Required">
-
-      <label class="field-label">Additional Notes</label>
-      <textarea id="extraNotes" placeholder="Optional"></textarea>
+      <input type="text" id="firstName" placeholder="First Name (required)">
+      <input type="text" id="lastName" placeholder="Last Name (required)">
+      <input type="text" id="studentGrade" placeholder="Grade (required)">
+      <textarea id="extraNotes" placeholder="Additional notes (optional)"></textarea>
 
       <div class="modal-buttons">
-        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-        <button class="btn-primary" onclick="submitMessage()">Submit</button>
+        <button onclick="closeModal()">Cancel</button>
+        <button onclick="submitMessage()">Submit</button>
       </div>
     </div>
   </div>
@@ -186,6 +154,7 @@
 
 </body>
 </html>
+
 
 
 
