@@ -207,12 +207,12 @@
     <img src="page3.png" alt="Counselor Page">
 
     <div class="counselor-grid">
-      <button onclick="openModal('miap2k10@gmail.com')">miap2k10@gmail.com</button>
-      <button onclick="openModal('kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
-      <button onclick="openModal('gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
-      <button onclick="openModal('apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
-      <button onclick="openModal('aturner@smpanthers.org')">aturner@smpanthers.org</button>
-      <button onclick="openModal('cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
+      <button onclick="openModal('miap2k10','miap2k10@gmail.com')">miap2k10@gmail.com</button>
+      <button onclick="openModal('kmcconnell','kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
+      <button onclick="openModal('gsorbi','gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
+      <button onclick="openModal('apanlilio','apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
+      <button onclick="openModal('aturner','aturner@smpanthers.org')">aturner@smpanthers.org</button>
+      <button onclick="openModal('cfilson','cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
     </div>
 
     <button class="back-button" onclick="goToPage('page2')">Back</button>
@@ -223,36 +223,27 @@
     <div class="modal crisis-modal">
       <h2>Immediate Support</h2>
       <ul class="crisis-list">
-        <li class="crisis-section">
-          <strong>Emergency</strong>
-          911 – Emergency services (police / ambulance / fire) for life-threatening crises.
-        </li>
-        <li class="crisis-section">
-          <strong>Mental Health & Crisis Support</strong>
+        <li class="crisis-section"><strong>Emergency</strong>911 – Emergency services (police / ambulance / fire) for life-threatening crises.</li>
+        <li class="crisis-section"><strong>Mental Health & Crisis Support</strong>
           988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
           National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
           Crisis Text Line – Text HOME to 741741 (24/7).
         </li>
-        <li class="crisis-section">
-          <strong>Eating Disorder Support</strong>
+        <li class="crisis-section"><strong>Eating Disorder Support</strong>
           National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
           Text NEDA to 741741.
         </li>
-        <li class="crisis-section">
-          <strong>Domestic Violence Support</strong>
+        <li class="crisis-section"><strong>Domestic Violence Support</strong>
           National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
           Text START to 88788.
         </li>
-        <li class="crisis-section">
-          <strong>Sexual Assault Support</strong>
+        <li class="crisis-section"><strong>Sexual Assault Support</strong>
           RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
         </li>
-        <li class="crisis-section">
-          <strong>Substance Abuse & Addiction Support</strong>
+        <li class="crisis-section"><strong>Substance Abuse & Addiction Support</strong>
           SAMHSA National Helpline – 1-800-662-HELP (4357).
         </li>
-        <li class="crisis-section">
-          <strong>LGBTQ Youth Support</strong>
+        <li class="crisis-section"><strong>LGBTQ Youth Support</strong>
           The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
         </li>
       </ul>
@@ -296,6 +287,7 @@
     let selectedReason = null;
     let selectedUrgency = null;
     let selectedCounselor = null;
+    let selectedCounselorEmail = null;
 
     function goToPage(id){
       document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -329,8 +321,9 @@
       goToPage("page3");
     }
 
-    function openModal(counselor){
-      selectedCounselor = counselor;
+    function openModal(counselorUsername, counselorEmail){
+      selectedCounselor = counselorUsername;
+      selectedCounselorEmail = counselorEmail;
       document.getElementById("modalOverlay").style.display = "flex";
     }
 
@@ -371,6 +364,7 @@
         urgency: selectedUrgency,
         notes,
         counselor: selectedCounselor,
+        counselorEmail: selectedCounselorEmail,
         dateTime: new Date().toLocaleString()
       };
 
@@ -383,4 +377,5 @@
   </script>
 </body>
 </html>
+
 
