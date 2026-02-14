@@ -232,6 +232,7 @@
       <input type="text" id="firstName" placeholder="First Name (required)">
       <input type="text" id="lastName" placeholder="Last Name (required)">
       <input type="text" id="studentGrade" placeholder="Grade (required)">
+      <input type="text" id="studentId" placeholder="Student ID (required)">
       <textarea id="extraNotes" placeholder="Additional notes (optional)"></textarea>
 
       <div class="modal-buttons">
@@ -291,10 +292,15 @@
       const firstName = document.getElementById("firstName").value.trim();
       const lastName = document.getElementById("lastName").value.trim();
       const grade = document.getElementById("studentGrade").value.trim();
+      const studentId = document.getElementById("studentId").value.trim();
       const notes = document.getElementById("extraNotes").value.trim();
 
-      if(!firstName || !lastName || !grade){
+      if(!firstName || !lastName || !grade || !studentId){
         alert("Please fill in required fields.");
+        return;
+      }
+      if(studentId !== "12345"){
+        alert("Student ID not recognized. Please check and try again.");
         return;
       }
 
@@ -319,4 +325,3 @@
   </script>
 </body>
 </html>
-
