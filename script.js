@@ -3,6 +3,9 @@ let selectedUrgency = "";
 let selectedCounselor = "";
 let selectedCounselorEmail = "";
 
+// --------------------------
+// Page Navigation
+// --------------------------
 function goToPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const page = document.getElementById(id);
@@ -23,6 +26,9 @@ function chooseUrgency(urgency) {
   }
 }
 
+// --------------------------
+// Modals
+// --------------------------
 function openCrisisModal() {
   const overlay = document.getElementById("crisisOverlay");
   if (overlay) overlay.style.display = "flex";
@@ -61,19 +67,51 @@ function closeSuccess() {
   goToPage("page1");
 }
 
+// --------------------------
+// Fetch & Populate Counselor Dropdown
+// --------------------------
+async function updateCounselorDropdown() {
+  try {
+    const res = await fetch("/api/counselors");
+    const counselors = await res.json(); // Array of { name, email, username }
+
+    const dropdown = document.getElementById("counselorSelect"); // change to your select ID
+    if (!dropdown) return;
+    const current = selectedCounselor;
+    dropdown.innerHTML = "";
+
+    counselors.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.username;
+      opt.textContent = c.name;
+      if (c.username === current) opt.selected = true;
+      dropdown.appendChild(opt);
+    });
+  } catch (err) {
+    console.error("Failed to load counselors", err);
+  }
+}
+
+// Call this periodically to sync with admin changes
+setInterval(updateCounselorDropdown, 5000);
+
+// --------------------------
+// Message Submission
+// --------------------------
 async function submitMessage() {
   const firstName = document.getElementById("firstName")?.value.trim();
   const lastName = document.getElementById("lastName")?.value.trim();
   const grade = document.getElementById("studentGrade")?.value.trim();
   const studentId = document.getElementById("studentId")?.value.trim();
   const notes = document.getElementById("extraNotes")?.value.trim();
+  const counselorSelect = document.getElementById("counselorSelect");
+  selectedCounselor = counselorSelect ? counselorSelect.value : selectedCounselor;
 
-  if (!firstName || !lastName || !grade || !studentId) {
+  if (!firstName || !lastName || !grade || !studentId || !selectedCounselor) {
     alert("Please fill in all required fields.");
     return;
   }
 
-  // ✅ Verify student with SIS
   try {
     const res = await fetch("/api/verifyStudent", {
       method: "POST",
@@ -100,11 +138,9 @@ async function submitMessage() {
     reason: selectedReason,
     urgency: selectedUrgency,
     counselor: selectedCounselor,
-    counselorEmail: selectedCounselorEmail,
     dateTime: new Date().toISOString()
   };
 
-  // ✅ Submit message to SIS
   try {
     const res = await fetch("/api/messages", {
       method: "POST",
@@ -114,25 +150,27 @@ async function submitMessage() {
     const data = await res.json();
     if (!data.success) throw new Error("Failed to submit message");
 
-    // Optional local copy for testing
-    const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
-    existing.push(entry);
-    localStorage.setItem("studentMessages", JSON.stringify(existing));
-
     closeModal();
     openSuccess();
 
-    // Reset form for next submission
+    // Reset form
     selectedReason = "";
     selectedUrgency = "";
     selectedCounselor = "";
-    selectedCounselorEmail = "";
     ["firstName", "lastName", "studentGrade", "studentId", "extraNotes"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
+
   } catch (err) {
     console.error(err);
     alert("Failed to send message. Check your network.");
   }
 }
+
+// --------------------------
+// Init
+// --------------------------
+window.onload = async () => {
+  await updateCounselorDropdown(); // populate on load
+};
