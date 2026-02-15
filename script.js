@@ -54,7 +54,7 @@ function closeSuccess() {
   goToPage("page1");
 }
 
-function submitMessage() {
+async function submitMessage() {
   const firstName = document.getElementById("firstName").value.trim();
   const lastName = document.getElementById("lastName").value.trim();
   const grade = document.getElementById("studentGrade").value.trim();
@@ -67,13 +67,25 @@ function submitMessage() {
     return;
   }
 
-  // ✅ Placeholder Student ID check (pre-SIS integration)
-  // Later replace with live SIS verification
-  if (!["12345", "23456", "34567"].includes(studentId)) {
-    alert("Student ID not recognized. Please check and try again.");
+  // ✅ Replace with SIS verification if needed
+  try {
+    const res = await fetch("/api/verifyStudent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentId, firstName, lastName })
+    });
+    const verify = await res.json();
+    if (!verify.valid) {
+      alert("Student ID not recognized. Please check and try again.");
+      return;
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Failed to verify student ID. Check your network.");
     return;
   }
 
+  // Build message payload
   const entry = {
     firstName,
     lastName,
@@ -84,25 +96,39 @@ function submitMessage() {
     urgency: selectedUrgency,
     counselor: selectedCounselor,
     counselorEmail: selectedCounselorEmail,
-    dateTime: new Date().toLocaleString() // ✅ exact timestamp
+    dateTime: new Date().toISOString() // exact timestamp for SIS
   };
 
-  // Save to localStorage
-  const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
-  existing.push(entry);
-  localStorage.setItem("studentMessages", JSON.stringify(existing));
+  // Send to SIS
+  try {
+    const res = await fetch("/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry)
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error("Failed to submit message");
 
-  closeModal();
-  openSuccess();
+    // ✅ Optional: keep local copy for offline caching
+    const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
+    existing.push(entry);
+    localStorage.setItem("studentMessages", JSON.stringify(existing));
 
-  // Optional: reset selections for new submission
-  selectedReason = "";
-  selectedUrgency = "";
-  selectedCounselor = "";
-  selectedCounselorEmail = "";
-  document.getElementById("firstName").value = "";
-  document.getElementById("lastName").value = "";
-  document.getElementById("studentGrade").value = "";
-  document.getElementById("studentId").value = "";
-  document.getElementById("extraNotes").value = "";
+    closeModal();
+    openSuccess();
+
+    // Reset selections
+    selectedReason = "";
+    selectedUrgency = "";
+    selectedCounselor = "";
+    selectedCounselorEmail = "";
+    document.getElementById("firstName").value = "";
+    document.getElementById("lastName").value = "";
+    document.getElementById("studentGrade").value = "";
+    document.getElementById("studentId").value = "";
+    document.getElementById("extraNotes").value = "";
+  } catch (err) {
+    console.error(err);
+    alert("Failed to send message. Check your network.");
+  }
 }
