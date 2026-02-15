@@ -6,7 +6,7 @@ let selectedCounselorEmail = "";
 function goToPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const page = document.getElementById(id);
-  if(page) page.classList.add("active");  // ✅ make sure page exists
+  if (page) page.classList.add("active");
 }
 
 function chooseReason(reason) {
@@ -25,12 +25,12 @@ function chooseUrgency(urgency) {
 
 function openCrisisModal() {
   const overlay = document.getElementById("crisisOverlay");
-  if(overlay) overlay.style.display = "flex";
+  if (overlay) overlay.style.display = "flex";
 }
 
 function closeCrisisModal() {
   const overlay = document.getElementById("crisisOverlay");
-  if(overlay) overlay.style.display = "none";
+  if (overlay) overlay.style.display = "none";
 }
 
 function continueFromCrisis() {
@@ -42,22 +42,22 @@ function openModal(counselorUsername, counselorEmail) {
   selectedCounselor = counselorUsername;
   selectedCounselorEmail = counselorEmail;
   const overlay = document.getElementById("modalOverlay");
-  if(overlay) overlay.style.display = "flex";
+  if (overlay) overlay.style.display = "flex";
 }
 
 function closeModal() {
   const overlay = document.getElementById("modalOverlay");
-  if(overlay) overlay.style.display = "none";
+  if (overlay) overlay.style.display = "none";
 }
 
 function openSuccess() {
   const overlay = document.getElementById("successOverlay");
-  if(overlay) overlay.style.display = "flex";
+  if (overlay) overlay.style.display = "flex";
 }
 
 function closeSuccess() {
   const overlay = document.getElementById("successOverlay");
-  if(overlay) overlay.style.display = "none";
+  if (overlay) overlay.style.display = "none";
   goToPage("page1");
 }
 
@@ -73,7 +73,7 @@ async function submitMessage() {
     return;
   }
 
-  // ✅ SIS verification
+  // ✅ Verify student with SIS
   try {
     const res = await fetch("/api/verifyStudent", {
       method: "POST",
@@ -104,6 +104,7 @@ async function submitMessage() {
     dateTime: new Date().toISOString()
   };
 
+  // ✅ Submit message to SIS
   try {
     const res = await fetch("/api/messages", {
       method: "POST",
@@ -113,7 +114,7 @@ async function submitMessage() {
     const data = await res.json();
     if (!data.success) throw new Error("Failed to submit message");
 
-    // Optional: local copy
+    // Optional local copy for testing
     const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
     existing.push(entry);
     localStorage.setItem("studentMessages", JSON.stringify(existing));
@@ -121,14 +122,14 @@ async function submitMessage() {
     closeModal();
     openSuccess();
 
-    // ✅ Reset form but keep page structure intact
+    // Reset form for next submission
     selectedReason = "";
     selectedUrgency = "";
     selectedCounselor = "";
     selectedCounselorEmail = "";
-    ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{
+    ["firstName", "lastName", "studentGrade", "studentId", "extraNotes"].forEach(id => {
       const el = document.getElementById(id);
-      if(el) el.value = "";
+      if (el) el.value = "";
     });
   } catch (err) {
     console.error(err);
