@@ -5,7 +5,8 @@ let selectedCounselorEmail = "";
 
 function goToPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  const page = document.getElementById(id);
+  if(page) page.classList.add("active");  // ✅ make sure page exists
 }
 
 function chooseReason(reason) {
@@ -23,11 +24,13 @@ function chooseUrgency(urgency) {
 }
 
 function openCrisisModal() {
-  document.getElementById("crisisOverlay").style.display = "flex";
+  const overlay = document.getElementById("crisisOverlay");
+  if(overlay) overlay.style.display = "flex";
 }
 
 function closeCrisisModal() {
-  document.getElementById("crisisOverlay").style.display = "none";
+  const overlay = document.getElementById("crisisOverlay");
+  if(overlay) overlay.style.display = "none";
 }
 
 function continueFromCrisis() {
@@ -38,36 +41,39 @@ function continueFromCrisis() {
 function openModal(counselorUsername, counselorEmail) {
   selectedCounselor = counselorUsername;
   selectedCounselorEmail = counselorEmail;
-  document.getElementById("modalOverlay").style.display = "flex";
+  const overlay = document.getElementById("modalOverlay");
+  if(overlay) overlay.style.display = "flex";
 }
 
 function closeModal() {
-  document.getElementById("modalOverlay").style.display = "none";
+  const overlay = document.getElementById("modalOverlay");
+  if(overlay) overlay.style.display = "none";
 }
 
 function openSuccess() {
-  document.getElementById("successOverlay").style.display = "flex";
+  const overlay = document.getElementById("successOverlay");
+  if(overlay) overlay.style.display = "flex";
 }
 
 function closeSuccess() {
-  document.getElementById("successOverlay").style.display = "none";
+  const overlay = document.getElementById("successOverlay");
+  if(overlay) overlay.style.display = "none";
   goToPage("page1");
 }
 
 async function submitMessage() {
-  const firstName = document.getElementById("firstName").value.trim();
-  const lastName = document.getElementById("lastName").value.trim();
-  const grade = document.getElementById("studentGrade").value.trim();
-  const studentId = document.getElementById("studentId").value.trim();
-  const notes = document.getElementById("extraNotes").value.trim();
+  const firstName = document.getElementById("firstName")?.value.trim();
+  const lastName = document.getElementById("lastName")?.value.trim();
+  const grade = document.getElementById("studentGrade")?.value.trim();
+  const studentId = document.getElementById("studentId")?.value.trim();
+  const notes = document.getElementById("extraNotes")?.value.trim();
 
-  // Required fields validation
   if (!firstName || !lastName || !grade || !studentId) {
     alert("Please fill in all required fields.");
     return;
   }
 
-  // ✅ Replace with SIS verification if needed
+  // ✅ SIS verification
   try {
     const res = await fetch("/api/verifyStudent", {
       method: "POST",
@@ -85,7 +91,6 @@ async function submitMessage() {
     return;
   }
 
-  // Build message payload
   const entry = {
     firstName,
     lastName,
@@ -96,10 +101,9 @@ async function submitMessage() {
     urgency: selectedUrgency,
     counselor: selectedCounselor,
     counselorEmail: selectedCounselorEmail,
-    dateTime: new Date().toISOString() // exact timestamp for SIS
+    dateTime: new Date().toISOString()
   };
 
-  // Send to SIS
   try {
     const res = await fetch("/api/messages", {
       method: "POST",
@@ -109,7 +113,7 @@ async function submitMessage() {
     const data = await res.json();
     if (!data.success) throw new Error("Failed to submit message");
 
-    // ✅ Optional: keep local copy for offline caching
+    // Optional: local copy
     const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
     existing.push(entry);
     localStorage.setItem("studentMessages", JSON.stringify(existing));
@@ -117,16 +121,15 @@ async function submitMessage() {
     closeModal();
     openSuccess();
 
-    // Reset selections
+    // ✅ Reset form but keep page structure intact
     selectedReason = "";
     selectedUrgency = "";
     selectedCounselor = "";
     selectedCounselorEmail = "";
-    document.getElementById("firstName").value = "";
-    document.getElementById("lastName").value = "";
-    document.getElementById("studentGrade").value = "";
-    document.getElementById("studentId").value = "";
-    document.getElementById("extraNotes").value = "";
+    ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.value = "";
+    });
   } catch (err) {
     console.error(err);
     alert("Failed to send message. Check your network.");
