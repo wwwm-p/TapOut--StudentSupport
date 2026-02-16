@@ -3,111 +3,72 @@ let selectedUrgency = "";
 let selectedCounselor = "";
 let selectedCounselorEmail = "";
 
-// --------------------------
+// -------------------
 // Page Navigation
-// --------------------------
+// -------------------
 function goToPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const page = document.getElementById(id);
   if (page) page.classList.add("active");
 }
 
-function chooseReason(reason) {
-  selectedReason = reason;
-  goToPage("page2");
-}
-
+// -------------------
+// Reason / Urgency
+// -------------------
+function chooseReason(reason) { selectedReason = reason; goToPage("page2"); }
 function chooseUrgency(urgency) {
   selectedUrgency = urgency;
-  if (urgency === "I’m in Crisis") {
-    openCrisisModal();
-  } else {
-    goToPage("page3");
-  }
+  if (urgency === "I’m in Crisis") openCrisisModal();
+  else goToPage("page3");
 }
 
-// --------------------------
+// -------------------
 // Modals
-// --------------------------
-function openCrisisModal() {
-  const overlay = document.getElementById("crisisOverlay");
-  if (overlay) overlay.style.display = "flex";
-}
-
-function closeCrisisModal() {
-  const overlay = document.getElementById("crisisOverlay");
-  if (overlay) overlay.style.display = "none";
-}
-
-function continueFromCrisis() {
-  closeCrisisModal();
-  goToPage("page3");
-}
+// -------------------
+function openCrisisModal() { document.getElementById("crisisOverlay").style.display = "flex"; }
+function closeCrisisModal() { document.getElementById("crisisOverlay").style.display = "none"; }
+function continueFromCrisis() { closeCrisisModal(); goToPage("page3"); }
 
 function openModal(counselorUsername, counselorEmail) {
   selectedCounselor = counselorUsername;
   selectedCounselorEmail = counselorEmail;
-  const overlay = document.getElementById("modalOverlay");
-  if (overlay) overlay.style.display = "flex";
+  document.getElementById("modalOverlay").style.display = "flex";
 }
+function closeModal() { document.getElementById("modalOverlay").style.display = "none"; }
 
-function closeModal() {
-  const overlay = document.getElementById("modalOverlay");
-  if (overlay) overlay.style.display = "none";
-}
+function openSuccess() { document.getElementById("successOverlay").style.display = "flex"; }
+function closeSuccess() { document.getElementById("successOverlay").style.display = "none"; goToPage("page1"); }
 
-function openSuccess() {
-  const overlay = document.getElementById("successOverlay");
-  if (overlay) overlay.style.display = "flex";
-}
-
-function closeSuccess() {
-  const overlay = document.getElementById("successOverlay");
-  if (overlay) overlay.style.display = "none";
-  goToPage("page1");
-}
-
-// --------------------------
-// Fetch & Populate Counselor Dropdown
-// --------------------------
-async function updateCounselorDropdown() {
+// -------------------
+// Populate Counselor Dropdown
+// -------------------
+async function populateStudentCounselorDropdown(){
   try {
-    const res = await fetch("/api/counselors");
-    const counselors = await res.json(); // Array of { name, email, username }
-
-    const dropdown = document.getElementById("counselorSelect"); // change to your select ID
-    if (!dropdown) return;
-    const current = selectedCounselor;
-    dropdown.innerHTML = "";
-
-    counselors.forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c.username;
-      opt.textContent = c.name;
-      if (c.username === current) opt.selected = true;
+    const res = await fetch('/api/counselors');
+    const counselors = await res.json();
+    const dropdown = document.getElementById('studentCounselorDropdown');
+    dropdown.innerHTML = '';
+    counselors.forEach(c=>{
+      const opt = document.createElement('option');
+      opt.value = c.username; opt.textContent = c.name;
       dropdown.appendChild(opt);
     });
-  } catch (err) {
-    console.error("Failed to load counselors", err);
-  }
+    // Save a persistent copy for admin merge
+    localStorage.setItem('studentCounselors', JSON.stringify(counselors));
+  } catch(err){ console.error(err); }
 }
 
-// Call this periodically to sync with admin changes
-setInterval(updateCounselorDropdown, 5000);
-
-// --------------------------
-// Message Submission
-// --------------------------
+// -------------------
+// Submit Message
+// -------------------
 async function submitMessage() {
   const firstName = document.getElementById("firstName")?.value.trim();
   const lastName = document.getElementById("lastName")?.value.trim();
   const grade = document.getElementById("studentGrade")?.value.trim();
   const studentId = document.getElementById("studentId")?.value.trim();
   const notes = document.getElementById("extraNotes")?.value.trim();
-  const counselorSelect = document.getElementById("counselorSelect");
-  selectedCounselor = counselorSelect ? counselorSelect.value : selectedCounselor;
 
-  if (!firstName || !lastName || !grade || !studentId || !selectedCounselor) {
+  if (!firstName || !lastName || !grade || !studentId) {
     alert("Please fill in all required fields.");
     return;
   }
@@ -119,25 +80,15 @@ async function submitMessage() {
       body: JSON.stringify({ studentId, firstName, lastName })
     });
     const verify = await res.json();
-    if (!verify.valid) {
-      alert("Student ID not recognized. Please check and try again.");
-      return;
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Failed to verify student ID. Check your network.");
-    return;
-  }
+    if (!verify.valid) { alert("Student ID not recognized."); return; }
+  } catch (err) { console.error(err); alert("Failed to verify student ID."); return; }
 
   const entry = {
-    firstName,
-    lastName,
-    grade,
-    studentId,
-    notes,
+    firstName, lastName, grade, studentId, notes,
     reason: selectedReason,
     urgency: selectedUrgency,
     counselor: selectedCounselor,
+    counselorEmail: selectedCounselorEmail,
     dateTime: new Date().toISOString()
   };
 
@@ -150,27 +101,22 @@ async function submitMessage() {
     const data = await res.json();
     if (!data.success) throw new Error("Failed to submit message");
 
-    closeModal();
-    openSuccess();
+    const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
+    existing.push(entry);
+    localStorage.setItem("studentMessages", JSON.stringify(existing));
 
-    // Reset form
-    selectedReason = "";
-    selectedUrgency = "";
-    selectedCounselor = "";
-    ["firstName", "lastName", "studentGrade", "studentId", "extraNotes"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
+    closeModal(); openSuccess();
+
+    selectedReason = ""; selectedUrgency = ""; selectedCounselor = ""; selectedCounselorEmail = "";
+    ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value="";
     });
-
-  } catch (err) {
-    console.error(err);
-    alert("Failed to send message. Check your network.");
-  }
+  } catch(err){ console.error(err); alert("Failed to send message."); }
 }
 
-// --------------------------
-// Init
-// --------------------------
-window.onload = async () => {
-  await updateCounselorDropdown(); // populate on load
+// -------------------
+// INIT
+// -------------------
+window.onload = async ()=>{
+  await populateStudentCounselorDropdown();
 };
