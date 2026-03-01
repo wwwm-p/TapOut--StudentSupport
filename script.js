@@ -22,6 +22,7 @@ function chooseReason(reason) {
   selectedReason = reason; 
   goToPage("page2"); 
 }
+
 function chooseUrgency(urgency) {
   selectedUrgency = urgency;
   if (urgency === "I’m in Crisis") openCrisisModal();
@@ -40,6 +41,7 @@ function openModal(counselorUsername, counselorEmail) {
   selectedCounselorEmail = counselorEmail;
   document.getElementById("modalOverlay").style.display = "flex";
 }
+
 function closeModal() { document.getElementById("modalOverlay").style.display = "none"; }
 
 function openSuccess() { document.getElementById("successOverlay").style.display = "flex"; }
@@ -50,7 +52,8 @@ function closeSuccess() { document.getElementById("successOverlay").style.displa
 // -------------------
 async function loadCounselors() {
   const grid = document.getElementById("counselorGrid");
-  grid.innerHTML = ""; // Clear previous buttons
+  if (!grid) return; // Safety check
+  grid.innerHTML = "";
 
   let counselors = [];
   
@@ -61,19 +64,17 @@ async function loadCounselors() {
     console.warn("API not available, using fallback counselors");
   }
 
-  // Fallback if API is empty or fails
   if (!counselors || counselors.length === 0) {
     counselors = [
-      {username:"miap2k10", email:"miap2k10@gmail.com"},
-      {username:"kmcconnell", email:"kmcconnell@smpanthers.org"},
-      {username:"gsorbi", email:"gsorbi@smpanthers.org"},
-      {username:"apanlilio", email:"apanlilio@smpanthers.org"},
-      {username:"aturner", email:"aturner@smpanthers.org"},
-      {username:"cfilson", email:"cfilson@smpanthers.org"}
+      { username: "miap2k10", email: "miap2k10@gmail.com" },
+      { username: "kmcconnell", email: "kmcconnell@smpanthers.org" },
+      { username: "gsorbi", email: "gsorbi@smpanthers.org" },
+      { username: "apanlilio", email: "apanlilio@smpanthers.org" },
+      { username: "aturner", email: "aturner@smpanthers.org" },
+      { username: "cfilson", email: "cfilson@smpanthers.org" }
     ];
   }
 
-  // Create buttons
   counselors.forEach(c => {
     const btn = document.createElement("button");
     btn.textContent = c.email; // can switch to c.name if preferred
@@ -97,7 +98,9 @@ async function submitMessage() {
     return;
   }
 
-  // Verify student ID via API
+  // -------------------
+  // Verify student via API
+  // -------------------
   try {
     const res = await fetch("/api/verifyStudent", {
       method: "POST",
@@ -105,11 +108,25 @@ async function submitMessage() {
       body: JSON.stringify({ studentId, firstName, lastName })
     });
     const verify = await res.json();
-    if (!verify.valid) { alert("Student ID not recognized."); return; }
-  } catch (err) { console.error(err); alert("Failed to verify student ID."); return; }
+    if (!verify.valid) {
+      alert("Student ID not recognized.");
+      return;
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Failed to verify student ID.");
+    return;
+  }
 
+  // -------------------
+  // Submit to Neon via API
+  // -------------------
   const entry = {
-    firstName, lastName, grade, studentId, notes,
+    firstName,
+    lastName,
+    grade,
+    studentId,
+    notes,
     reason: selectedReason,
     urgency: selectedUrgency,
     counselor: selectedCounselor,
@@ -126,18 +143,27 @@ async function submitMessage() {
     const data = await res.json();
     if (!data.success) throw new Error("Failed to submit message");
 
-    // Clear form
-    closeModal(); openSuccess();
-    selectedReason = ""; selectedUrgency = ""; selectedCounselor = ""; selectedCounselorEmail = "";
-    ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{
-      const el=document.getElementById(id); if(el) el.value="";
+    closeModal();
+    openSuccess();
+
+    // Clear form fields & state
+    selectedReason = "";
+    selectedUrgency = "";
+    selectedCounselor = "";
+    selectedCounselorEmail = "";
+    ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
     });
-  } catch(err){ console.error(err); alert("Failed to send message."); }
+  } catch (err) {
+    console.error(err);
+    alert("Failed to send message.");
+  }
 }
 
 // -------------------
 // INIT
 // -------------------
 window.onload = () => {
-  loadCounselors(); // Ensures buttons exist immediately on page load
+  loadCounselors(); // Load buttons on page load
 };
