@@ -10,12 +10,18 @@ function goToPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const page = document.getElementById(id);
   if (page) page.classList.add("active");
+
+  // Load counselors dynamically when page3 opens
+  if (id === "page3") loadCounselors();
 }
 
 // -------------------
 // Reason / Urgency
 // -------------------
-function chooseReason(reason) { selectedReason = reason; goToPage("page2"); }
+function chooseReason(reason) { 
+  selectedReason = reason; 
+  goToPage("page2"); 
+}
 function chooseUrgency(urgency) {
   selectedUrgency = urgency;
   if (urgency === "I’m in Crisis") openCrisisModal();
@@ -40,22 +46,24 @@ function openSuccess() { document.getElementById("successOverlay").style.display
 function closeSuccess() { document.getElementById("successOverlay").style.display = "none"; goToPage("page1"); }
 
 // -------------------
-// Populate Counselor Dropdown
+// Load Counselors Dynamically
 // -------------------
-async function populateStudentCounselorDropdown(){
+async function loadCounselors() {
   try {
-    const res = await fetch('/api/counselors');
+    const res = await fetch("/api/counselors");
     const counselors = await res.json();
-    const dropdown = document.getElementById('studentCounselorDropdown');
-    dropdown.innerHTML = '';
-    counselors.forEach(c=>{
-      const opt = document.createElement('option');
-      opt.value = c.username; opt.textContent = c.name;
-      dropdown.appendChild(opt);
+    const grid = document.getElementById("counselorGrid");
+    grid.innerHTML = "";
+
+    counselors.forEach(c => {
+      const btn = document.createElement("button");
+      btn.textContent = c.email; // can switch to c.name if preferred
+      btn.onclick = () => openModal(c.username, c.email);
+      grid.appendChild(btn);
     });
-    // Save a persistent copy for admin merge
-    localStorage.setItem('studentCounselors', JSON.stringify(counselors));
-  } catch(err){ console.error(err); }
+  } catch(err) {
+    console.error("Failed to load counselors", err);
+  }
 }
 
 // -------------------
@@ -73,6 +81,7 @@ async function submitMessage() {
     return;
   }
 
+  // Verify student ID via API
   try {
     const res = await fetch("/api/verifyStudent", {
       method: "POST",
@@ -92,6 +101,7 @@ async function submitMessage() {
     dateTime: new Date().toISOString()
   };
 
+  // Submit message to API
   try {
     const res = await fetch("/api/messages", {
       method: "POST",
@@ -101,12 +111,8 @@ async function submitMessage() {
     const data = await res.json();
     if (!data.success) throw new Error("Failed to submit message");
 
-    const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
-    existing.push(entry);
-    localStorage.setItem("studentMessages", JSON.stringify(existing));
-
+    // Clean up form
     closeModal(); openSuccess();
-
     selectedReason = ""; selectedUrgency = ""; selectedCounselor = ""; selectedCounselorEmail = "";
     ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{
       const el=document.getElementById(id); if(el) el.value="";
@@ -117,6 +123,6 @@ async function submitMessage() {
 // -------------------
 // INIT
 // -------------------
-window.onload = async ()=>{
-  await populateStudentCounselorDropdown();
+window.onload = () => {
+  // Nothing to do on load — counselors will load dynamically when page3 is opened
 };
