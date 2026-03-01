@@ -11,7 +11,7 @@ function goToPage(id) {
   const page = document.getElementById(id);
   if (page) page.classList.add("active");
 
-  // Load counselors dynamically when page3 opens
+  // Load counselors dynamically when Page 3 opens
   if (id === "page3") loadCounselors();
 }
 
@@ -46,24 +46,40 @@ function openSuccess() { document.getElementById("successOverlay").style.display
 function closeSuccess() { document.getElementById("successOverlay").style.display = "none"; goToPage("page1"); }
 
 // -------------------
-// Load Counselors Dynamically
+// Load Counselors (dynamic fallback)
 // -------------------
 async function loadCounselors() {
+  const grid = document.getElementById("counselorGrid");
+  grid.innerHTML = ""; // Clear previous buttons
+
+  let counselors = [];
+  
   try {
     const res = await fetch("/api/counselors");
-    const counselors = await res.json();
-    const grid = document.getElementById("counselorGrid");
-    grid.innerHTML = "";
-
-    counselors.forEach(c => {
-      const btn = document.createElement("button");
-      btn.textContent = c.email; // can switch to c.name if preferred
-      btn.onclick = () => openModal(c.username, c.email);
-      grid.appendChild(btn);
-    });
-  } catch(err) {
-    console.error("Failed to load counselors", err);
+    counselors = await res.json();
+  } catch (err) {
+    console.warn("API not available, using fallback counselors");
   }
+
+  // Fallback if API is empty or fails
+  if (!counselors || counselors.length === 0) {
+    counselors = [
+      {username:"miap2k10", email:"miap2k10@gmail.com"},
+      {username:"kmcconnell", email:"kmcconnell@smpanthers.org"},
+      {username:"gsorbi", email:"gsorbi@smpanthers.org"},
+      {username:"apanlilio", email:"apanlilio@smpanthers.org"},
+      {username:"aturner", email:"aturner@smpanthers.org"},
+      {username:"cfilson", email:"cfilson@smpanthers.org"}
+    ];
+  }
+
+  // Create buttons
+  counselors.forEach(c => {
+    const btn = document.createElement("button");
+    btn.textContent = c.email; // can switch to c.name if preferred
+    btn.onclick = () => openModal(c.username, c.email);
+    grid.appendChild(btn);
+  });
 }
 
 // -------------------
@@ -101,7 +117,6 @@ async function submitMessage() {
     dateTime: new Date().toISOString()
   };
 
-  // Submit message to API
   try {
     const res = await fetch("/api/messages", {
       method: "POST",
@@ -111,7 +126,7 @@ async function submitMessage() {
     const data = await res.json();
     if (!data.success) throw new Error("Failed to submit message");
 
-    // Clean up form
+    // Clear form
     closeModal(); openSuccess();
     selectedReason = ""; selectedUrgency = ""; selectedCounselor = ""; selectedCounselorEmail = "";
     ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{
@@ -124,5 +139,5 @@ async function submitMessage() {
 // INIT
 // -------------------
 window.onload = () => {
-  // Nothing to do on load — counselors will load dynamically when page3 is opened
+  loadCounselors(); // Ensures buttons exist immediately on page load
 };
