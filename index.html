@@ -119,20 +119,29 @@
 </div>
 
 <script>
-let selectedReason="", selectedUrgency="", selectedCounselor="", selectedCounselorEmail="";
+let selectedReason = "";
+let selectedUrgency = "";
+let selectedCounselor = "";
+let selectedCounselorEmail = "";
 
+// -------------------
 // Page Navigation
+// -------------------
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  if(id==="page3") loadCounselors();
+  if(id === "page3") loadCounselors();
 }
 
+// -------------------
 // Reason / Urgency
-function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
-function chooseUrgency(urgency){ selectedUrgency=urgency; if(urgency==="I’m in Crisis") openCrisisModal(); else goToPage("page3"); }
+// -------------------
+function chooseReason(reason){ selectedReason = reason; goToPage("page2"); }
+function chooseUrgency(urgency){ selectedUrgency = urgency; if(urgency==="I’m in Crisis") openCrisisModal(); else goToPage("page3"); }
 
+// -------------------
 // Modals
+// -------------------
 function openCrisisModal(){ document.getElementById("crisisOverlay").style.display="flex"; }
 function closeCrisisModal(){ document.getElementById("crisisOverlay").style.display="none"; }
 function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
@@ -141,10 +150,12 @@ function closeModal(){ document.getElementById("modalOverlay").style.display="no
 function openSuccess(){ document.getElementById("successOverlay").style.display="flex"; }
 function closeSuccess(){ document.getElementById("successOverlay").style.display="none"; goToPage("page1"); }
 
-// Load Counselors dynamically
+// -------------------
+// Load Counselors
+// -------------------
 function loadCounselors(){
-  const grid=document.getElementById("counselorGrid");
-  grid.innerHTML="";
+  const grid = document.getElementById("counselorGrid");
+  grid.innerHTML = "";
   const counselors=[
     {username:"miap2k10", email:"miap2k10@gmail.com"},
     {username:"kmcconnell", email:"kmcconnell@smpanthers.org"},
@@ -161,7 +172,9 @@ function loadCounselors(){
   });
 }
 
-// Submit Message (ready for Neon integration)
+// -------------------
+// Submit Message (Neon-ready placeholder)
+// -------------------
 function submitMessage(){
   const firstName=document.getElementById("firstName").value.trim();
   const lastName=document.getElementById("lastName").value.trim();
@@ -169,24 +182,21 @@ function submitMessage(){
   const studentId=document.getElementById("studentId").value.trim();
   const notes=document.getElementById("extraNotes").value.trim();
 
-  if(!firstName||!lastName||!grade||!studentId){ alert("Fill required fields"); return; }
+  if(!firstName || !lastName || !grade || !studentId){ alert("Please fill in all required fields."); return; }
 
-  // Test: log message (replace with API call to Neon when connected)
-  console.log({
-    firstName,lastName,grade,studentId,notes,
-    reason:selectedReason, urgency:selectedUrgency,
-    counselor:selectedCounselor, counselorEmail:selectedCounselorEmail,
-    dateTime:new Date().toISOString()
-  });
+  const messageEntry = { firstName,lastName,grade,studentId,notes,reason:selectedReason,urgency:selectedUrgency,counselor:selectedCounselor,counselorEmail:selectedCounselorEmail,dateTime:new Date().toISOString() };
+
+  console.log("Message ready for Neon:", messageEntry);
 
   closeModal(); openSuccess();
-  selectedReason=selectedUrgency=selectedCounselor=selectedCounselorEmail="";
-  ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value="";
-  });
+
+  selectedReason = ""; selectedUrgency = ""; selectedCounselor = ""; selectedCounselorEmail = "";
+  ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+
+  // === PLACEHOLDER for Neon API call ===
 }
 
-window.onload=()=>loadCounselors();
+window.onload = () => loadCounselors();
 </script>
 
 </body>
