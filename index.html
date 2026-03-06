@@ -4,18 +4,15 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Student Support</title>
+<link rel="stylesheet" href="style.css" />
 <style>
   * { box-sizing: border-box; }
   body { margin:0; font-family:sans-serif; background:#fffcf5; text-align:center; }
-
   .page { display:none; }
   .page.active { display:block; }
-
   .hotspot { cursor:pointer; margin:5px; padding:10px 15px; border-radius:12px; border:none; font-size:14px; }
   .back-button { cursor:pointer; margin-top:10px; padding:8px 12px; border-radius:12px; border:none; background:#ccc; }
-
   .counselor-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:15px 0; }
-
   .modal-overlay { position:fixed; inset:0; display:none; justify-content:center; align-items:center; background:rgba(15,23,42,0.55); backdrop-filter:blur(6px); z-index:1000; }
   .modal { background:#fff; padding:26px; border-radius:18px; width:360px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.22); border:1px solid #eef2f7; }
   .modal input, .modal textarea { width:100%; margin-bottom:12px; padding:11px; border-radius:12px; border:1px solid #e6e8ec; background:#f9fafb; text-align:center; }
@@ -24,12 +21,10 @@
   .modal-buttons button { padding:9px 18px; border-radius:999px; border:none; cursor:pointer; font-size:14px; }
   .modal-buttons button:first-child { background:#f1f5f9; color:#334155; }
   .modal-buttons button:last-child { background:#0070c9; color:white; }
-
   .success-modal { width:320px; text-align:center; }
   .success-icon { width:56px;height:56px;border-radius:50%;background:#16a34a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:4px auto 10px auto; }
   .success-text { font-size:18px;font-weight:700;color:#0f172a;margin-bottom:10px; }
   .success-actions button { padding:10px 18px; border-radius:999px; border:none; cursor:pointer; font-size:14px; font-weight:600; background:#0070c9; color:#fff; }
-
   .crisis-modal { width:min(560px,92vw); text-align:left; }
   .crisis-modal h2 { text-align:center; }
   .crisis-list { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; font-size:14px; color:#0f172a; }
@@ -42,32 +37,32 @@
 </head>
 <body>
 
-<!-- Page 1: Reason -->
+<!-- Page 1 -->
 <div class="page active" id="page1">
-  <h2>Why are you reaching out today?</h2>
-  <button class="hotspot" onclick="chooseReason('Academic stress')">Academic stress</button>
-  <button class="hotspot" onclick="chooseReason('Anxiety or panic')">Anxiety</button>
-  <button class="hotspot" onclick="chooseReason('Depression or sadness')">Depression</button>
-  <button class="hotspot" onclick="chooseReason('Family issues')">Family</button>
-  <button class="hotspot" onclick="chooseReason('Relationship/friendship')">Relationship</button>
-  <button class="hotspot" onclick="chooseReason('Bullying/harassment')">Bullying</button>
-  <button class="hotspot" onclick="chooseReason('Just need someone to talk')">Talk</button>
-  <button class="hotspot" onclick="chooseReason('Not ready to say')">Unsure</button>
+  <img src="page1.png" alt="Welcome Page">
+  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
+  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
+  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
+  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
+  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
+  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
+  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
+  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
 </div>
 
-<!-- Page 2: Urgency -->
+<!-- Page 2 -->
 <div class="page" id="page2">
-  <h2>How urgent is this?</h2>
-  <button class="hotspot" onclick="chooseUrgency('Just Curious')">Just Curious</button>
-  <button class="hotspot" onclick="chooseUrgency('Feeling a Little Off')">Little Off</button>
-  <button class="hotspot" onclick="chooseUrgency('Not Coping Well')">Not Coping</button>
-  <button class="hotspot" onclick="chooseUrgency('In Crisis')">Crisis</button>
+  <img src="page2.png" alt="Urgency Page">
+  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
+  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
+  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
+  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
-<!-- Page 3: Counselor selection -->
+<!-- Page 3 -->
 <div class="page" id="page3">
-  <h2>Select a counselor</h2>
+  <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
@@ -77,25 +72,28 @@
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
     <ul class="crisis-list">
-      <li class="crisis-section"><strong>Emergency:</strong> 911 – Emergency services.</li>
-      <li class="crisis-section"><strong>Mental Health:</strong> 988 Suicide & Crisis Lifeline; Crisis Text Line (741741)</li>
+      <li class="crisis-section"><strong>Emergency</strong>911 – Emergency services.</li>
+      <li class="crisis-section"><strong>Mental Health & Crisis Support</strong>
+        988 Suicide & Crisis Lifeline – Call or text 988.<br>
+        Crisis Text Line – Text HOME to 741741.
+      </li>
     </ul>
     <div class="crisis-actions">
       <button class="secondary" onclick="closeCrisisModal()">Close</button>
-      <button class="primary" onclick="continueFromCrisis()">Continue</button>
+      <button class="primary" onclick="continueFromCrisis()">Continue to Counselor</button>
     </div>
   </div>
 </div>
 
-<!-- Student Modal -->
+<!-- Student Info Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>Submit Message</h2>
-    <input type="text" id="firstName" placeholder="First Name" />
-    <input type="text" id="lastName" placeholder="Last Name" />
-    <input type="text" id="grade" placeholder="Grade" />
-    <input type="text" id="studentId" placeholder="Student ID" />
-    <textarea id="notes" placeholder="Additional notes"></textarea>
+    <input type="text" id="firstName" placeholder="First Name (required)">
+    <input type="text" id="lastName" placeholder="Last Name (required)">
+    <input type="text" id="studentGrade" placeholder="Grade (required)">
+    <input type="text" id="studentId" placeholder="Student ID (required)">
+    <textarea id="extraNotes" placeholder="Additional notes (optional)"></textarea>
     <div class="modal-buttons">
       <button onclick="closeModal()">Cancel</button>
       <button onclick="submitMessage()">Submit</button>
@@ -120,31 +118,45 @@ let selectedUrgency = "";
 let selectedCounselor = "";
 let selectedCounselorEmail = "";
 
+// -------------------
+// Page Navigation
+// -------------------
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  if(id==="page3") loadCounselors();
+  if(id === "page3") loadCounselors();
 }
 
+// -------------------
+// Reason / Urgency
+// -------------------
 function chooseReason(reason){ selectedReason = reason; goToPage("page2"); }
-function chooseUrgency(urgency){ selectedUrgency = urgency; if(urgency==="In Crisis") openCrisisModal(); else goToPage("page3"); }
+function chooseUrgency(urgency){ selectedUrgency = urgency; if(urgency==="I’m in Crisis") openCrisisModal(); else goToPage("page3"); }
 
+// -------------------
+// Modals
+// -------------------
 function openCrisisModal(){ document.getElementById("crisisOverlay").style.display="flex"; }
 function closeCrisisModal(){ document.getElementById("crisisOverlay").style.display="none"; }
 function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
-
-function openModal(username,email){ selectedCounselor=username; selectedCounselorEmail=email; document.getElementById("modalOverlay").style.display="flex"; }
+function openModal(c,e){ selectedCounselor=c; selectedCounselorEmail=e; document.getElementById("modalOverlay").style.display="flex"; }
 function closeModal(){ document.getElementById("modalOverlay").style.display="none"; }
 function openSuccess(){ document.getElementById("successOverlay").style.display="flex"; }
 function closeSuccess(){ document.getElementById("successOverlay").style.display="none"; goToPage("page1"); }
 
+// -------------------
+// Load Counselors
+// -------------------
 function loadCounselors(){
-  const grid=document.getElementById("counselorGrid");
-  grid.innerHTML="";
+  const grid = document.getElementById("counselorGrid");
+  grid.innerHTML = "";
   const counselors=[
-    {username:"counselor1", email:"counselor1@example.com"},
-    {username:"counselor2", email:"counselor2@example.com"},
-    {username:"counselor3", email:"counselor3@example.com"}
+    {username:"miap2k10", email:"miap2k10@gmail.com"},
+    {username:"kmcconnell", email:"kmcconnell@smpanthers.org"},
+    {username:"gsorbi", email:"gsorbi@smpanthers.org"},
+    {username:"apanlilio", email:"apanlilio@smpanthers.org"},
+    {username:"aturner", email:"aturner@smpanthers.org"},
+    {username:"cfilson", email:"cfilson@smpanthers.org"}
   ];
   counselors.forEach(c=>{
     const btn=document.createElement("button");
@@ -154,28 +166,42 @@ function loadCounselors(){
   });
 }
 
-function submitMessage(){
+// -------------------
+// Submit Message to API
+// -------------------
+async function submitMessage(){
   const firstName=document.getElementById("firstName").value.trim();
   const lastName=document.getElementById("lastName").value.trim();
-  const grade=document.getElementById("grade").value.trim();
+  const grade=document.getElementById("studentGrade").value.trim();
   const studentId=document.getElementById("studentId").value.trim();
-  const notes=document.getElementById("notes").value.trim();
+  const notes=document.getElementById("extraNotes").value.trim();
 
-  if(!firstName||!lastName||!grade||!studentId){ alert("Please fill all required fields."); return; }
+  if(!firstName || !lastName || !grade || !studentId){ alert("Please fill in all required fields."); return; }
 
-  const entry={ firstName,lastName,grade,studentId,notes,reason:selectedReason,urgency:selectedUrgency,counselor:selectedCounselor,counselorEmail:selectedCounselorEmail,dateTime:new Date().toISOString() };
+  const entry = {
+    firstName,lastName,grade,studentId,notes,
+    reason:selectedReason,
+    urgency:selectedUrgency,
+    counselor:selectedCounselor,
+    counselorEmail:selectedCounselorEmail,
+    dateTime:new Date().toISOString()
+  };
 
-  console.log("Message ready for Neon API:", entry);
-
-  closeModal();
-  openSuccess();
-
-  // reset
-  selectedReason=""; selectedUrgency=""; selectedCounselor=""; selectedCounselorEmail="";
-  ["firstName","lastName","grade","studentId","notes"].forEach(id=>document.getElementById(id).value="");
+  try {
+    const res = await fetch("/api/messages", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify(entry)
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error("Failed");
+    closeModal(); openSuccess();
+    selectedReason=""; selectedUrgency=""; selectedCounselor=""; selectedCounselorEmail="";
+    ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>document.getElementById(id).value="");
+  } catch(err){ alert("Failed to send message."); }
 }
 
-window.onload=loadCounselors;
+window.onload = () => loadCounselors();
 </script>
 </body>
 </html>
