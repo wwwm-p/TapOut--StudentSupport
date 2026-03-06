@@ -8,10 +8,10 @@
   * { box-sizing: border-box; }
   body { margin:0; font-family:sans-serif; background:#fffcf5; text-align:center; }
 
-  .page { display:none; }
+  .page { display:none; position:relative; }
   .page.active { display:block; }
 
-  .hotspot { cursor:pointer; margin:5px; padding:10px 15px; border-radius:12px; border:none; font-size:14px; }
+  .hotspot { cursor:pointer; margin:5px; padding:10px 15px; border-radius:12px; border:none; font-size:14px; position:absolute; }
   .back-button { cursor:pointer; margin-top:10px; padding:8px 12px; border-radius:12px; border:none; background:#ccc; }
 
   .counselor-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:15px 0; }
@@ -44,35 +44,35 @@
 
 <!-- Page 1: Reason -->
 <div class="page active" id="page1">
-  <h2>Why are you reaching out today?</h2>
-  <button class="hotspot" onclick="chooseReason('Academic stress')">Academic stress</button>
-  <button class="hotspot" onclick="chooseReason('Anxiety or panic')">Anxiety</button>
-  <button class="hotspot" onclick="chooseReason('Depression or sadness')">Depression</button>
-  <button class="hotspot" onclick="chooseReason('Family issues')">Family</button>
-  <button class="hotspot" onclick="chooseReason('Relationship/friendship')">Relationship</button>
-  <button class="hotspot" onclick="chooseReason('Bullying/harassment')">Bullying</button>
-  <button class="hotspot" onclick="chooseReason('Just need someone to talk')">Talk</button>
-  <button class="hotspot" onclick="chooseReason('Not ready to say')">Unsure</button>
+  <img src="page1.png" alt="Welcome Page" style="width:100%; display:block;" />
+  <button class="hotspot" style="top:100px; left:50px;" onclick="chooseReason('Academic stress')">Academic stress</button>
+  <button class="hotspot" style="top:160px; left:50px;" onclick="chooseReason('Anxiety or panic')">Anxiety</button>
+  <button class="hotspot" style="top:220px; left:50px;" onclick="chooseReason('Depression or sadness')">Depression</button>
+  <button class="hotspot" style="top:280px; left:50px;" onclick="chooseReason('Family issues')">Family</button>
+  <button class="hotspot" style="top:340px; left:50px;" onclick="chooseReason('Relationship/friendship')">Relationship</button>
+  <button class="hotspot" style="top:400px; left:50px;" onclick="chooseReason('Bullying/harassment')">Bullying</button>
+  <button class="hotspot" style="top:460px; left:50px;" onclick="chooseReason('Just need someone to talk')">Talk</button>
+  <button class="hotspot" style="top:520px; left:50px;" onclick="chooseReason('Not ready to say')">Unsure</button>
 </div>
 
 <!-- Page 2: Urgency -->
 <div class="page" id="page2">
-  <h2>How urgent is this?</h2>
-  <button class="hotspot" onclick="chooseUrgency('Just Curious')">Just Curious</button>
-  <button class="hotspot" onclick="chooseUrgency('Feeling a Little Off')">Little Off</button>
-  <button class="hotspot" onclick="chooseUrgency('Not Coping Well')">Not Coping</button>
-  <button class="hotspot" onclick="chooseUrgency('In Crisis')">Crisis</button>
+  <img src="page2.png" alt="Urgency Page" style="width:100%; display:block;" />
+  <button class="hotspot" style="top:100px; left:50px;" onclick="chooseUrgency('Just Curious')">Just Curious</button>
+  <button class="hotspot" style="top:160px; left:50px;" onclick="chooseUrgency('Feeling a Little Off')">Little Off</button>
+  <button class="hotspot" style="top:220px; left:50px;" onclick="chooseUrgency('Not Coping Well')">Not Coping</button>
+  <button class="hotspot" style="top:280px; left:50px;" onclick="chooseUrgency('In Crisis')">Crisis</button>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
 <!-- Page 3: Counselor selection -->
 <div class="page" id="page3">
-  <h2>Select a counselor</h2>
-  <div class="counselor-grid" id="counselorGrid"></div>
+  <img src="page3.png" alt="Counselor Page" style="width:100%; display:block;" />
+  <div class="counselor-grid" id="counselorGrid" style="position:relative; top:-300px;"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- Crisis Modal -->
+<!-- Crisis, student, and success modals remain unchanged -->
 <div class="modal-overlay" id="crisisOverlay">
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
@@ -87,7 +87,6 @@
   </div>
 </div>
 
-<!-- Student Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>Submit Message</h2>
@@ -103,7 +102,6 @@
   </div>
 </div>
 
-<!-- Success Modal -->
 <div class="modal-overlay" id="successOverlay">
   <div class="modal success-modal">
     <div class="success-icon">✓</div>
@@ -115,44 +113,31 @@
 </div>
 
 <script>
-let selectedReason = "";
-let selectedUrgency = "";
-let selectedCounselor = "";
-let selectedCounselorEmail = "";
-
+let selectedReason="", selectedUrgency="", selectedCounselor="", selectedCounselorEmail="";
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   if(id==="page3") loadCounselors();
 }
-
-function chooseReason(reason){ selectedReason = reason; goToPage("page2"); }
-function chooseUrgency(urgency){ selectedUrgency = urgency; if(urgency==="In Crisis") openCrisisModal(); else goToPage("page3"); }
-
+function chooseReason(r){ selectedReason=r; goToPage("page2"); }
+function chooseUrgency(u){ selectedUrgency=u; if(u==="In Crisis") openCrisisModal(); else goToPage("page3"); }
 function openCrisisModal(){ document.getElementById("crisisOverlay").style.display="flex"; }
 function closeCrisisModal(){ document.getElementById("crisisOverlay").style.display="none"; }
 function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
-
-function openModal(username,email){ selectedCounselor=username; selectedCounselorEmail=email; document.getElementById("modalOverlay").style.display="flex"; }
+function openModal(u,e){ selectedCounselor=u; selectedCounselorEmail=e; document.getElementById("modalOverlay").style.display="flex"; }
 function closeModal(){ document.getElementById("modalOverlay").style.display="none"; }
 function openSuccess(){ document.getElementById("successOverlay").style.display="flex"; }
 function closeSuccess(){ document.getElementById("successOverlay").style.display="none"; goToPage("page1"); }
 
 function loadCounselors(){
-  const grid=document.getElementById("counselorGrid");
-  grid.innerHTML="";
+  const grid=document.getElementById("counselorGrid"); grid.innerHTML="";
   const counselors=[
     { username: "counselor1", email: "counselor1@example.com" },
     { username: "counselor2", email: "counselor2@example.com" },
     { username: "counselor3", email: "counselor3@example.com" },
     { username: "counselor4", email: "counselor4@example.com" }
   ];
-  counselors.forEach(c=>{
-    const btn=document.createElement("button");
-    btn.textContent=c.email;
-    btn.onclick=()=>openModal(c.username,c.email);
-    grid.appendChild(btn);
-  });
+  counselors.forEach(c=>{ const btn=document.createElement("button"); btn.textContent=c.email; btn.onclick=()=>openModal(c.username,c.email); grid.appendChild(btn); });
 }
 
 async function submitMessage(){
@@ -161,32 +146,14 @@ async function submitMessage(){
   const grade=document.getElementById("grade").value.trim();
   const studentId=document.getElementById("studentId").value.trim();
   const notes=document.getElementById("notes").value.trim();
-
   if(!firstName||!lastName||!grade||!studentId){ alert("Please fill all required fields."); return; }
-
-  const entry={
-    firstName,lastName,grade,studentId,notes,
-    reason:selectedReason,
-    urgency:selectedUrgency,
-    counselor:selectedCounselor,
-    counselorEmail:selectedCounselorEmail,
-    dateTime:new Date().toISOString()
-  };
-
+  const entry={ firstName,lastName,grade,studentId,notes,reason:selectedReason,urgency:selectedUrgency,counselor:selectedCounselor,counselorEmail:selectedCounselorEmail,dateTime:new Date().toISOString() };
   try{
-    const res=await fetch("/api/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(entry)
-    });
-    const data=await res.json();
-    if(!data.success) throw new Error("Failed to submit");
-    closeModal(); openSuccess();
+    const res=await fetch("/api/messages",{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(entry) });
+    const data=await res.json(); if(!data.success) throw new Error("Failed"); closeModal(); openSuccess();
     selectedReason=""; selectedUrgency=""; selectedCounselor=""; selectedCounselorEmail="";
     ["firstName","lastName","grade","studentId","notes"].forEach(id=>document.getElementById(id).value="");
-  }catch(err){
-    alert("Failed to send message.");
-  }
+  }catch(err){ alert("Failed to send message."); }
 }
 
 window.onload=loadCounselors;
