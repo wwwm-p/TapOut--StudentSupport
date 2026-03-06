@@ -12,33 +12,58 @@ export default async function handler(req, res) {
 
   const {
     studentId,
-    firstName,
-    lastName,
-    grade,
+    counselorUsername,
     notes,
     reason,
-    urgency,
-    counselor,
-    counselorEmail
+    urgency
   } = req.body;
 
-  if (!studentId || !firstName || !lastName || !grade || !reason || !urgency || !counselor || !counselorEmail) {
+  if (!studentId || !counselorUsername || !reason || !urgency) {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
 
   const crisis = urgency === "I’m in Crisis";
 
   try {
-    const query = `
-      INSERT INTO messages
-      (student_id, first_name, last_name, grade, notes, reason, urgency, counselor_username, counselor_email, crisis)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-    `;
-    await pool.query(query, [studentId, firstName, lastName, grade, notes, reason, urgency, counselor, counselorEmail, crisis]);
+    // Lookup counselor_id from username
+    const counselorResult = await pool.query(
+      'SELECT counselor_id FROM counselors WHERE username=$1 AND active=TRUE',
+      [counselorUsername]
+    );
+    if (counselorResult.rows.length === 0) {
+      return res.status(400).json({ success: false, error: 'Counselor not found or inactive' });
+    }
+    const counselorId = counselorResult.rows[0].counselor_id;
 
-    res.status(200).json({ success: true });
+    // Verify student exists
+    const studentResult = await pool.query(
+      'SELECT student_id FROM users WHERE student_id=$1',
+      [studentId]
+    );
+    if (studentResult.rows.length === 0) {
+      return res.status(400).json({ success: false, error: 'Student not found' });
+    }
+
+    // Optional: check if counselor is assigned to student
+    const assignmentResult = await pool.query(
+      'SELECT * FROM student_counselor_assignments WHERE student_id=$1 AND counselor_id=$2',
+      [studentId, counselorId]
+    );
+    if (assignmentResult.rows.length === 0) {
+      return res.status(400).json({ success: false, error: 'Counselor not assigned to this student' });
+    }
+
+    // Insert message
+    await pool.query(
+      `INSERT INTO messages (student_id, counselor_id, notes, reason, urgency, crisis)
+       VALUES ($1,$2,$3,$4,$5,$6)`,
+      [studentId, counselorId, notes || '', reason, urgency, crisis]
+    );
+
+    return res.status(200).json({ success: true });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, error: 'Database error' });
+    console.error('Messages API error:', err);
+    return res.status(500).json({ success: false, error: 'Database error' });
   }
 }
