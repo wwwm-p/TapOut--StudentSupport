@@ -91,11 +91,11 @@
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>Submit Message</h2>
-    <input type="text" id="firstName" placeholder="First Name" />
-    <input type="text" id="lastName" placeholder="Last Name" />
-    <input type="text" id="grade" placeholder="Grade" />
-    <input type="text" id="studentId" placeholder="Student ID" />
-    <textarea id="notes" placeholder="Additional notes"></textarea>
+    <input type="text" id="firstName" placeholder="First Name (required)" />
+    <input type="text" id="lastName" placeholder="Last Name (required)" />
+    <input type="text" id="grade" placeholder="Grade (required)" />
+    <input type="text" id="studentId" placeholder="Student ID (required)" />
+    <textarea id="notes" placeholder="Additional notes (optional)"></textarea>
     <div class="modal-buttons">
       <button onclick="closeModal()">Cancel</button>
       <button onclick="submitMessage()">Submit</button>
@@ -120,24 +120,15 @@ let selectedUrgency = "";
 let selectedCounselor = "";
 let selectedCounselorEmail = "";
 
-// -------------------
-// Page Navigation
-// -------------------
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   if(id==="page3") loadCounselors();
 }
 
-// -------------------
-// Reason / Urgency
-// -------------------
 function chooseReason(reason){ selectedReason = reason; goToPage("page2"); }
 function chooseUrgency(urgency){ selectedUrgency = urgency; if(urgency==="In Crisis") openCrisisModal(); else goToPage("page3"); }
 
-// -------------------
-// Modals
-// -------------------
 function openCrisisModal(){ document.getElementById("crisisOverlay").style.display="flex"; }
 function closeCrisisModal(){ document.getElementById("crisisOverlay").style.display="none"; }
 function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
@@ -147,19 +138,14 @@ function closeModal(){ document.getElementById("modalOverlay").style.display="no
 function openSuccess(){ document.getElementById("successOverlay").style.display="flex"; }
 function closeSuccess(){ document.getElementById("successOverlay").style.display="none"; goToPage("page1"); }
 
-// -------------------
-// Load Counselors (example emails ready)
-// -------------------
 function loadCounselors(){
   const grid=document.getElementById("counselorGrid");
   grid.innerHTML="";
   const counselors=[
-    {username:"miap2k10", email:"miap2k10@gmail.com"},
-    {username:"kmcconnell", email:"kmcconnell@smpanthers.org"},
-    {username:"gsorbi", email:"gsorbi@smpanthers.org"},
-    {username:"apanlilio", email:"apanlilio@smpanthers.org"},
-    {username:"aturner", email:"aturner@smpanthers.org"},
-    {username:"cfilson", email:"cfilson@smpanthers.org"}
+    { username: "counselor1", email: "counselor1@example.com" },
+    { username: "counselor2", email: "counselor2@example.com" },
+    { username: "counselor3", email: "counselor3@example.com" },
+    { username: "counselor4", email: "counselor4@example.com" }
   ];
   counselors.forEach(c=>{
     const btn=document.createElement("button");
@@ -169,9 +155,6 @@ function loadCounselors(){
   });
 }
 
-// -------------------
-// Submit Message (Neon-ready example)
-// -------------------
 async function submitMessage(){
   const firstName=document.getElementById("firstName").value.trim();
   const lastName=document.getElementById("lastName").value.trim();
@@ -181,7 +164,7 @@ async function submitMessage(){
 
   if(!firstName||!lastName||!grade||!studentId){ alert("Please fill all required fields."); return; }
 
-  const entry={ 
+  const entry={
     firstName,lastName,grade,studentId,notes,
     reason:selectedReason,
     urgency:selectedUrgency,
@@ -190,20 +173,24 @@ async function submitMessage(){
     dateTime:new Date().toISOString()
   };
 
-  console.log("Message ready for Neon API:", entry);
-
-  // TODO: call your Neon API endpoint here, e.g.,
-  // await fetch("/api/messages",{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(entry)});
-
-  closeModal();
-  openSuccess();
-
-  // reset
-  selectedReason=""; selectedUrgency=""; selectedCounselor=""; selectedCounselorEmail="";
-  ["firstName","lastName","grade","studentId","notes"].forEach(id=>document.getElementById(id).value="");
+  try{
+    const res=await fetch("/api/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(entry)
+    });
+    const data=await res.json();
+    if(!data.success) throw new Error("Failed to submit");
+    closeModal(); openSuccess();
+    selectedReason=""; selectedUrgency=""; selectedCounselor=""; selectedCounselorEmail="";
+    ["firstName","lastName","grade","studentId","notes"].forEach(id=>document.getElementById(id).value="");
+  }catch(err){
+    alert("Failed to send message.");
+  }
 }
 
 window.onload=loadCounselors;
 </script>
+
 </body>
 </html>
