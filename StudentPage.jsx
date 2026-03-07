@@ -19,20 +19,18 @@ export default function StudentPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [counselors, setCounselors] = useState([]);
 
+  // -----------------------------
   // Load counselors dynamically
+  // -----------------------------
   const loadCounselors = async () => {
     try {
       const res = await fetch("/api/counselors");
       const data = await res.json();
-      if (data && data.length) setCounselors(data);
-      else throw new Error("Empty API");
+      if (data && data.length) setCounselors(data.filter(c => c.active));
     } catch {
-      // fallback hardcoded counselors
       setCounselors([
         { username: "counselor1", email: "counselor1@example.com" },
-        { username: "counselor2", email: "counselor2@example.com" },
-        { username: "counselor3", email: "counselor3@example.com" },
-        { username: "counselor4", email: "counselor4@example.com" }
+        { username: "counselor2", email: "counselor2@example.com" }
       ]);
     }
   };
@@ -41,7 +39,9 @@ export default function StudentPage() {
     loadCounselors();
   }, []);
 
+  // -----------------------------
   // Navigation
+  // -----------------------------
   const goToPage = (id) => setPage(id);
   const chooseReason = (reason) => { setSelectedReason(reason); goToPage("page2"); };
   const chooseUrgency = (urgency) => {
@@ -50,7 +50,9 @@ export default function StudentPage() {
     else goToPage("page3");
   };
 
+  // -----------------------------
   // Modal handling
+  // -----------------------------
   const openModal = (username, email) => {
     setSelectedCounselor(username);
     setSelectedCounselorEmail(email);
@@ -61,19 +63,16 @@ export default function StudentPage() {
   const continueFromCrisis = () => { setShowCrisis(false); goToPage("page3"); };
   const closeSuccess = () => { setShowSuccess(false); goToPage("page1"); };
 
+  // -----------------------------
   // Form handling
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
-  };
+  // -----------------------------
+  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
 
   const submitMessage = async () => {
     const { firstName, lastName, grade, studentId, notes } = formData;
-    if (!firstName || !lastName || !grade || !studentId) {
-      alert("Please fill in all required fields.");
-      return;
-    }
+    if (!firstName || !lastName || !grade || !studentId) return alert("Please fill in all required fields.");
 
-    // SIS verification (includes grade check)
+    // Verify student via SIS API
     try {
       const res = await fetch("/api/verifyStudent", {
         method: "POST",
@@ -81,13 +80,9 @@ export default function StudentPage() {
         body: JSON.stringify({ studentId, firstName, lastName, grade })
       });
       const verify = await res.json();
-      if (!verify.valid) {
-        alert("Student ID, name, or grade does not match SIS records.");
-        return;
-      }
+      if (!verify.valid) return alert("Student ID, name, or grade does not match SIS records.");
     } catch {
-      alert("Failed to verify student ID.");
-      return;
+      return alert("Failed to verify student ID.");
     }
 
     const entry = {
@@ -110,11 +105,11 @@ export default function StudentPage() {
         const data = await res.json();
         if (!data.success) throw new Error("Failed to send crisis message");
       } else {
-        // Non-crisis messages only confirmed locally
+        // Non-crisis: local confirmation
         console.log("Non-crisis message (local):", entry);
       }
 
-      // Reset state & show success
+      // Reset
       setShowModal(false);
       setShowSuccess(true);
       setSelectedReason("");
@@ -122,27 +117,36 @@ export default function StudentPage() {
       setSelectedCounselor("");
       setSelectedCounselorEmail("");
       setFormData({ firstName: "", lastName: "", grade: "", studentId: "", notes: "" });
+
     } catch (err) {
       console.error(err);
       alert("Failed to submit message.");
     }
   };
 
+  // -----------------------------
+  // Render
+  // -----------------------------
   return (
     <div className="student-page" style={{ textAlign:"center", background:"#fffcf5" }}>
+
       {/* Page 1 */}
       {page === "page1" && (
         <div className="page active">
           <img src="/page1.png" alt="Welcome Page" />
           <div style={{ marginTop: 10 }}>
-            <button className="hotspot" onClick={()=>chooseReason("Academic stress or pressure")}>Academic</button>
-            <button className="hotspot" onClick={()=>chooseReason("Anxiety or panic attacks")}>Anxiety</button>
-            <button className="hotspot" onClick={()=>chooseReason("Depression or sadness")}>Depression</button>
-            <button className="hotspot" onClick={()=>chooseReason("Family issues or home stress")}>Family</button>
-            <button className="hotspot" onClick={()=>chooseReason("Relationship or friendship problems")}>Relationship</button>
-            <button className="hotspot" onClick={()=>chooseReason("Bullying or harassment")}>Bullying</button>
-            <button className="hotspot" onClick={()=>chooseReason("I just need someone to talk to")}>Talk</button>
-            <button className="hotspot" onClick={()=>chooseReason("I’m not ready to say")}>Unsure</button>
+            {[
+              ["Academic stress or pressure","Academic"],
+              ["Anxiety or panic attacks","Anxiety"],
+              ["Depression or sadness","Depression"],
+              ["Family issues or home stress","Family"],
+              ["Relationship or friendship problems","Relationship"],
+              ["Bullying or harassment","Bullying"],
+              ["I just need someone to talk to","Talk"],
+              ["I’m not ready to say","Unsure"]
+            ].map(([reason,label])=>(
+              <button key={label} className="hotspot" onClick={()=>chooseReason(reason)}>{label}</button>
+            ))}
           </div>
         </div>
       )}
@@ -152,10 +156,14 @@ export default function StudentPage() {
         <div className="page">
           <img src="/page2.png" alt="Urgency Page" />
           <div style={{ marginTop: 10 }}>
-            <button className="hotspot" onClick={()=>chooseUrgency("I’m Doing Fine – Just Curious")}>Fine</button>
-            <button className="hotspot" onClick={()=>chooseUrgency("Feeling a Little Off")}>Little Off</button>
-            <button className="hotspot" onClick={()=>chooseUrgency("I’m Not Coping Well")}>Not Coping</button>
-            <button className="hotspot" onClick={()=>chooseUrgency("I’m in Crisis")}>Crisis</button>
+            {[
+              ["I’m Doing Fine – Just Curious","Fine"],
+              ["Feeling a Little Off","Little Off"],
+              ["I’m Not Coping Well","Not Coping"],
+              ["I’m in Crisis","Crisis"]
+            ].map(([urgency,label])=>(
+              <button key={label} className="hotspot" onClick={()=>chooseUrgency(urgency)}>{label}</button>
+            ))}
             <button className="back-button" onClick={()=>goToPage("page1")}>Back</button>
           </div>
         </div>
@@ -199,11 +207,13 @@ export default function StudentPage() {
         <div className="modal-overlay" style={{ display:"flex" }}>
           <div className="modal">
             <h2>Submit Message</h2>
-            <input id="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} />
-            <input id="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} />
-            <input id="grade" placeholder="Grade" value={formData.grade} onChange={handleChange} />
-            <input id="studentId" placeholder="Student ID" value={formData.studentId} onChange={handleChange} />
-            <textarea id="notes" placeholder="Additional notes" value={formData.notes} onChange={handleChange}></textarea>
+            {["firstName","lastName","grade","studentId","notes"].map(field=>(
+              field==="notes" ? (
+                <textarea key={field} id={field} placeholder="Additional notes" value={formData.notes} onChange={handleChange}></textarea>
+              ) : (
+                <input key={field} id={field} placeholder={field} value={formData[field]} onChange={handleChange} />
+              )
+            ))}
             <div style={{ marginTop:12 }}>
               <button onClick={closeModal}>Cancel</button>
               <button onClick={submitMessage}>Submit</button>
