@@ -19,7 +19,7 @@ export default function StudentPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [counselors, setCounselors] = useState([]);
 
-  // Load counselors (API fallback)
+  // Load counselors dynamically
   const loadCounselors = async () => {
     try {
       const res = await fetch("/api/counselors");
@@ -27,7 +27,7 @@ export default function StudentPage() {
       if (data && data.length) setCounselors(data);
       else throw new Error("Empty API");
     } catch {
-      // fallback hardcoded counselors (SIS-ready placeholders)
+      // fallback hardcoded counselors
       setCounselors([
         { username: "counselor1", email: "counselor1@example.com" },
         { username: "counselor2", email: "counselor2@example.com" },
@@ -41,10 +41,8 @@ export default function StudentPage() {
     loadCounselors();
   }, []);
 
-  // Page navigation
+  // Navigation
   const goToPage = (id) => setPage(id);
-
-  // Reason / Urgency
   const chooseReason = (reason) => { setSelectedReason(reason); goToPage("page2"); };
   const chooseUrgency = (urgency) => {
     setSelectedUrgency(urgency);
@@ -75,16 +73,16 @@ export default function StudentPage() {
       return;
     }
 
-    // Verify student ID
+    // SIS verification (includes grade check)
     try {
       const res = await fetch("/api/verifyStudent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId, firstName, lastName })
+        body: JSON.stringify({ studentId, firstName, lastName, grade })
       });
       const verify = await res.json();
       if (!verify.valid) {
-        alert("Student ID not recognized.");
+        alert("Student ID, name, or grade does not match SIS records.");
         return;
       }
     } catch {
@@ -92,7 +90,6 @@ export default function StudentPage() {
       return;
     }
 
-    // Submit to Neon
     const entry = {
       firstName, lastName, grade, studentId, notes,
       reason: selectedReason,
@@ -103,31 +100,41 @@ export default function StudentPage() {
     };
 
     try {
-      const res = await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(entry)
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error("Failed");
+      if (selectedUrgency === "I’m in Crisis") {
+        // Crisis messages go to admin
+        const res = await fetch("/api/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entry)
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error("Failed to send crisis message");
+      } else {
+        // Non-crisis messages only confirmed locally
+        console.log("Non-crisis message (local):", entry);
+      }
 
-      // success
+      // Reset state & show success
       setShowModal(false);
       setShowSuccess(true);
-      setSelectedReason(""); setSelectedUrgency(""); setSelectedCounselor(""); setSelectedCounselorEmail("");
-      setFormData({ firstName:"", lastName:"", grade:"", studentId:"", notes:"" });
-    } catch {
-      alert("Failed to send message.");
+      setSelectedReason("");
+      setSelectedUrgency("");
+      setSelectedCounselor("");
+      setSelectedCounselorEmail("");
+      setFormData({ firstName: "", lastName: "", grade: "", studentId: "", notes: "" });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit message.");
     }
   };
 
   return (
-    <div className="student-page" style={{textAlign:"center", background:"#fffcf5"}}>
+    <div className="student-page" style={{ textAlign:"center", background:"#fffcf5" }}>
       {/* Page 1 */}
-      {page==="page1" && (
+      {page === "page1" && (
         <div className="page active">
           <img src="/page1.png" alt="Welcome Page" />
-          <div style={{marginTop:10}}>
+          <div style={{ marginTop: 10 }}>
             <button className="hotspot" onClick={()=>chooseReason("Academic stress or pressure")}>Academic</button>
             <button className="hotspot" onClick={()=>chooseReason("Anxiety or panic attacks")}>Anxiety</button>
             <button className="hotspot" onClick={()=>chooseReason("Depression or sadness")}>Depression</button>
@@ -141,10 +148,10 @@ export default function StudentPage() {
       )}
 
       {/* Page 2 */}
-      {page==="page2" && (
+      {page === "page2" && (
         <div className="page">
           <img src="/page2.png" alt="Urgency Page" />
-          <div style={{marginTop:10}}>
+          <div style={{ marginTop: 10 }}>
             <button className="hotspot" onClick={()=>chooseUrgency("I’m Doing Fine – Just Curious")}>Fine</button>
             <button className="hotspot" onClick={()=>chooseUrgency("Feeling a Little Off")}>Little Off</button>
             <button className="hotspot" onClick={()=>chooseUrgency("I’m Not Coping Well")}>Not Coping</button>
@@ -155,12 +162,12 @@ export default function StudentPage() {
       )}
 
       {/* Page 3 */}
-      {page==="page3" && (
+      {page === "page3" && (
         <div className="page">
           <img src="/page3.png" alt="Counselor Page" />
-          <div className="counselor-grid" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:10, marginTop:10}}>
-            {counselors.map(c=>(
-              <button key={c.username} onClick={()=>openModal(c.username,c.email)}>{c.email}</button>
+          <div className="counselor-grid" style={{ display:"flex", flexWrap:"wrap", justifyContent:"center", gap:10, marginTop:10 }}>
+            {counselors.map(c => (
+              <button key={c.username} onClick={()=>openModal(c.username, c.email)}>{c.email}</button>
             ))}
           </div>
           <button className="back-button" onClick={()=>goToPage("page2")}>Back</button>
@@ -169,17 +176,17 @@ export default function StudentPage() {
 
       {/* Crisis Modal */}
       {showCrisis && (
-        <div className="modal-overlay" style={{display:"flex", position:"fixed", inset:0, justifyContent:"center", alignItems:"center", background:"rgba(15,23,42,0.55)"}}>
-          <div className="modal" style={{background:"#fff", padding:26, borderRadius:18, width:360}}>
+        <div className="modal-overlay" style={{ display:"flex" }}>
+          <div className="modal">
             <h2>Immediate Support</h2>
-            <ul style={{listStyle:"none", padding:0}}>
+            <ul style={{ listStyle:"none", padding:0 }}>
               <li><strong>Emergency</strong> 911 – Emergency services.</li>
-              <li><strong>Mental Health & Crisis Support</strong>
-                <br/>988 Suicide & Crisis Lifeline – Call or text 988.
-                <br/>Crisis Text Line – Text HOME to 741741.
+              <li><strong>Mental Health & Crisis Support</strong><br/>
+                  988 Suicide & Crisis Lifeline – Call/text 988.<br/>
+                  Crisis Text Line – Text HOME to 741741.
               </li>
             </ul>
-            <div style={{marginTop:12}}>
+            <div style={{ marginTop: 12 }}>
               <button onClick={closeCrisisModal}>Close</button>
               <button onClick={continueFromCrisis}>Continue</button>
             </div>
@@ -189,15 +196,15 @@ export default function StudentPage() {
 
       {/* Student Modal */}
       {showModal && (
-        <div className="modal-overlay" style={{display:"flex", position:"fixed", inset:0, justifyContent:"center", alignItems:"center", background:"rgba(15,23,42,0.55)"}}>
-          <div className="modal" style={{background:"#fff", padding:26, borderRadius:18, width:360}}>
+        <div className="modal-overlay" style={{ display:"flex" }}>
+          <div className="modal">
             <h2>Submit Message</h2>
             <input id="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} />
             <input id="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} />
             <input id="grade" placeholder="Grade" value={formData.grade} onChange={handleChange} />
             <input id="studentId" placeholder="Student ID" value={formData.studentId} onChange={handleChange} />
             <textarea id="notes" placeholder="Additional notes" value={formData.notes} onChange={handleChange}></textarea>
-            <div style={{marginTop:12}}>
+            <div style={{ marginTop:12 }}>
               <button onClick={closeModal}>Cancel</button>
               <button onClick={submitMessage}>Submit</button>
             </div>
@@ -207,14 +214,15 @@ export default function StudentPage() {
 
       {/* Success Modal */}
       {showSuccess && (
-        <div className="modal-overlay" style={{display:"flex", position:"fixed", inset:0, justifyContent:"center", alignItems:"center", background:"rgba(15,23,42,0.55)"}}>
-          <div className="modal" style={{background:"#fff", padding:26, borderRadius:18, width:320, textAlign:"center"}}>
-            <div style={{width:56,height:56,borderRadius:"50%",background:"#16a34a",color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 10px auto"}}>✓</div>
+        <div className="modal-overlay" style={{ display:"flex" }}>
+          <div className="modal" style={{ textAlign:"center" }}>
+            <div style={{ width:56,height:56,borderRadius:"50%",background:"#16a34a", color:"#fff", display:"flex", justifyContent:"center", alignItems:"center", margin:"0 auto 10px auto"}}>✓</div>
             <div>Message sent!</div>
-            <button style={{marginTop:10}} onClick={closeSuccess}>OK</button>
+            <button style={{ marginTop:10 }} onClick={closeSuccess}>OK</button>
           </div>
         </div>
       )}
+
     </div>
   );
 }
