@@ -62,42 +62,55 @@ function closeSuccess() {
 }
 
 // -------------------
-// Populate Counselors dynamically
+// Populate Counselors dynamically with default examples
 // -------------------
 async function populateStudentCounselorDropdown() {
+  // Default example counselors
+  let counselors = [
+    { username: "counselor1", email: "counselor1@example.com", name: "Counselor One" },
+    { username: "counselor2", email: "counselor2@example.com", name: "Counselor Two" },
+    { username: "counselor3", email: "counselor3@example.com", name: "Counselor Three" },
+    { username: "counselor4", email: "counselor4@example.com", name: "Counselor Four" },
+    { username: "counselor5", email: "counselor5@example.com", name: "Counselor Five" },
+    { username: "counselor6", email: "counselor6@example.com", name: "Counselor Six" }
+  ];
+
   try {
     const res = await fetch('/api/counselors');
-    const counselors = await res.json();
-    
-    // Populate dropdown if exists
-    const dropdown = document.getElementById('studentCounselorDropdown');
-    if (dropdown) {
-      dropdown.innerHTML = '';
-      counselors.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.username;
-        opt.textContent = c.name || c.email || c.username;
-        dropdown.appendChild(opt);
-      });
+    const fetched = await res.json();
+    if (Array.isArray(fetched) && fetched.length > 0) {
+      counselors = fetched; // Use real admin/SIS data if available
     }
-
-    // Populate the counselor grid dynamically
-    const grid = document.getElementById('counselorGrid');
-    if (grid) {
-      grid.innerHTML = '';
-      counselors.forEach(c => {
-        const btn = document.createElement('button');
-        btn.textContent = c.email;
-        btn.onclick = () => openModal(c.username, c.email);
-        grid.appendChild(btn);
-      });
-    }
-
-    // Save a persistent copy for admin reference
-    localStorage.setItem('studentCounselors', JSON.stringify(counselors));
   } catch (err) {
-    console.error("Failed to populate counselors:", err);
+    console.warn("Using default example counselors. Admin API not ready yet.", err);
   }
+
+  // Populate dropdown if exists
+  const dropdown = document.getElementById('studentCounselorDropdown');
+  if (dropdown) {
+    dropdown.innerHTML = '';
+    counselors.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.username;
+      opt.textContent = c.name || c.email || c.username;
+      dropdown.appendChild(opt);
+    });
+  }
+
+  // Populate the counselor grid
+  const grid = document.getElementById('counselorGrid');
+  if (grid) {
+    grid.innerHTML = '';
+    counselors.forEach(c => {
+      const btn = document.createElement('button');
+      btn.textContent = c.email;
+      btn.onclick = () => openModal(c.username, c.email);
+      grid.appendChild(btn);
+    });
+  }
+
+  // Save locally
+  localStorage.setItem('studentCounselors', JSON.stringify(counselors));
 }
 
 // -------------------
