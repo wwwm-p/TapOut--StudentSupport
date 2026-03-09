@@ -8,23 +8,25 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif;}
-body{background:#f8fafc;padding:18px;}
+*{box-sizing:border-box}
 
 /* PAGES */
 .page{
 display:none;
 text-align:center;
 position:relative;
-max-width:600px;
-margin:0 auto 16px auto;
+width:100%;
 }
 .page.active{
 display:block;
 }
-.page img{width:100%;height:auto;display:block;border-radius:12px;}
+.page img{
+width:100%;
+height:auto;
+display:block;
+}
 
-/* HOTSPOTS */
+/* HOTSPOT BUTTONS */
 .hotspot{
 position:absolute;
 border:none;
@@ -33,7 +35,7 @@ cursor:pointer;
 z-index:2;
 }
 
-/* Example positions (adjust as needed) */
+/* Example hotspot positions */
 #page1 .academic { top:20%; left:10%; width:45px; height:45px; }
 #page1 .anxiety { top:30%; left:10%; width:45px; height:45px; }
 #page1 .depression { top:40%; left:10%; width:45px; height:45px; }
@@ -68,7 +70,11 @@ text-align:center;
 box-shadow:0 24px 60px rgba(0,0,0,.22);
 border:1px solid #eef2f7;
 }
-.modal h2{margin:0 0 14px;font-size:20px;font-weight:700;}
+.modal h2{
+margin:0 0 14px;
+font-size:20px;
+font-weight:700;
+}
 .modal input,
 .modal textarea{
 width:100%;
@@ -79,16 +85,28 @@ border:1px solid #e6e8ec;
 background:#f9fafb;
 text-align:center;
 }
-.modal textarea{height:90px;resize:none;}
-.modal-buttons{display:flex;gap:12px;justify-content:center;}
+.modal textarea{
+height:90px;
+resize:none;
+}
+.modal-buttons{
+display:flex;
+gap:12px;
+justify-content:center;
+}
 .modal-buttons button{
 padding:9px 18px;
 border-radius:999px;
 border:none;
 cursor:pointer;
 }
-.modal-buttons button:first-child{background:#f1f5f9;}
-.modal-buttons button:last-child{background:#0070c9;color:white;}
+.modal-buttons button:first-child{
+background:#f1f5f9;
+}
+.modal-buttons button:last-child{
+background:#0070c9;
+color:white;
+}
 
 /* COUNSELOR GRID */
 .counselor-grid{
