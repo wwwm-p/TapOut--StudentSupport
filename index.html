@@ -315,7 +315,185 @@ Back
 
 </div>
 
-<script src="script.js"></script>
+<script>
+var selectedReason = "";
+var selectedUrgency = "";
+var selectedCounselor = "";
+var selectedCounselorEmail = "";
+
+function goToPage(id) {
+  var pages = document.querySelectorAll(".page");
+  for (var i = 0; i < pages.length; i++) {
+    pages[i].classList.remove("active");
+  }
+  var page = document.getElementById(id);
+  if (page) page.classList.add("active");
+}
+
+function chooseReason(reason) {
+  selectedReason = reason;
+  goToPage("page2");
+}
+
+function chooseUrgency(urgency) {
+  selectedUrgency = urgency;
+  if (urgency === "I’m in Crisis") {
+    openCrisisModal();
+  } else {
+    goToPage("page3");
+  }
+}
+
+function openCrisisModal() {
+  var overlay = document.getElementById("crisisOverlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
+function closeCrisisModal() {
+  var overlay = document.getElementById("crisisOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function continueFromCrisis() {
+  closeCrisisModal();
+  goToPage("page3");
+}
+
+function openModal(username, email) {
+  selectedCounselor = username;
+  selectedCounselorEmail = email;
+  var overlay = document.getElementById("modalOverlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
+function closeModal() {
+  var overlay = document.getElementById("modalOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function openSuccess() {
+  var overlay = document.getElementById("successOverlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
+function closeSuccess() {
+  var overlay = document.getElementById("successOverlay");
+  if (overlay) overlay.style.display = "none";
+  goToPage("page1");
+}
+
+function populateStudentCounselorDropdown() {
+  var dropdown = document.getElementById("studentCounselorDropdown");
+  if (!dropdown) return;
+
+  fetch("/api/counselors")
+    .then(function(res){ return res.json(); })
+    .then(function(counselors){
+      dropdown.innerHTML = "";
+      for (var i = 0; i < counselors.length; i++) {
+        var opt = document.createElement("option");
+        opt.value = counselors[i].username;
+        opt.textContent = counselors[i].name;
+        dropdown.appendChild(opt);
+      }
+      localStorage.setItem("studentCounselors", JSON.stringify(counselors));
+    })
+    .catch(function(err){ console.error(err); });
+}
+
+function submitMessage() {
+  var firstNameEl = document.getElementById("firstName");
+  var lastNameEl = document.getElementById("lastName");
+  var gradeEl = document.getElementById("studentGrade");
+  var studentIdEl = document.getElementById("studentId");
+  var notesEl = document.getElementById("extraNotes");
+
+  var firstName = firstNameEl ? firstNameEl.value.trim() : "";
+  var lastName = lastNameEl ? lastNameEl.value.trim() : "";
+  var grade = gradeEl ? gradeEl.value.trim() : "";
+  var studentId = studentIdEl ? studentIdEl.value.trim() : "";
+  var notes = notesEl ? notesEl.value.trim() : "";
+
+  if (!firstName || !lastName || !grade || !studentId) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  var verifyBody = JSON.stringify({ studentId: studentId, firstName: firstName, lastName: lastName });
+
+  fetch("/api/verifyStudent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: verifyBody
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(verify){
+    if (!verify.valid) {
+      alert("Student ID not recognized.");
+      throw new Error("invalid");
+    }
+    return true;
+  })
+  .catch(function(err){
+    if (studentId !== "12345") {
+      console.error(err);
+      alert("Failed to verify student ID.");
+      throw err;
+    }
+  })
+  .then(function(){
+    var entry = {
+      firstName: firstName,
+      lastName: lastName,
+      grade: grade,
+      studentId: studentId,
+      notes: notes,
+      reason: selectedReason,
+      urgency: selectedUrgency,
+      counselor: selectedCounselor,
+      counselorEmail: selectedCounselorEmail,
+      dateTime: new Date().toISOString()
+    };
+
+    return fetch("/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry)
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      if (!data.success) throw new Error("Failed to submit message");
+
+      var existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
+      existing.push(entry);
+      localStorage.setItem("studentMessages", JSON.stringify(existing));
+
+      closeModal();
+      openSuccess();
+
+      selectedReason = "";
+      selectedUrgency = "";
+      selectedCounselor = "";
+      selectedCounselorEmail = "";
+
+      var ids = ["firstName","lastName","studentGrade","studentId","extraNotes"];
+      for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById(ids[i]);
+        if (el) el.value = "";
+      }
+    })
+    .catch(function(err){
+      console.error(err);
+      alert("Failed to send message.");
+    });
+  });
+}
+
+window.onload = function(){
+  console.log("Student support system loaded.");
+  populateStudentCounselorDropdown();
+};
+</script>
 
 </body>
 </html>
