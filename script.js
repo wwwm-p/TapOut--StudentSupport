@@ -1,78 +1,125 @@
+// ==============================
+// GLOBAL STATE
+// ==============================
 let selectedReason = "";
 let selectedUrgency = "";
 let selectedCounselor = "";
 let selectedCounselorEmail = "";
 
-// -------------------
-// Page Navigation
-// -------------------
+// ==============================
+// PAGE NAVIGATION
+// ==============================
 function goToPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const page = document.getElementById(id);
   if (page) page.classList.add("active");
 }
 
-// -------------------
-// Reason / Urgency
-// -------------------
-function chooseReason(reason) { selectedReason = reason; goToPage("page2"); }
+// ==============================
+// REASON / URGENCY
+// ==============================
+function chooseReason(reason) {
+  selectedReason = reason;
+  goToPage("page2");
+}
+
 function chooseUrgency(urgency) {
   selectedUrgency = urgency;
-  if (urgency === "I’m in Crisis") openCrisisModal();
-  else goToPage("page3");
+
+  if (urgency === "I’m in Crisis") {
+    openCrisisModal();
+  } else {
+    goToPage("page3");
+  }
+}
+
+// ==============================
+// MODALS
+// ==============================
+function openCrisisModal() {
+  const overlay = document.getElementById("crisisOverlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
+function closeCrisisModal() {
+  const overlay = document.getElementById("crisisOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function continueFromCrisis() {
+  closeCrisisModal();
+  goToPage("page3");
+}
+
+function openModal(username, email) {
+  selectedCounselor = username;
+  selectedCounselorEmail = email;
+
+  const overlay = document.getElementById("modalOverlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
+function closeModal() {
+  const overlay = document.getElementById("modalOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function openSuccess() {
+  const overlay = document.getElementById("successOverlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
+function closeSuccess() {
+  const overlay = document.getElementById("successOverlay");
+  if (overlay) overlay.style.display = "none";
+  goToPage("page1");
 }
 
 // -------------------
-// Modals
-// -------------------
-function openCrisisModal() { document.getElementById("crisisOverlay").style.display = "flex"; }
-function closeCrisisModal() { document.getElementById("crisisOverlay").style.display = "none"; }
-function continueFromCrisis() { closeCrisisModal(); goToPage("page3"); }
-
-function openModal(counselorUsername, counselorEmail) {
-  selectedCounselor = counselorUsername;
-  selectedCounselorEmail = counselorEmail;
-  document.getElementById("modalOverlay").style.display = "flex";
-}
-function closeModal() { document.getElementById("modalOverlay").style.display = "none"; }
-
-function openSuccess() { document.getElementById("successOverlay").style.display = "flex"; }
-function closeSuccess() { document.getElementById("successOverlay").style.display = "none"; goToPage("page1"); }
-
-// -------------------
-// Populate Counselor Dropdown
+// Populate Counselor Dropdown (optional)
 // -------------------
 async function populateStudentCounselorDropdown(){
+  const dropdown = document.getElementById("studentCounselorDropdown");
+  if (!dropdown) return;
   try {
-    const res = await fetch('/api/counselors');
+    const res = await fetch("/api/counselors");
     const counselors = await res.json();
-    const dropdown = document.getElementById('studentCounselorDropdown');
-    if (!dropdown) return;
-    dropdown.innerHTML = '';
-    counselors.forEach(c=>{
-      const opt = document.createElement('option');
-      opt.value = c.username; opt.textContent = c.name;
+    dropdown.innerHTML = "";
+    counselors.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.username;
+      opt.textContent = c.name;
       dropdown.appendChild(opt);
     });
-    localStorage.setItem('studentCounselors', JSON.stringify(counselors));
+    localStorage.setItem("studentCounselors", JSON.stringify(counselors));
   } catch(err){ console.error(err); }
 }
 
-// -------------------
-// Submit Message
-// -------------------
+// ==============================
+// SUBMIT MESSAGE
+// ==============================
 async function submitMessage() {
-  const firstName = document.getElementById("firstName")?.value.trim();
-  const lastName = document.getElementById("lastName")?.value.trim();
-  const grade = document.getElementById("studentGrade")?.value.trim();
-  const studentId = document.getElementById("studentId")?.value.trim();
-  const notes = document.getElementById("extraNotes")?.value.trim();
+
+  const firstNameEl = document.getElementById("firstName");
+  const lastNameEl = document.getElementById("lastName");
+  const gradeEl = document.getElementById("studentGrade");
+  const studentIdEl = document.getElementById("studentId");
+  const notesEl = document.getElementById("extraNotes");
+
+  const firstName = firstNameEl ? firstNameEl.value.trim() : "";
+  const lastName = lastNameEl ? lastNameEl.value.trim() : "";
+  const grade = gradeEl ? gradeEl.value.trim() : "";
+  const studentId = studentIdEl ? studentIdEl.value.trim() : "";
+  const notes = notesEl ? notesEl.value.trim() : "";
 
   if (!firstName || !lastName || !grade || !studentId) {
     alert("Please fill in all required fields.");
     return;
   }
 
+  // ==============================
+  // SIS VERIFICATION (with fallback)
+  // ==============================
   try {
     const res = await fetch("/api/verifyStudent", {
       method: "POST",
@@ -89,8 +136,15 @@ async function submitMessage() {
     }
   }
 
+  // ==============================
+  // CREATE MESSAGE OBJECT
+  // ==============================
   const entry = {
-    firstName, lastName, grade, studentId, notes,
+    firstName,
+    lastName,
+    grade,
+    studentId,
+    notes,
     reason: selectedReason,
     urgency: selectedUrgency,
     counselor: selectedCounselor,
@@ -111,18 +165,25 @@ async function submitMessage() {
     existing.push(entry);
     localStorage.setItem("studentMessages", JSON.stringify(existing));
 
-    closeModal(); openSuccess();
+    closeModal();
+    openSuccess();
 
-    selectedReason = ""; selectedUrgency = ""; selectedCounselor = ""; selectedCounselorEmail = "";
+    selectedReason = "";
+    selectedUrgency = "";
+    selectedCounselor = "";
+    selectedCounselorEmail = "";
+
     ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{
-      const el=document.getElementById(id); if(el) el.value="";
+      const el = document.getElementById(id);
+      if(el) el.value = "";
     });
   } catch(err){ console.error(err); alert("Failed to send message."); }
 }
 
-// -------------------
+// ==============================
 // INIT
-// -------------------
-window.onload = async ()=>{
+// ==============================
+window.onload = async () => {
+  console.log("Student support system loaded.");
   await populateStudentCounselorDropdown();
 };
