@@ -1,205 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Support</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Support</title>
+  <link rel="stylesheet" href="style.css" />
 
-<link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: #f8fafc; padding: 18px; }
 
-<style>
-*{box-sizing:border-box}
+    /* Pages */
+    .page { display: none !important; position: relative; text-align: center; max-width: 680px; width: 100%; margin: 0 auto 16px auto; }
+    .page.active { display: block !important; }
+    .page img { width: 100%; height: auto; display: block; border-radius: 12px; }
 
-/* PAGES */
-.page{
-display:none;
-text-align:center;
-position:relative;
-width:100%;
-}
-.page.active{
-display:block;
-}
-.page img{
-width:100%;
-height:auto;
-display:block;
-}
+    /* Hotspot buttons inside page container */
+    .hotspot {
+      position: absolute;
+      border: none;
+      background: rgba(0,0,0,0);
+      cursor: pointer;
+      z-index: 2;
+    }
 
-/* HOTSPOT BUTTONS */
-.hotspot{
-position:absolute;
-border:none;
-background:rgba(0,0,0,0);
-cursor:pointer;
-z-index:2;
-}
+    /* Example positions (adjust top/left/width/height as needed for your images) */
+    #page1 .hotspot.academic { top:20%; left:10%; width:45px; height:45px; }
+    #page1 .hotspot.anxiety { top:30%; left:10%; width:45px; height:45px; }
+    #page1 .hotspot.depression { top:40%; left:10%; width:45px; height:45px; }
+    #page1 .hotspot.family { top:50%; left:10%; width:45px; height:45px; }
+    #page1 .hotspot.relationship { top:60%; left:10%; width:45px; height:45px; }
+    #page1 .hotspot.bullying { top:70%; left:10%; width:45px; height:45px; }
+    #page1 .hotspot.talk { top:80%; left:10%; width:45px; height:45px; }
+    #page1 .hotspot.unsure { top:90%; left:10%; width:45px; height:45px; }
 
-/* Example hotspot positions */
-#page1 .academic { top:20%; left:10%; width:45px; height:45px; }
-#page1 .anxiety { top:30%; left:10%; width:45px; height:45px; }
-#page1 .depression { top:40%; left:10%; width:45px; height:45px; }
-#page1 .family { top:50%; left:10%; width:45px; height:45px; }
-#page1 .relationships { top:60%; left:10%; width:45px; height:45px; }
-#page1 .bullying { top:70%; left:10%; width:45px; height:45px; }
-#page1 .talk { top:80%; left:10%; width:45px; height:45px; }
-#page1 .notready { top:90%; left:10%; width:45px; height:45px; }
+    #page2 .hotspot.fine { top:25%; left:10%; width:45px; height:45px; }
+    #page2 .hotspot.littleoff { top:40%; left:10%; width:45px; height:45px; }
+    #page2 .hotspot.coping { top:55%; left:10%; width:45px; height:45px; }
+    #page2 .hotspot.crisis { top:70%; left:10%; width:45px; height:45px; }
 
-#page2 .fine { top:25%; left:10%; width:45px; height:45px; }
-#page2 .littleoff { top:40%; left:10%; width:45px; height:45px; }
-#page2 .coping { top:55%; left:10%; width:45px; height:45px; }
-#page2 .crisis { top:70%; left:10%; width:45px; height:45px; }
+    .back-button {
+      margin:10px auto;
+      padding:8px 18px;
+      border:none;
+      border-radius:999px;
+      background:#f1f5f9;
+      color:#334155;
+      cursor:pointer;
+      display:block;
+    }
 
-/* MODALS */
-.modal-overlay{
-position:fixed;
-inset:0;
-background:rgba(15,23,42,.55);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:1000;
-backdrop-filter:blur(6px);
-}
-.modal{
-width:360px;
-background:white;
-padding:26px;
-border-radius:18px;
-text-align:center;
-box-shadow:0 24px 60px rgba(0,0,0,.22);
-border:1px solid #eef2f7;
-}
-.modal h2{
-margin:0 0 14px;
-font-size:20px;
-font-weight:700;
-}
-.modal input,
-.modal textarea{
-width:100%;
-margin-bottom:12px;
-padding:11px;
-border-radius:12px;
-border:1px solid #e6e8ec;
-background:#f9fafb;
-text-align:center;
-}
-.modal textarea{
-height:90px;
-resize:none;
-}
-.modal-buttons{
-display:flex;
-gap:12px;
-justify-content:center;
-}
-.modal-buttons button{
-padding:9px 18px;
-border-radius:999px;
-border:none;
-cursor:pointer;
-}
-.modal-buttons button:first-child{
-background:#f1f5f9;
-}
-.modal-buttons button:last-child{
-background:#0070c9;
-color:white;
-}
+    .counselor-grid {
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
+      margin-top:10px;
+    }
 
-/* COUNSELOR GRID */
-.counselor-grid{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:10px;
-margin-top:20px;
-}
-.counselor-grid button{
-padding:10px 14px;
-border-radius:12px;
-border:none;
-background:#0070c9;
-color:white;
-cursor:pointer;
-}
+    /* MODAL (centered + modern) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(6px);
+    }
 
-/* BACK BUTTON */
-.back-button{
-margin-top:16px;
-padding:10px 14px;
-border-radius:12px;
-border:none;
-background:#d1d5db;
-cursor:pointer;
-}
-</style>
+    .modal {
+      width: 360px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 28px 26px;
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+      border: 1px solid #eef2f7;
+    }
+
+    .modal h2 {
+      margin: 0 0 14px 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .modal input,
+    .modal textarea {
+      width: 100%;
+      display: block;
+      margin: 0 auto 12px auto;
+      padding: 11px 12px;
+      font-size: 14px;
+      border-radius: 12px;
+      border: 1px solid #e6e8ec;
+      background: #f9fafb;
+      text-align: center;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .modal input:focus,
+    .modal textarea:focus {
+      outline: none;
+      border: 1px solid #0070c9;
+      box-shadow: 0 0 0 3px rgba(0,112,201,0.2);
+      background: #ffffff;
+    }
+
+    .modal textarea {
+      resize: none;
+      height: 90px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .modal-buttons button {
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .modal-buttons button:first-child {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .modal-buttons button:last-child {
+      background: #0070c9;
+      color: white;
+    }
+
+    /* Crisis modal */
+    .crisis-modal { width:min(560px,92vw); text-align:left; }
+    .crisis-modal h2 { text-align:center; }
+    .crisis-list { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; font-size:14px; color:#0f172a; }
+    .crisis-list strong { display:block; font-size:15px; }
+    .crisis-section { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
+    .crisis-actions { display:flex; justify-content:center; gap:12px; margin-top:14px; }
+    .crisis-actions .secondary { background:#f1f5f9; color:#334155; }
+    .crisis-actions .primary { background:#0070c9; color:#fff; }
+  </style>
 </head>
 
 <body>
 
-<!-- PAGE 1 -->
-<div class="page active" id="page1">
-<img src="page1.png" alt="Page 1">
-<button class="hotspot academic" onclick="chooseReason('Academic Stress')"></button>
-<button class="hotspot anxiety" onclick="chooseReason('Anxiety or Panic Attacks')"></button>
-<button class="hotspot depression" onclick="chooseReason('Depression or Sadness')"></button>
-<button class="hotspot family" onclick="chooseReason('Family Issues')"></button>
-<button class="hotspot relationships" onclick="chooseReason('Relationship Problems')"></button>
-<button class="hotspot bullying" onclick="chooseReason('Bullying')"></button>
-<button class="hotspot talk" onclick="chooseReason('Just Need Someone To Talk To')"></button>
-<button class="hotspot notready" onclick="chooseReason('Not Ready To Say')"></button>
-</div>
+  <!-- Page 1 -->
+  <div class="page active" id="page1">
+    <img src="page1.png" alt="Welcome Page">
+    <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
+    <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
+    <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
+    <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
+    <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
+    <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
+    <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
+    <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
+  </div>
 
-<!-- PAGE 2 -->
-<div class="page" id="page2">
-<img src="page2.png" alt="Page 2">
-<button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
-<button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
-<button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
-<button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
-<button class="back-button" onclick="goToPage('page1')">Back</button>
-</div>
+  <!-- Page 2 -->
+  <div class="page" id="page2">
+    <img src="page2.png" alt="Urgency Page">
+    <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
+    <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
+    <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
+    <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
+    <button class="back-button" onclick="goToPage('page1')">Back</button>
+  </div>
 
-<!-- PAGE 3 -->
-<div class="page" id="page3">
-<h2>Select Counselor</h2>
-<div class="counselor-grid">
-<button onclick="openModal('counselor1','counselor1@example.com')">counselor1@example.com</button>
-<button onclick="openModal('counselor2','counselor2@example.com')">counselor2@example.com</button>
-<button onclick="openModal('counselor3','counselor3@example.com')">counselor3@example.com</button>
-<button onclick="openModal('counselor4','counselor4@example.com')">counselor4@example.com</button>
-<button onclick="openModal('counselor5','counselor5@example.com')">counselor5@example.com</button>
-<button onclick="openModal('counselor6','counselor6@example.com')">counselor6@example.com</button>
-</div>
-<button class="back-button" onclick="goToPage('page2')">Back</button>
-</div>
+  <!-- Page 3 -->
+  <div class="page" id="page3">
+    <img src="page3.png" alt="Counselor Page">
+    <div class="counselor-grid">
+      <button onclick="openModal('miap2k10','miap2k10@gmail.com')">miap2k10@gmail.com</button>
+      <button onclick="openModal('kmcconnell','kmcconnell@smpanthers.org')">kmcconnell@smpanthers.org</button>
+      <button onclick="openModal('gsorbi','gsorbi@smpanthers.org')">gsorbi@smpanthers.org</button>
+      <button onclick="openModal('apanlilio','apanlilio@smpanthers.org')">apanlilio@smpanthers.org</button>
+      <button onclick="openModal('aturner','aturner@smpanthers.org')">aturner@smpanthers.org</button>
+      <button onclick="openModal('cfilson','cfilson@smpanthers.org')">cfilson@smpanthers.org</button>
+    </div>
+    <button class="back-button" onclick="goToPage('page2')">Back</button>
+  </div>
 
-<!-- STUDENT MODAL -->
-<div class="modal-overlay" id="modalOverlay">
-<div class="modal">
-<h2>Submit Message</h2>
-<input id="firstName" placeholder="First Name">
-<input id="lastName" placeholder="Last Name">
-<input id="studentGrade" placeholder="Grade">
-<input id="studentId" placeholder="Student ID">
-<textarea id="extraNotes" placeholder="Additional notes"></textarea>
-<div class="modal-buttons">
-<button onclick="closeModal()">Cancel</button>
-<button onclick="submitMessage()">Submit</button>
-</div>
-</div>
-</div>
+  <!-- Crisis Numbers Modal -->
+  <div class="modal-overlay" id="crisisOverlay">
+    <div class="modal crisis-modal">
+      <h2>Immediate Support</h2>
+      <ul class="crisis-list">
+        <li class="crisis-section">
+          <strong>Emergency</strong>
+          911 – Emergency services (police / ambulance / fire) for life-threatening crises.
+        </li>
+        <li class="crisis-section">
+          <strong>Mental Health & Crisis Support</strong>
+          988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
+          National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
+          Crisis Text Line – Text HOME to 741741 (24/7).
+        </li>
+        <li class="crisis-section">
+          <strong>Eating Disorder Support</strong>
+          National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
+          Text NEDA to 741741.
+        </li>
+        <li class="crisis-section">
+          <strong>Domestic Violence Support</strong>
+          National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
+          Text START to 88788.
+        </li>
+        <li class="crisis-section">
+          <strong>Sexual Assault Support</strong>
+          RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
+        </li>
+        <li class="crisis-section">
+          <strong>Substance Abuse & Addiction Support</strong>
+          SAMHSA National Helpline – 1-800-662-HELP (4357).
+        </li>
+        <li class="crisis-section">
+          <strong>LGBTQ Youth Support</strong>
+          The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
+        </li>
+      </ul>
+      <div class="crisis-actions">
+        <button class="secondary" onclick="closeCrisisModal()">Close</button>
+        <button class="primary" onclick="continueFromCrisis()">Continue to Counselor</button>
+      </div>
+    </div>
+  </div>
 
-<!-- SUCCESS MODAL -->
-<div class="modal-overlay" id="successOverlay">
-<div class="modal">
-<h2>Message Sent</h2>
-<button onclick="closeSuccess()">OK</button>
-</div>
-</div>
+  <!-- Student Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2>Submit Message</h2>
+      <input type="text" id="firstName" placeholder="First Name (required)">
+      <input type="text" id="lastName" placeholder="Last Name (required)">
+      <input type="text" id="studentGrade" placeholder="Grade (required)">
+      <input type="text" id="studentId" placeholder="Student ID (required)">
+      <textarea id="extraNotes" placeholder="Additional notes (optional)"></textarea>
+      <div class="modal-buttons">
+        <button onclick="closeModal()">Cancel</button>
+        <button onclick="submitMessage()">Submit</button>
+      </div>
+    </div>
+  </div>
 
-<script src="script.js"></script>
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="successOverlay">
+    <div class="modal">
+      <h2>Message Sent</h2>
+      <button onclick="closeSuccess()">OK</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
