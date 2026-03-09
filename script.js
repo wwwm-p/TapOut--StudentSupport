@@ -62,24 +62,38 @@ function closeSuccess() {
 }
 
 // -------------------
-// Populate Counselor Dropdown
+// Populate Counselors dynamically
 // -------------------
 async function populateStudentCounselorDropdown() {
   try {
     const res = await fetch('/api/counselors');
     const counselors = await res.json();
+    
+    // Populate dropdown if exists
     const dropdown = document.getElementById('studentCounselorDropdown');
-    if (!dropdown) return;
+    if (dropdown) {
+      dropdown.innerHTML = '';
+      counselors.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.username;
+        opt.textContent = c.name || c.email || c.username;
+        dropdown.appendChild(opt);
+      });
+    }
 
-    dropdown.innerHTML = '';
-    counselors.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c.username; 
-      opt.textContent = c.name || c.email || c.username;
-      dropdown.appendChild(opt);
-    });
+    // Populate the counselor grid dynamically
+    const grid = document.getElementById('counselorGrid');
+    if (grid) {
+      grid.innerHTML = '';
+      counselors.forEach(c => {
+        const btn = document.createElement('button');
+        btn.textContent = c.email;
+        btn.onclick = () => openModal(c.username, c.email);
+        grid.appendChild(btn);
+      });
+    }
 
-    // Save a persistent copy for admin merge
+    // Save a persistent copy for admin reference
     localStorage.setItem('studentCounselors', JSON.stringify(counselors));
   } catch (err) {
     console.error("Failed to populate counselors:", err);
@@ -102,7 +116,7 @@ async function submitMessage() {
   }
 
   // -------------------
-  // SIS Verification
+  // Student Verification via Admin API
   // -------------------
   try {
     const res = await fetch("/api/verifyStudent", {
@@ -111,10 +125,13 @@ async function submitMessage() {
       body: JSON.stringify({ studentId, firstName, lastName, grade })
     });
     const verify = await res.json();
-    if (!verify.valid) { alert("Student ID, name, or grade mismatch."); return; }
+    if (!verify.valid) {
+      alert("Student ID, name, or grade mismatch.");
+      return;
+    }
   } catch (err) {
     console.error(err);
-    alert("Failed to verify student ID.");
+    alert("Failed to verify student.");
     return;
   }
 
@@ -131,42 +148,40 @@ async function submitMessage() {
     dateTime: new Date().toISOString()
   };
 
+  // -------------------
+  // Send all messages to Admin Dashboard
+  // -------------------
   try {
-    // ✅ Only send crisis messages to admin
-    if (selectedUrgency === "I’m in Crisis") {
-      const res = await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(entry)
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error("Failed to submit crisis message");
-    } else {
-      console.log("Non-crisis message submitted locally:", entry);
-    }
-
-    // Save locally for student history
-    const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
-    existing.push(entry);
-    localStorage.setItem("studentMessages", JSON.stringify(existing));
-
-    closeModal();
-    openSuccess();
-
-    // Reset selections and form fields
-    selectedReason = "";
-    selectedUrgency = "";
-    selectedCounselor = "";
-    selectedCounselorEmail = "";
-    ["firstName", "lastName", "studentGrade", "studentId", "extraNotes"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
+    const res = await fetch("/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry)
     });
-
+    const data = await res.json();
+    if (!data.success) throw new Error("Failed to submit message");
   } catch (err) {
     console.error(err);
     alert("Failed to send message.");
+    return;
   }
+
+  // -------------------
+  // Save locally for student history
+  // -------------------
+  const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
+  existing.push(entry);
+  localStorage.setItem("studentMessages", JSON.stringify(existing));
+
+  // -------------------
+  // Reset form and selections
+  // -------------------
+  closeModal();
+  openSuccess();
+  selectedReason = selectedUrgency = selectedCounselor = selectedCounselorEmail = "";
+  ["firstName", "lastName", "studentGrade", "studentId", "extraNotes"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
 }
 
 // -------------------
