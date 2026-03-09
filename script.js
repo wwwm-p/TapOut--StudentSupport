@@ -103,7 +103,9 @@ async function populateStudentCounselorDropdown() {
     grid.innerHTML = '';
     counselors.forEach(c => {
       const btn = document.createElement('button');
+      btn.type = "button"; // Ensures not treated as form submit
       btn.textContent = c.email;
+      btn.style.cursor = "pointer"; // Make sure it's clickable
       btn.onclick = () => openModal(c.username, c.email);
       grid.appendChild(btn);
     });
@@ -128,9 +130,6 @@ async function submitMessage() {
     return;
   }
 
-  // -------------------
-  // Student Verification via Admin API
-  // -------------------
   try {
     const res = await fetch("/api/verifyStudent", {
       method: "POST",
@@ -161,9 +160,6 @@ async function submitMessage() {
     dateTime: new Date().toISOString()
   };
 
-  // -------------------
-  // Send all messages to Admin Dashboard
-  // -------------------
   try {
     const res = await fetch("/api/messages", {
       method: "POST",
@@ -178,16 +174,12 @@ async function submitMessage() {
     return;
   }
 
-  // -------------------
-  // Save locally for student history
-  // -------------------
+  // Save locally
   const existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
   existing.push(entry);
   localStorage.setItem("studentMessages", JSON.stringify(existing));
 
-  // -------------------
-  // Reset form and selections
-  // -------------------
+  // Reset form
   closeModal();
   openSuccess();
   selectedReason = selectedUrgency = selectedCounselor = selectedCounselorEmail = "";
