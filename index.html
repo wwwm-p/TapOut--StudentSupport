@@ -4,126 +4,128 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Student Support</title>
-
 <link rel="stylesheet" href="style.css">
 
 <style>
-
-*{box-sizing:border-box}
+*{box-sizing:border-box;}
 
 /* PAGES */
-
 .page{
-display:none;
-text-align:center;
-position:relative;
+  display:none;
+  text-align:center;
+  position:relative;
 }
-
 .page.active{
-display:block;
+  display:block;
+}
+.page img{
+  width:100%;
+  height:auto;
+  display:block;
 }
 
-.page img{
-width:100%;
-height:auto;
-display:block;
+/* PAGE BUTTONS */
+.page button {
+  display: block;
+  width: 80%;
+  max-width: 400px;
+  margin: 10px auto;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: #0070c9;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.page button:hover {
+  background: #005ea6;
+}
+
+/* Back buttons */
+.back-button {
+  background: #d1d5db !important;
+  color: #1f2937 !important;
+}
+.back-button:hover {
+  background: #9ca3af !important;
 }
 
 /* MODALS */
-
 .modal-overlay{
-position:fixed;
-inset:0;
-background:rgba(15,23,42,.55);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:1000;
-backdrop-filter:blur(6px);
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+  backdrop-filter:blur(6px);
 }
-
 .modal{
-width:360px;
-background:white;
-padding:26px;
-border-radius:18px;
-text-align:center;
-box-shadow:0 24px 60px rgba(0,0,0,.22);
-border:1px solid #eef2f7;
+  width:360px;
+  background:white;
+  padding:26px;
+  border-radius:18px;
+  text-align:center;
+  box-shadow:0 24px 60px rgba(0,0,0,.22);
+  border:1px solid #eef2f7;
 }
-
 .modal h2{
-margin:0 0 14px;
-font-size:20px;
-font-weight:700;
+  margin:0 0 14px;
+  font-size:20px;
+  font-weight:700;
 }
-
 .modal input,
 .modal textarea{
-width:100%;
-margin-bottom:12px;
-padding:11px;
-border-radius:12px;
-border:1px solid #e6e8ec;
-background:#f9fafb;
-text-align:center;
+  width:100%;
+  margin-bottom:12px;
+  padding:11px;
+  border-radius:12px;
+  border:1px solid #e6e8ec;
+  background:#f9fafb;
+  text-align:center;
 }
-
 .modal textarea{
-height:90px;
-resize:none;
+  height:90px;
+  resize:none;
 }
-
 .modal-buttons{
-display:flex;
-gap:12px;
-justify-content:center;
+  display:flex;
+  gap:12px;
+  justify-content:center;
 }
-
 .modal-buttons button{
-padding:9px 18px;
-border-radius:999px;
-border:none;
-cursor:pointer;
+  padding:9px 18px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
 }
-
 .modal-buttons button:first-child{
-background:#f1f5f9;
+  background:#f1f5f9;
 }
-
 .modal-buttons button:last-child{
-background:#0070c9;
-color:white;
+  background:#0070c9;
+  color:white;
 }
 
 /* COUNSELOR GRID */
-
 .counselor-grid{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:10px;
-margin-top:20px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin-top:20px;
 }
-
 .counselor-grid button{
-padding:10px 14px;
-border-radius:12px;
-border:none;
-background:#0070c9;
-color:white;
-cursor:pointer;
-}
-
-/* BACK BUTTON */
-
-.back-button{
-margin-top:16px;
-padding:10px 14px;
-border-radius:12px;
-border:none;
-background:#d1d5db;
-cursor:pointer;
+  padding:10px 14px;
+  border-radius:12px;
+  border:none;
+  background:#0070c9;
+  color:white;
+  cursor:pointer;
 }
 
 /* CRISIS MODAL */
@@ -135,18 +137,14 @@ cursor:pointer;
 .crisis-actions { display:flex; justify-content:center; gap:12px; margin-top:14px; }
 .crisis-actions .secondary { background:#f1f5f9; color:#334155; }
 .crisis-actions .primary { background:#0070c9; color:white; }
-
 </style>
 </head>
 
 <body>
 
 <!-- PAGE 1 -->
-
 <div class="page active" id="page1">
-
 <img src="page1.png" alt="Page 1">
-
 <button type="button" onclick="chooseReason('Academic Stress')">Academic Stress</button>
 <button type="button" onclick="chooseReason('Anxiety or Panic Attacks')">Anxiety</button>
 <button type="button" onclick="chooseReason('Depression or Sadness')">Depression</button>
@@ -155,75 +153,30 @@ cursor:pointer;
 <button type="button" onclick="chooseReason('Bullying')">Bullying</button>
 <button type="button" onclick="chooseReason('Just Need Someone To Talk To')">Talk</button>
 <button type="button" onclick="chooseReason('Not Ready To Say')">Not Ready</button>
-
 </div>
 
 <!-- PAGE 2 -->
-
 <div class="page" id="page2">
-
 <img src="page2.png" alt="Page 2">
-
-<button type="button" onclick="chooseUrgency('I’m Doing Fine – Just Curious')">
-I'm Doing Fine
-</button>
-
-<button type="button" onclick="chooseUrgency('Feeling a Little Off')">
-Feeling A Little Off
-</button>
-
-<button type="button" onclick="chooseUrgency('I’m Not Coping Well')">
-Not Coping Well
-</button>
-
-<button type="button" onclick="chooseUrgency('I’m in Crisis')">
-I'm In Crisis
-</button>
-
-<button type="button" class="back-button" onclick="goToPage('page1')">
-Back
-</button>
-
+<button type="button" onclick="chooseUrgency('I’m Doing Fine – Just Curious')">I'm Doing Fine</button>
+<button type="button" onclick="chooseUrgency('Feeling a Little Off')">Feeling A Little Off</button>
+<button type="button" onclick="chooseUrgency('I’m Not Coping Well')">Not Coping Well</button>
+<button type="button" onclick="chooseUrgency('I’m in Crisis')">I'm In Crisis</button>
+<button type="button" class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
 <!-- PAGE 3 -->
-
 <div class="page" id="page3">
-
 <h2>Select Counselor</h2>
-
 <div class="counselor-grid">
-
-<button type="button" onclick="openModal('counselor1','counselor1@example.com')">
-counselor1@example.com
-</button>
-
-<button type="button" onclick="openModal('counselor2','counselor2@example.com')">
-counselor2@example.com
-</button>
-
-<button type="button" onclick="openModal('counselor3','counselor3@example.com')">
-counselor3@example.com
-</button>
-
-<button type="button" onclick="openModal('counselor4','counselor4@example.com')">
-counselor4@example.com
-</button>
-
-<button type="button" onclick="openModal('counselor5','counselor5@example.com')">
-counselor5@example.com
-</button>
-
-<button type="button" onclick="openModal('counselor6','counselor6@example.com')">
-counselor6@example.com
-</button>
-
+<button type="button" onclick="openModal('counselor1','counselor1@example.com')">counselor1@example.com</button>
+<button type="button" onclick="openModal('counselor2','counselor2@example.com')">counselor2@example.com</button>
+<button type="button" onclick="openModal('counselor3','counselor3@example.com')">counselor3@example.com</button>
+<button type="button" onclick="openModal('counselor4','counselor4@example.com')">counselor4@example.com</button>
+<button type="button" onclick="openModal('counselor5','counselor5@example.com')">counselor5@example.com</button>
+<button type="button" onclick="openModal('counselor6','counselor6@example.com')">counselor6@example.com</button>
 </div>
-
-<button type="button" class="back-button" onclick="goToPage('page2')">
-Back
-</button>
-
+<button type="button" class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
 <!-- CRISIS MODAL -->
@@ -231,88 +184,38 @@ Back
 <div class="modal crisis-modal">
 <h2>Immediate Support</h2>
 <ul class="crisis-list">
-  <li class="crisis-section">
-    <strong>Emergency</strong>
-    911 – Emergency services (police / ambulance / fire) for life-threatening crises.
-  </li>
-  <li class="crisis-section">
-    <strong>Mental Health & Crisis Support</strong>
-    988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
-    National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
-    Crisis Text Line – Text HOME to 741741 (24/7).
-  </li>
-  <li class="crisis-section">
-    <strong>Eating Disorder Support</strong>
-    National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
-    Text NEDA to 741741.
-  </li>
-  <li class="crisis-section">
-    <strong>Domestic Violence Support</strong>
-    National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
-    Text START to 88788.
-  </li>
-  <li class="crisis-section">
-    <strong>Sexual Assault Support</strong>
-    RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
-  </li>
-  <li class="crisis-section">
-    <strong>Substance Abuse & Addiction Support</strong>
-    SAMHSA National Helpline – 1-800-662-HELP (4357).
-  </li>
-  <li class="crisis-section">
-    <strong>LGBTQ Youth Support</strong>
-    The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
-  </li>
+  <li class="crisis-section"><strong>Emergency</strong> 911 – Emergency services (police / ambulance / fire).</li>
+  <li class="crisis-section"><strong>Mental Health & Crisis Support</strong> 988 Suicide & Crisis Lifeline – Call or text 988.<br>Crisis Text Line – Text HOME to 741741.</li>
 </ul>
 <div class="crisis-actions">
-  <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
-  <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
+<button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
+<button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
 </div>
 </div>
 </div>
 
 <!-- STUDENT MODAL -->
-
 <div class="modal-overlay" id="modalOverlay">
-
 <div class="modal">
-
 <h2>Submit Message</h2>
-
 <input id="firstName" placeholder="First Name">
-
 <input id="lastName" placeholder="Last Name">
-
 <input id="studentGrade" placeholder="Grade">
-
 <input id="studentId" placeholder="Student ID">
-
 <textarea id="extraNotes" placeholder="Additional notes"></textarea>
-
 <div class="modal-buttons">
-
 <button type="button" onclick="closeModal()">Cancel</button>
-
 <button type="button" onclick="submitMessage()">Submit</button>
-
 </div>
-
 </div>
-
 </div>
 
 <!-- SUCCESS MODAL -->
-
 <div class="modal-overlay" id="successOverlay">
-
 <div class="modal">
-
 <h2>Message Sent</h2>
-
 <button type="button" onclick="closeSuccess()">OK</button>
-
 </div>
-
 </div>
 
 <script>
@@ -321,178 +224,60 @@ var selectedUrgency = "";
 var selectedCounselor = "";
 var selectedCounselorEmail = "";
 
-function goToPage(id) {
-  var pages = document.querySelectorAll(".page");
-  for (var i = 0; i < pages.length; i++) {
-    pages[i].classList.remove("active");
-  }
-  var page = document.getElementById(id);
-  if (page) page.classList.add("active");
+function goToPage(id){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
+function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
+function chooseUrgency(urgency){ selectedUrgency=urgency; (urgency==="I’m in Crisis") ? openCrisisModal() : goToPage("page3"); }
+function openCrisisModal(){ document.getElementById("crisisOverlay").style.display="flex"; }
+function closeCrisisModal(){ document.getElementById("crisisOverlay").style.display="none"; }
+function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
+function openModal(username,email){ selectedCounselor=username; selectedCounselorEmail=email; document.getElementById("modalOverlay").style.display="flex"; }
+function closeModal(){ document.getElementById("modalOverlay").style.display="none"; }
+function openSuccess(){ document.getElementById("successOverlay").style.display="flex"; }
+function closeSuccess(){ document.getElementById("successOverlay").style.display="none"; goToPage("page1"); }
 
-function chooseReason(reason) {
-  selectedReason = reason;
-  goToPage("page2");
-}
+function submitMessage(){
+  var firstName=document.getElementById("firstName").value.trim();
+  var lastName=document.getElementById("lastName").value.trim();
+  var grade=document.getElementById("studentGrade").value.trim();
+  var studentId=document.getElementById("studentId").value.trim();
+  var notes=document.getElementById("extraNotes").value.trim();
 
-function chooseUrgency(urgency) {
-  selectedUrgency = urgency;
-  if (urgency === "I’m in Crisis") {
-    openCrisisModal();
-  } else {
-    goToPage("page3");
-  }
-}
+  if(!firstName||!lastName||!grade||!studentId){ alert("Please fill in all required fields."); return; }
 
-function openCrisisModal() {
-  var overlay = document.getElementById("crisisOverlay");
-  if (overlay) overlay.style.display = "flex";
-}
-
-function closeCrisisModal() {
-  var overlay = document.getElementById("crisisOverlay");
-  if (overlay) overlay.style.display = "none";
-}
-
-function continueFromCrisis() {
-  closeCrisisModal();
-  goToPage("page3");
-}
-
-function openModal(username, email) {
-  selectedCounselor = username;
-  selectedCounselorEmail = email;
-  var overlay = document.getElementById("modalOverlay");
-  if (overlay) overlay.style.display = "flex";
-}
-
-function closeModal() {
-  var overlay = document.getElementById("modalOverlay");
-  if (overlay) overlay.style.display = "none";
-}
-
-function openSuccess() {
-  var overlay = document.getElementById("successOverlay");
-  if (overlay) overlay.style.display = "flex";
-}
-
-function closeSuccess() {
-  var overlay = document.getElementById("successOverlay");
-  if (overlay) overlay.style.display = "none";
-  goToPage("page1");
-}
-
-function populateStudentCounselorDropdown() {
-  var dropdown = document.getElementById("studentCounselorDropdown");
-  if (!dropdown) return;
-
-  fetch("/api/counselors")
-    .then(function(res){ return res.json(); })
-    .then(function(counselors){
-      dropdown.innerHTML = "";
-      for (var i = 0; i < counselors.length; i++) {
-        var opt = document.createElement("option");
-        opt.value = counselors[i].username;
-        opt.textContent = counselors[i].name;
-        dropdown.appendChild(opt);
-      }
-      localStorage.setItem("studentCounselors", JSON.stringify(counselors));
-    })
-    .catch(function(err){ console.error(err); });
-}
-
-function submitMessage() {
-  var firstNameEl = document.getElementById("firstName");
-  var lastNameEl = document.getElementById("lastName");
-  var gradeEl = document.getElementById("studentGrade");
-  var studentIdEl = document.getElementById("studentId");
-  var notesEl = document.getElementById("extraNotes");
-
-  var firstName = firstNameEl ? firstNameEl.value.trim() : "";
-  var lastName = lastNameEl ? lastNameEl.value.trim() : "";
-  var grade = gradeEl ? gradeEl.value.trim() : "";
-  var studentId = studentIdEl ? studentIdEl.value.trim() : "";
-  var notes = notesEl ? notesEl.value.trim() : "";
-
-  if (!firstName || !lastName || !grade || !studentId) {
-    alert("Please fill in all required fields.");
-    return;
-  }
-
-  var verifyBody = JSON.stringify({ studentId: studentId, firstName: firstName, lastName: lastName });
-
-  fetch("/api/verifyStudent", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: verifyBody
+  // Verify Student
+  fetch("/api/verifyStudent",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ student_id: studentId })
   })
-  .then(function(res){ return res.json(); })
-  .then(function(verify){
-    if (!verify.valid) {
-      alert("Student ID not recognized.");
-      throw new Error("invalid");
-    }
-    return true;
-  })
-  .catch(function(err){
-    if (studentId !== "12345") {
-      console.error(err);
-      alert("Failed to verify student ID.");
-      throw err;
-    }
-  })
-  .then(function(){
-    var entry = {
-      firstName: firstName,
-      lastName: lastName,
-      grade: grade,
-      studentId: studentId,
-      notes: notes,
-      reason: selectedReason,
-      urgency: selectedUrgency,
-      counselor: selectedCounselor,
-      counselorEmail: selectedCounselorEmail,
-      dateTime: new Date().toISOString()
-    };
+  .then(res=>res.json())
+  .then(verify=>{
+    if(!verify.valid){ alert("Student ID not recognized."); throw new Error("invalid"); }
 
-    return fetch("/api/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(entry)
-    })
-    .then(function(res){ return res.json(); })
-    .then(function(data){
-      if (!data.success) throw new Error("Failed to submit message");
-
-      var existing = JSON.parse(localStorage.getItem("studentMessages") || "[]");
-      existing.push(entry);
-      localStorage.setItem("studentMessages", JSON.stringify(existing));
-
-      closeModal();
-      openSuccess();
-
-      selectedReason = "";
-      selectedUrgency = "";
-      selectedCounselor = "";
-      selectedCounselorEmail = "";
-
-      var ids = ["firstName","lastName","studentGrade","studentId","extraNotes"];
-      for (var i = 0; i < ids.length; i++) {
-        var el = document.getElementById(ids[i]);
-        if (el) el.value = "";
-      }
-    })
-    .catch(function(err){
-      console.error(err);
-      alert("Failed to send message.");
+    return fetch("/api/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        student_id: studentId,
+        counselor_username:selectedCounselor,
+        notes:notes,
+        reason:selectedReason,
+        urgency:selectedUrgency
+      })
     });
-  });
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    if(!data.success) throw new Error("Failed to send");
+    closeModal(); openSuccess();
+    selectedReason=""; selectedUrgency=""; selectedCounselor=""; selectedCounselorEmail="";
+    ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>document.getElementById(id).value="");
+  })
+  .catch(err=>{ console.error(err); alert("Failed to send message."); });
 }
-
-window.onload = function(){
-  console.log("Student support system loaded.");
-  populateStudentCounselorDropdown();
-};
 </script>
 
 </body>
