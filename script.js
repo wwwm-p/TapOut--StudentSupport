@@ -62,30 +62,27 @@ function closeSuccess() {
 }
 
 // -------------------
-// Populate Counselors dynamically with default examples
+// Populate Counselors dynamically
 // -------------------
 async function populateStudentCounselorDropdown() {
-  // Default example counselors
-  let counselors = [
-    { username: "counselor1", email: "counselor1@example.com", name: "Counselor One" },
-    { username: "counselor2", email: "counselor2@example.com", name: "Counselor Two" },
-    { username: "counselor3", email: "counselor3@example.com", name: "Counselor Three" },
-    { username: "counselor4", email: "counselor4@example.com", name: "Counselor Four" },
-    { username: "counselor5", email: "counselor5@example.com", name: "Counselor Five" },
-    { username: "counselor6", email: "counselor6@example.com", name: "Counselor Six" }
-  ];
+  let counselors = [];
 
   try {
-    const res = await fetch('/api/counselors');
-    const fetched = await res.json();
-    if (Array.isArray(fetched) && fetched.length > 0) {
-      counselors = fetched; // Use real admin/SIS data if available
+    const res = await fetch('/api/getCounselors'); // use new API
+    const data = await res.json();
+    if (data.success && Array.isArray(data.counselors)) {
+      counselors = data.counselors;
     }
   } catch (err) {
-    console.warn("Using default example counselors. Admin API not ready yet.", err);
+    console.warn("Failed to fetch counselors, using default examples.", err);
+    counselors = [
+      { username: "counselor1", email: "counselor1@example.com", name: "Counselor One" },
+      { username: "counselor2", email: "counselor2@example.com", name: "Counselor Two" },
+      { username: "counselor3", email: "counselor3@example.com", name: "Counselor Three" }
+    ];
   }
 
-  // Populate dropdown if exists
+  // Populate counselor dropdown if exists
   const dropdown = document.getElementById('studentCounselorDropdown');
   if (dropdown) {
     dropdown.innerHTML = '';
@@ -103,9 +100,9 @@ async function populateStudentCounselorDropdown() {
     grid.innerHTML = '';
     counselors.forEach(c => {
       const btn = document.createElement('button');
-      btn.type = "button"; // Ensures not treated as form submit
-      btn.textContent = c.email;
-      btn.style.cursor = "pointer"; // Make sure it's clickable
+      btn.type = "button"; // prevent default form behavior
+      btn.textContent = c.name || c.email;
+      btn.style.cursor = "pointer";
       btn.onclick = () => openModal(c.username, c.email);
       grid.appendChild(btn);
     });
@@ -130,6 +127,9 @@ async function submitMessage() {
     return;
   }
 
+  // -------------------
+  // Verify Student
+  // -------------------
   try {
     const res = await fetch("/api/verifyStudent", {
       method: "POST",
@@ -160,6 +160,9 @@ async function submitMessage() {
     dateTime: new Date().toISOString()
   };
 
+  // -------------------
+  // Send to messages API
+  // -------------------
   try {
     const res = await fetch("/api/messages", {
       method: "POST",
@@ -179,7 +182,9 @@ async function submitMessage() {
   existing.push(entry);
   localStorage.setItem("studentMessages", JSON.stringify(existing));
 
+  // -------------------
   // Reset form
+  // -------------------
   closeModal();
   openSuccess();
   selectedReason = selectedUrgency = selectedCounselor = selectedCounselorEmail = "";
