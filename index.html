@@ -5,6 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Student Support</title>
 <link rel="stylesheet" href="style.css" />
+
+<!-- PWA: Manifest file link -->
+<link rel="manifest" href="manifest.json" />
+
+<!-- PWA: Theme color for browser UI -->
+<meta name="theme-color" content="#0070c9" />
+
+<!-- PWA: Mobile web app compatibility -->
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Student Support" />
+
+<!-- PWA: Apple touch icons (placeholders if icons are missing) -->
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png" />
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png" />
+<link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png" />
+
 <style>
 * { box-sizing: border-box; margin:0; padding:0; }
 
@@ -17,6 +35,8 @@
   width: 100%;
   pointer-events: none; /* allows clicks to pass through images */
   user-select: none;
+  height: auto; /* Responsive image sizing */
+  display: block; /* Avoid inline image gaps */
 }
 
 /* Hotspot buttons */
@@ -87,6 +107,9 @@
 /* Counselor Grid */
 .counselor-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:10px; }
 .counselor-grid button { padding:8px 12px; border-radius:12px; border:none; cursor:pointer; background:#0070c9; color:white; }
+
+/* Responsive layout support */
+body { max-width: 100%; overflow-x: hidden; }
 </style>
 </head>
 <body>
@@ -262,6 +285,16 @@ async function submitMessage(){
   closeModal(); openSuccess();
   selectedReason=selectedUrgency=selectedCounselor=selectedCounselorEmail="";
   ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+}
+
+// -------------------
+// PWA: Register Service Worker for offline caching
+// -------------------
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .catch(err => console.warn("Service worker registration failed:", err));
+  });
 }
 
 // -------------------
