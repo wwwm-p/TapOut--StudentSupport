@@ -1,93 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Student Support</title>
 
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="style.css">
 
-<!-- ✅ PWA Manifest -->
-<link rel="manifest" href="/student-manifest.json" />
+<!-- PWA -->
+<link rel="manifest" href="/student-manifest.json">
+<meta name="theme-color" content="#0070c9">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Student Support">
 
-<!-- ✅ Required meta -->
-<meta name="theme-color" content="#0070c9" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="Student Support" />
-
-<!-- ✅ IMPORTANT: use SAME icon everywhere -->
-<link rel="icon" href="/icons/icon-192-student.png">
-<link rel="apple-touch-icon" href="/icons/icon-192-student.png">
+<!-- Icons -->
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192-student.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512-student.png">
 
 <style>
-* { box-sizing: border-box; margin:0; padding:0; }
-
-.page { display: none; position: relative; }
-.page.active { display: block; text-align:center; }
-
-.page img {
-  width: 100%;
-  pointer-events: none;
-  user-select: none;
-  height: auto;
-  display: block;
-}
-
-.hotspot { position: absolute; z-index: 10; cursor: pointer; }
-
-.back-button {
-  margin-top:10px;
-  padding:8px 12px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  background:#ccc;
-}
-
-.counselor-grid {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  margin-top:10px;
-}
-
-.counselor-grid button {
-  padding:8px 12px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  background:#0070c9;
-  color:white;
-}
-
-/* ✅ Install button */
-.install-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 2000;
-  padding: 12px 18px;
-  background:#0070c9;
-  color:white;
-  border:none;
-  border-radius:24px;
-  cursor:pointer;
-  font-size:16px;
-  display:none;
-}
-
-body { max-width: 100%; overflow-x: hidden; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{overflow-x:hidden;}
+.page{display:none;position:relative;}
+.page.active{display:block;text-align:center;}
+.page img{width:100%;height:auto;display:block;pointer-events:none;user-select:none;}
+.hotspot{position:absolute;z-index:10;cursor:pointer;}
+.back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
+.counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
+.counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
+.install-button{position:fixed;bottom:20px;right:20px;z-index:2000;padding:12px 18px;background:#0070c9;color:white;border:none;border-radius:24px;cursor:pointer;font-size:16px;display:none;}
 </style>
 </head>
-
 <body>
 
-<!-- PAGE 1 -->
+<!-- Pages -->
 <div class="page active" id="page1">
-  <img src="page1.png">
+  <img src="page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
   <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
   <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
@@ -98,9 +46,8 @@ body { max-width: 100%; overflow-x: hidden; }
   <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
 </div>
 
-<!-- PAGE 2 -->
 <div class="page" id="page2">
-  <img src="page2.png">
+  <img src="page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
   <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
   <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
@@ -108,102 +55,72 @@ body { max-width: 100%; overflow-x: hidden; }
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
-<!-- PAGE 3 -->
 <div class="page" id="page3">
-  <img src="page3.png">
+  <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- ✅ INSTALL BUTTON -->
+<!-- Install Button -->
 <button class="install-button" id="installButton">Install App</button>
 
 <script>
-// =======================
-// STATE
-// =======================
 let selectedReason="",selectedUrgency="",selectedCounselor="",selectedCounselorEmail="";
 
-// =======================
-// NAVIGATION
-// =======================
-function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
-}
+// Page navigation
+function goToPage(id){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); document.getElementById(id)?.classList.add("active"); }
+function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
+function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
 
-function chooseReason(reason){
-  selectedReason=reason;
-  goToPage("page2");
-}
-
-function chooseUrgency(urgency){
-  selectedUrgency=urgency;
-  goToPage("page3");
-}
-
-// =======================
-// SERVICE WORKER (CRITICAL FIX)
-// =======================
-if("serviceWorker" in navigator){
-  window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register("/service-worker.js")
-      .then(()=>console.log("SW registered"))
-      .catch(err=>console.warn("SW failed:", err));
+// Service Worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load', async ()=>{
+    try{
+      const reg = await navigator.serviceWorker.register('/service-worker.js');
+      console.log('SW registered:', reg);
+    }catch(err){ console.warn('SW failed:', err); }
   });
 }
 
-// =======================
-// INSTALL BUTTON (CRITICAL)
-// =======================
+// Install button
 let deferredPrompt;
-const installBtn = document.getElementById("installButton");
+const installBtn = document.getElementById('installButton');
 
-window.addEventListener("beforeinstallprompt", (e)=>{
-  console.log("PWA install available");
+window.addEventListener('beforeinstallprompt', (e)=>{
   e.preventDefault();
   deferredPrompt = e;
-  installBtn.style.display = "block";
+  installBtn.style.display='block';
 });
 
-installBtn.addEventListener("click", async ()=>{
-  if(!deferredPrompt) return;
-
-  installBtn.style.display = "none";
-  deferredPrompt.prompt();
-
-  const choice = await deferredPrompt.userChoice;
-  console.log("Install result:", choice.outcome);
-
-  deferredPrompt = null;
+installBtn.addEventListener('click', async ()=>{
+  installBtn.style.display='none';
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    console.log('User install choice:', choice.outcome);
+    deferredPrompt = null;
+  }
 });
 
-// =======================
-// COUNSELORS
-// =======================
+// Populate counselors
 async function populateStudentCounselorDropdown(){
-  const counselors=[
-    {username:"c1",email:"counselor1@example.com"}
-  ];
-
+  const counselors=[{username:"counselor1",email:"counselor1@example.com",name:"Counselor One"}];
   const grid=document.getElementById("counselorGrid");
-  grid.innerHTML="";
-
+  grid.innerHTML='';
   counselors.forEach(c=>{
     const btn=document.createElement("button");
     btn.textContent=c.email;
-    btn.onclick=()=>console.log("Selected",c);
+    btn.onclick=()=>openModal(c.username,c.email);
     grid.appendChild(btn);
   });
 }
 
-// =======================
-// INIT
-// =======================
-window.onload = async()=>{
-  await populateStudentCounselorDropdown();
-};
-</script>
+// Placeholder modals
+function openModal(u,e){ console.log("Open modal for",u,e); }
+function openCrisisModal(){ console.log("Crisis modal"); }
 
+// Init
+window.onload=async()=>{ await populateStudentCounselorDropdown(); };
+</script>
 </body>
 </html>
