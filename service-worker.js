@@ -10,8 +10,7 @@ const ASSETS_TO_CACHE = [
   "/student-manifest.json",
   "/service-worker.js",
   "/icons/icon-192-student.png",
-  "/icons/icon-512-student.png",
-  "/icons/apple-touch-icon-student.png"
+  "/icons/icon-512-student.png"
 ];
 
 // INSTALL: cache core assets
