@@ -6,21 +6,17 @@
 <title>Student Support</title>
 <link rel="stylesheet" href="style.css" />
 
-<!-- PWA: Manifest -->
+<!-- PWA Manifest -->
 <link rel="manifest" href="/student-manifest.json" />
 
-<!-- Theme color -->
 <meta name="theme-color" content="#0070c9" />
-
-<!-- Mobile Web App -->
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Student Support" />
 
 <!-- Icons -->
-<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192-student.png" />
-<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512-student.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192-student.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512-student.png">
 
 <style>
 * { box-sizing: border-box; margin:0; padding:0; }
@@ -39,14 +35,6 @@
 .modal-buttons button { padding:9px 18px; border-radius:999px; border:none; cursor:pointer; font-size:14px; }
 .modal-buttons button:first-child { background:#f1f5f9; color:#334155; }
 .modal-buttons button:last-child { background:#0070c9; color:white; }
-.crisis-modal { width:min(560px,92vw); text-align:left; }
-.crisis-modal h2 { text-align:center; }
-.crisis-list { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; font-size:14px; color:#0f172a; }
-.crisis-list strong { display:block; font-size:15px; }
-.crisis-section { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
-.crisis-actions { display:flex; justify-content:center; gap:12px; margin-top:14px; }
-.crisis-actions .secondary { background:#f1f5f9; color:#334155; }
-.crisis-actions .primary { background:#0070c9; color:#fff; }
 .counselor-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:10px; }
 .counselor-grid button { padding:8px 12px; border-radius:12px; border:none; cursor:pointer; background:#0070c9; color:white; }
 .install-button { position: fixed; bottom: 20px; right: 20px; z-index: 2000; padding: 12px 18px; background:#0070c9; color:white; border:none; border-radius:24px; cursor:pointer; font-size:16px; display:none; }
@@ -55,7 +43,7 @@ body { max-width: 100%; overflow-x: hidden; }
 </head>
 <body>
 
-<!-- Pages -->
+<!-- Pages (same as before) -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
@@ -67,7 +55,6 @@ body { max-width: 100%; overflow-x: hidden; }
   <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
   <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
 </div>
-
 <div class="page" id="page2">
   <img src="page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
@@ -76,128 +63,60 @@ body { max-width: 100%; overflow-x: hidden; }
   <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
-
 <div class="page" id="page3">
   <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- Crisis Modal -->
-<div class="modal-overlay" id="crisisOverlay">
-  <div class="modal crisis-modal">
-    <h2>Immediate Support</h2>
-    <ul class="crisis-list">
-      <li class="crisis-section"><strong>Emergency</strong> 911 – Emergency services.</li>
-      <li class="crisis-section"><strong>Mental Health & Crisis Support</strong>
-        988 Suicide & Crisis Lifeline – Call/text 988.<br>
-        Crisis Text Line – Text HOME to 741741.
-      </li>
-    </ul>
-    <div class="crisis-actions">
-      <button class="secondary" onclick="closeCrisisModal()">Close</button>
-      <button class="primary" onclick="continueFromCrisis()">Continue to Counselor</button>
-    </div>
-  </div>
-</div>
-
-<!-- Student Modal -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h2>Submit Message</h2>
-    <input type="text" id="firstName" placeholder="First Name (required)">
-    <input type="text" id="lastName" placeholder="Last Name (required)">
-    <input type="text" id="studentGrade" placeholder="Grade (required)">
-    <input type="text" id="studentId" placeholder="Student ID (required)">
-    <textarea id="extraNotes" placeholder="Additional notes (optional)"></textarea>
-    <div class="modal-buttons">
-      <button onclick="closeModal()">Cancel</button>
-      <button onclick="submitMessage()">Submit</button>
-    </div>
-  </div>
-</div>
-
-<!-- Success Modal -->
-<div class="modal-overlay" id="successOverlay">
-  <div class="modal success-modal">
-    <div class="success-icon">✓</div>
-    <div class="success-text">Message sent!</div>
-    <div class="success-actions">
-      <button onclick="closeSuccess()">OK</button>
-    </div>
-  </div>
-</div>
-
-<!-- Install App Button -->
+<!-- Install Button -->
 <button class="install-button" id="installButton">Install App</button>
 
 <script>
 let selectedReason="",selectedUrgency="",selectedCounselor="",selectedCounselorEmail="";
 
-// Page Navigation
+// Navigation functions
 function goToPage(id){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); document.getElementById(id)?.classList.add("active"); }
 function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
 function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
 
-// Modals
-function openCrisisModal(){ document.getElementById("crisisOverlay").style.display="flex"; }
-function closeCrisisModal(){ document.getElementById("crisisOverlay").style.display="none"; }
-function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
-function openModal(username,email){ selectedCounselor=username; selectedCounselorEmail=email; document.getElementById("modalOverlay").style.display="flex"; }
-function closeModal(){ document.getElementById("modalOverlay").style.display="none"; }
-function openSuccess(){ document.getElementById("successOverlay").style.display="flex"; }
-function closeSuccess(){ document.getElementById("successOverlay").style.display="none"; goToPage("page1"); }
+// Service Worker
+if("serviceWorker"in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("/service-worker.js").catch(err=>console.warn(err)); }); }
 
-// Populate Counselors
-async function populateStudentCounselorDropdown(){
-  let counselors=[{username:"counselor1",email:"counselor1@example.com",name:"Counselor One"},{username:"counselor2",email:"counselor2@example.com",name:"Counselor Two"},{username:"counselor3",email:"counselor3@example.com",name:"Counselor Three"},{username:"counselor4",email:"counselor4@example.com",name:"Counselor Four"},{username:"counselor5",email:"counselor5@example.com",name:"Counselor Five"},{username:"counselor6",email:"counselor6@example.com",name:"Counselor Six"}];
-  try{ const res=await fetch('/api/counselors'); const fetched=await res.json(); Array.isArray(fetched)&&fetched.length>0&&(counselors=fetched); }catch(err){console.warn("Using default example counselors.",err);}
-  const grid=document.getElementById("counselorGrid"); grid.innerHTML=""; counselors.forEach(c=>{const btn=document.createElement("button"); btn.type="button"; btn.textContent=c.email; btn.onclick=()=>openModal(c.username,c.email); grid.appendChild(btn);});
-  localStorage.setItem('studentCounselors',JSON.stringify(counselors));
-}
-
-// Submit Message
-async function submitMessage(){
-  const firstName=document.getElementById("firstName").value.trim();
-  const lastName=document.getElementById("lastName").value.trim();
-  const grade=document.getElementById("studentGrade").value.trim();
-  const studentId=document.getElementById("studentId").value.trim();
-  const notes=document.getElementById("extraNotes").value.trim();
-  if(!firstName||!lastName||!grade||!studentId){ alert("Please fill all required fields."); return; }
-  const entry={firstName,lastName,grade,studentId,notes,reason:selectedReason,urgency:selectedUrgency,counselor:selectedCounselor,counselorEmail:selectedCounselorEmail,dateTime:new Date().toISOString()};
-  try{
-    const res=await fetch("/api/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(entry)});
-    const data=await res.json();
-    if(!data.success)throw new Error("Failed to submit message");
-  }catch(err){console.error(err);alert("Failed to send message.");return;}
-  closeModal(); openSuccess(); selectedReason=selectedUrgency=selectedCounselor=selectedCounselorEmail=""; ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{const el=document.getElementById(id);el&&(el.value="");});
-}
-
-// Service Worker Registration
-if("serviceWorker"in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("/service-worker.js").catch(err=>console.warn("SW registration failed:",err)); }); }
-
-// PWA Install Button
+// Install PWA
 let deferredPrompt;
 const installBtn = document.getElementById("installButton");
 
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener('beforeinstallprompt', (e)=>{
   e.preventDefault();
   deferredPrompt = e;
   installBtn.style.display = 'block';
 });
 
-installBtn.addEventListener('click', async () => {
+installBtn.addEventListener('click', async ()=>{
   installBtn.style.display = 'none';
   if(deferredPrompt){
     deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log("User response to install:", outcome);
+    const choice = await deferredPrompt.userChoice;
+    console.log('Install choice:', choice.outcome);
     deferredPrompt = null;
   }
 });
 
 // INIT
-window.onload=async()=>{ await populateStudentCounselorDropdown(); };
+window.onload = async()=>{ await populateStudentCounselorDropdown(); };
+
+// Populate counselors
+async function populateStudentCounselorDropdown(){
+  let counselors=[{username:"counselor1",email:"counselor1@example.com",name:"Counselor One"}];
+  const grid=document.getElementById("counselorGrid");
+  grid.innerHTML = "";
+  counselors.forEach(c=>{ const btn=document.createElement("button"); btn.textContent=c.email; btn.onclick=()=>openModal(c.username,c.email); grid.appendChild(btn); });
+}
+
+// Modals (placeholder)
+function openModal(u,e){ console.log("Open modal for",u,e); }
+function openCrisisModal(){ console.log("Crisis modal"); }
 </script>
 </body>
 </html>
