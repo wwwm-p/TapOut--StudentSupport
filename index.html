@@ -29,9 +29,23 @@ body{overflow-x:hidden;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-button{position:fixed;bottom:20px;right:20px;z-index:2000;padding:12px 18px;background:#0070c9;color:white;border:none;border-radius:24px;cursor:pointer;font-size:16px;display:none;}
+.top-bar{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:12px 24px;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:100;}
+.top-bar .app-name{font-weight:bold;font-size:1.2em;}
+.top-bar .top-actions{display:flex;gap:16px;align-items:center;}
+.dark-toggle{padding:6px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;}
+body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 </style>
 </head>
 <body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="app-name">Student Support</div>
+  <div class="top-actions">
+    <button class="dark-toggle" id="darkToggle">Dark Mode</button>
+    <button class="install-button" id="installButton">Install App</button>
+  </div>
+</div>
 
 <!-- Pages -->
 <div class="page active" id="page1">
@@ -61,32 +75,35 @@ body{overflow-x:hidden;}
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- Install Button -->
-<button class="install-button" id="installButton">Install App</button>
-
 <script>
-let selectedReason="",selectedUrgency="",selectedCounselor="",selectedCounselorEmail="";
+let selectedReason="", selectedUrgency="", selectedCounselor="", selectedCounselorEmail="";
 
 // Page navigation
-function goToPage(id){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); document.getElementById(id)?.classList.add("active"); }
+function goToPage(id){ 
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); 
+  document.getElementById(id)?.classList.add("active"); 
+}
 function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
 function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
 
+// Dark Mode
+document.getElementById("darkToggle").onclick = ()=>{ document.body.classList.toggle("dark"); };
+
 // Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load', async ()=>{
+if("serviceWorker" in navigator){
+  window.addEventListener("load", async ()=>{
     try{
-      const reg = await navigator.serviceWorker.register('/service-worker.js');
-      console.log('SW registered:', reg);
-    }catch(err){ console.warn('SW failed:', err); }
+      const reg = await navigator.serviceWorker.register("/service-worker.js");
+      console.log("SW registered:", reg);
+    }catch(err){ console.warn("SW failed:", err); }
   });
 }
 
-// Install button
+// Install App Button
 let deferredPrompt;
-const installBtn = document.getElementById('installButton');
+const installBtn = document.getElementById("installButton");
 
-window.addEventListener('beforeinstallprompt', (e)=>{
+window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredPrompt = e;
   installBtn.style.display='block';
@@ -97,7 +114,7 @@ installBtn.addEventListener('click', async ()=>{
   if(deferredPrompt){
     deferredPrompt.prompt();
     const choice = await deferredPrompt.userChoice;
-    console.log('User install choice:', choice.outcome);
+    console.log('User choice:', choice.outcome);
     deferredPrompt = null;
   }
 });
@@ -116,7 +133,7 @@ async function populateStudentCounselorDropdown(){
 }
 
 // Placeholder modals
-function openModal(u,e){ console.log("Open modal for",u,e); }
+function openModal(u,e){ console.log("Open modal for", u,e); }
 function openCrisisModal(){ console.log("Crisis modal"); }
 
 // Init
