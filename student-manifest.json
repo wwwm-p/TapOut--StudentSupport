@@ -1,14 +1,13 @@
 {
   "name": "Student Support",
-  "short_name": "Support",
-  "description": "Student support app to connect with counselors.",
+  "short_name": "StudentSupport",
+  "description": "A student support app to connect with counselors and access mental health resources.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#0070c9",
-
   "icons": [
     {
       "src": "/icons/icon-192-student.png",
