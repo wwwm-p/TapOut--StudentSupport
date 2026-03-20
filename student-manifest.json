@@ -4,17 +4,19 @@
   "description": "A student support app to connect with counselors and access mental health resources.",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "/icons/icon-192-student.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/icons/icon-512-student.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icons/apple-touch-icon.png",
+      "src": "/icons/apple-touch-icon-student.png",
       "sizes": "180x180",
       "type": "image/png"
     }
