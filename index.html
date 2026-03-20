@@ -18,6 +18,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Student Support" />
 
+<!-- Icons -->
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192-student.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512-student.png" />
+
 <style>
 * { box-sizing: border-box; margin:0; padding:0; }
 .page { display: none; position: relative; }
@@ -45,19 +49,13 @@
 .crisis-actions .primary { background:#0070c9; color:#fff; }
 .counselor-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:10px; }
 .counselor-grid button { padding:8px 12px; border-radius:12px; border:none; cursor:pointer; background:#0070c9; color:white; }
+.install-button { position: fixed; bottom: 20px; right: 20px; z-index: 2000; padding: 12px 18px; background:#0070c9; color:white; border:none; border-radius:24px; cursor:pointer; font-size:16px; display:none; }
 body { max-width: 100%; overflow-x: hidden; }
-
-/* Install Button */
-#installBtn {
-  position: fixed; bottom: 16px; right: 16px; padding:12px 18px;
-  background:#0070c9; color:#fff; border:none; border-radius:12px;
-  cursor:pointer; font-size:16px; z-index:9999; display:none;
-}
 </style>
 </head>
 <body>
 
-<!-- Pages (page1, page2, page3, modals) -->
+<!-- Pages -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
@@ -85,13 +83,16 @@ body { max-width: 100%; overflow-x: hidden; }
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- Modals: Crisis, Student, Success -->
+<!-- Crisis Modal -->
 <div class="modal-overlay" id="crisisOverlay">
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
     <ul class="crisis-list">
       <li class="crisis-section"><strong>Emergency</strong> 911 – Emergency services.</li>
-      <li class="crisis-section"><strong>Mental Health & Crisis Support</strong> 988 Suicide & Crisis Lifeline – Call/text 988.<br>Crisis Text Line – Text HOME to 741741.</li>
+      <li class="crisis-section"><strong>Mental Health & Crisis Support</strong>
+        988 Suicide & Crisis Lifeline – Call/text 988.<br>
+        Crisis Text Line – Text HOME to 741741.
+      </li>
     </ul>
     <div class="crisis-actions">
       <button class="secondary" onclick="closeCrisisModal()">Close</button>
@@ -100,6 +101,7 @@ body { max-width: 100%; overflow-x: hidden; }
   </div>
 </div>
 
+<!-- Student Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>Submit Message</h2>
@@ -115,6 +117,7 @@ body { max-width: 100%; overflow-x: hidden; }
   </div>
 </div>
 
+<!-- Success Modal -->
 <div class="modal-overlay" id="successOverlay">
   <div class="modal success-modal">
     <div class="success-icon">✓</div>
@@ -126,14 +129,12 @@ body { max-width: 100%; overflow-x: hidden; }
 </div>
 
 <!-- Install App Button -->
-<button id="installBtn">Install App</button>
+<button class="install-button" id="installButton">Install App</button>
 
 <script>
-// -------------------
-// Selections
 let selectedReason="",selectedUrgency="",selectedCounselor="",selectedCounselorEmail="";
 
-// Page navigation
+// Page Navigation
 function goToPage(id){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); document.getElementById(id)?.classList.add("active"); }
 function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
 function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
@@ -149,13 +150,13 @@ function closeSuccess(){ document.getElementById("successOverlay").style.display
 
 // Populate Counselors
 async function populateStudentCounselorDropdown(){
-  let counselors=[{username:"counselor1",email:"counselor1@example.com",name:"Counselor One"},{username:"counselor2",email:"counselor2@example.com",name:"Counselor Two"}];
-  try{ const res=await fetch('/api/counselors'); const fetched=await res.json(); Array.isArray(fetched)&&fetched.length>0&&(counselors=fetched); }catch(err){console.warn("Using default counselors.",err);}
+  let counselors=[{username:"counselor1",email:"counselor1@example.com",name:"Counselor One"},{username:"counselor2",email:"counselor2@example.com",name:"Counselor Two"},{username:"counselor3",email:"counselor3@example.com",name:"Counselor Three"},{username:"counselor4",email:"counselor4@example.com",name:"Counselor Four"},{username:"counselor5",email:"counselor5@example.com",name:"Counselor Five"},{username:"counselor6",email:"counselor6@example.com",name:"Counselor Six"}];
+  try{ const res=await fetch('/api/counselors'); const fetched=await res.json(); Array.isArray(fetched)&&fetched.length>0&&(counselors=fetched); }catch(err){console.warn("Using default example counselors.",err);}
   const grid=document.getElementById("counselorGrid"); grid.innerHTML=""; counselors.forEach(c=>{const btn=document.createElement("button"); btn.type="button"; btn.textContent=c.email; btn.onclick=()=>openModal(c.username,c.email); grid.appendChild(btn);});
   localStorage.setItem('studentCounselors',JSON.stringify(counselors));
 }
 
-// Submit message
+// Submit Message
 async function submitMessage(){
   const firstName=document.getElementById("firstName").value.trim();
   const lastName=document.getElementById("lastName").value.trim();
@@ -164,24 +165,39 @@ async function submitMessage(){
   const notes=document.getElementById("extraNotes").value.trim();
   if(!firstName||!lastName||!grade||!studentId){ alert("Please fill all required fields."); return; }
   const entry={firstName,lastName,grade,studentId,notes,reason:selectedReason,urgency:selectedUrgency,counselor:selectedCounselor,counselorEmail:selectedCounselorEmail,dateTime:new Date().toISOString()};
-  try{ const res=await fetch("/api/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(entry)}); const data=await res.json(); if(!data.success)throw new Error("Failed to submit message"); }
-  catch(err){ console.error(err); alert("Failed to send message."); return; }
+  try{
+    const res=await fetch("/api/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(entry)});
+    const data=await res.json();
+    if(!data.success)throw new Error("Failed to submit message");
+  }catch(err){console.error(err);alert("Failed to send message.");return;}
   closeModal(); openSuccess(); selectedReason=selectedUrgency=selectedCounselor=selectedCounselorEmail=""; ["firstName","lastName","studentGrade","studentId","extraNotes"].forEach(id=>{const el=document.getElementById(id);el&&(el.value="");});
 }
 
-// -------------------
+// Service Worker Registration
+if("serviceWorker"in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("/service-worker.js").catch(err=>console.warn("SW registration failed:",err)); }); }
+
 // PWA Install Button
 let deferredPrompt;
-const installBtn=document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault(); deferredPrompt=e; installBtn.style.display='block';});
-installBtn.addEventListener('click',async()=>{installBtn.style.display='none'; deferredPrompt&&(deferredPrompt.prompt(),await deferredPrompt.userChoice, deferredPrompt=null);});
+const installBtn = document.getElementById("installButton");
 
-// -------------------
-// Service Worker
-if('serviceWorker'in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('/service-worker.js').then(()=>console.log('SW registered')).catch(err=>console.warn('SW failed:',err));});}
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = 'block';
+});
+
+installBtn.addEventListener('click', async () => {
+  installBtn.style.display = 'none';
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log("User response to install:", outcome);
+    deferredPrompt = null;
+  }
+});
 
 // INIT
-window.onload=async()=>{await populateStudentCounselorDropdown();}
+window.onload=async()=>{ await populateStudentCounselorDropdown(); };
 </script>
 </body>
 </html>
