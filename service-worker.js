@@ -1,4 +1,5 @@
 const CACHE_NAME = "student-support-cache-v1";
+
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",
@@ -6,14 +7,14 @@ const ASSETS_TO_CACHE = [
   "/page1.png",
   "/page2.png",
   "/page3.png",
-  "/manifest.json",
+  "/student-manifest.json",
   "/service-worker.js",
-  "icons/icon-192.png",
-  "icons/icon-512.png",
-  "icons/apple-touch-icon.png"
+  "/icons/icon-192-student.png",
+  "/icons/icon-512-student.png",
+  "/icons/apple-touch-icon-student.png"
 ];
 
-// Install: cache core assets
+// INSTALL: cache core assets
 self.addEventListener("install", (event) => {
   console.log("[SW] Installing service worker and caching assets...");
   event.waitUntil(
@@ -22,7 +23,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Activate: clean up old caches
+// ACTIVATE: clean up old caches
 self.addEventListener("activate", (event) => {
   console.log("[SW] Activating new service worker...");
   event.waitUntil(
@@ -37,26 +38,23 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: respond with cache first, then network
+// FETCH: cache-first strategy with fallback
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+      if (cachedResponse) return cachedResponse;
+
       return fetch(event.request)
         .then((networkResponse) => {
-          // Cache new requests dynamically
-          return caches.open(CACHE_NAME).then((cache) => {
-            // Only cache GET requests
-            if (event.request.method === "GET") {
+          if (event.request.method === "GET") {
+            caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          });
+            });
+          }
+          return networkResponse;
         })
         .catch(() => {
-          // Optional: fallback page if offline and resource not cached
+          // Fallback to index.html for navigation requests
           if (event.request.mode === "navigate") {
             return caches.match("/index.html");
           }
