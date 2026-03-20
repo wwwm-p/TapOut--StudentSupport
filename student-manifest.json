@@ -1,7 +1,14 @@
 {
   "name": "Student Support",
-  "short_name": "StudentSupport",
-  "description": "A student support app to connect with counselors and access mental health resources.",
+  "short_name": "Support",
+  "description": "Student support app to connect with counselors.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#0070c9",
+
   "icons": [
     {
       "src": "/icons/icon-192-student.png",
@@ -14,19 +21,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/apple-touch-icon-student.png",
-      "sizes": "180x180",
-      "type": "image/png"
     }
-  ],
-  "start_url": "/index.html",
-  "scope": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0070c9",
-  "orientation": "portrait-primary",
-  "related_applications": [],
-  "prefer_related_applications": false
+  ]
 }
