@@ -7,7 +7,7 @@
 
 <link rel="stylesheet" href="style.css">
 
-<!-- PWA -->
+<!-- PWA Manifest -->
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
 <meta name="mobile-web-app-capable" content="yes">
@@ -78,10 +78,10 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 <script>
 let selectedReason="", selectedUrgency="", selectedCounselor="", selectedCounselorEmail="";
 
-// Page navigation
-function goToPage(id){ 
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); 
-  document.getElementById(id)?.classList.add("active"); 
+// Navigation
+function goToPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id)?.classList.add("active");
 }
 function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
 function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
@@ -91,25 +91,20 @@ document.getElementById("darkToggle").onclick = ()=>{ document.body.classList.to
 
 // Service Worker
 if("serviceWorker" in navigator){
-  window.addEventListener("load", async ()=>{
-    try{
-      const reg = await navigator.serviceWorker.register("/service-worker.js");
-      console.log("SW registered:", reg);
-    }catch(err){ console.warn("SW failed:", err); }
-  });
+  navigator.serviceWorker.register("/service-worker.js")
+    .then(reg=>console.log("SW registered:", reg))
+    .catch(err=>console.warn("SW registration failed:", err));
 }
 
 // Install App Button
 let deferredPrompt;
 const installBtn = document.getElementById("installButton");
-
-window.addEventListener('beforeinstallprompt', e=>{
+window.addEventListener("beforeinstallprompt", e=>{
   e.preventDefault();
   deferredPrompt = e;
   installBtn.style.display='block';
 });
-
-installBtn.addEventListener('click', async ()=>{
+installBtn.addEventListener("click", async ()=>{
   installBtn.style.display='none';
   if(deferredPrompt){
     deferredPrompt.prompt();
@@ -137,7 +132,7 @@ function openModal(u,e){ console.log("Open modal for", u,e); }
 function openCrisisModal(){ console.log("Crisis modal"); }
 
 // Init
-window.onload=async()=>{ await populateStudentCounselorDropdown(); };
+window.onload = async ()=>{ await populateStudentCounselorDropdown(); };
 </script>
 </body>
 </html>
