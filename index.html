@@ -6,66 +6,24 @@
 <title>TapOut! Student Support</title>
 
 <link rel="stylesheet" href="/style.css">
-
-<!-- PWA Manifest -->
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
 <link rel="apple-touch-icon" href="/icons/icon-192-student.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="TapOut! Student Support">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{overflow-x:hidden;}
-.page{display:none;position:relative;min-height:100vh;}
+.page{display:none;position:relative;}
 .page.active{display:block;text-align:center;}
-.page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;background:transparent;border:none;}
-
-/* HOTSPOT POSITIONS */
-/* PAGE 1 (8 options, 2 columns) */
-.hotspot.academic{top:16%; left:6%; width:40%; height:9%;}
-.hotspot.anxiety{top:16%; left:54%; width:40%; height:9%;}
-.hotspot.depression{top:28%; left:6%; width:40%; height:9%;}
-.hotspot.family{top:28%; left:54%; width:40%; height:9%;}
-.hotspot.relationship{top:40%; left:6%; width:40%; height:9%;}
-.hotspot.bullying{top:40%; left:54%; width:40%; height:9%;}
-.hotspot.talk{top:52%; left:6%; width:40%; height:9%;}
-.hotspot.unsure{top:52%; left:54%; width:40%; height:9%;}
-
-/* PAGE 2 (single column) */
-.hotspot.fine{top:22%; left:10%; width:80%; height:10%;}
-.hotspot.littleoff{top:36%; left:10%; width:80%; height:10%;}
-.hotspot.coping{top:50%; left:10%; width:80%; height:10%;}
-.hotspot.crisis{top:64%; left:10%; width:80%; height:10%;}
-
-/* URGENCY NUMBER BADGES */
-.urgency-label{
-  position:absolute;
-  z-index:11;
-  width:32px;
-  height:32px;
-  border-radius:999px;
-  background:#0070c9;
-  color:#fff;
-  font-weight:700;
-  font-size:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:none;
-}
-.urgency-label.fine{top:24%; left:12%;}
-.urgency-label.littleoff{top:38%; left:12%;}
-.urgency-label.coping{top:52%; left:12%;}
-.urgency-label.crisis{top:66%; left:12%;}
-
+.page img{width:100%;height:auto;}
+.hotspot{position:absolute;z-index:10;cursor:pointer;}
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
-.install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
+.install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;position:fixed;bottom:20px;right:20px;z-index:1000;}
 .top-bar{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:12px 24px;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:100;}
 .top-bar .app-name{font-weight:bold;font-size:1.2em;}
 .top-bar .top-actions{display:flex;gap:16px;align-items:center;}
@@ -85,29 +43,12 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 
 <div class="page active" id="page1">
   <img src="/page1.png" alt="Welcome Page">
-  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
-  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
-  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
-  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
-  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
-  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
-  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
-  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
+  <!-- Hotspots -->
 </div>
-
 <div class="page" id="page2">
   <img src="/page2.png" alt="Urgency Page">
-  <div class="urgency-label fine">1</div>
-  <div class="urgency-label littleoff">2</div>
-  <div class="urgency-label coping">3</div>
-  <div class="urgency-label crisis">4</div>
-  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
-  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
-  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
-  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
-
 <div class="page" id="page3">
   <img src="/page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
@@ -117,25 +58,21 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 <script>
 let selectedReason="", selectedUrgency="";
 
-// NAVIGATION
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
 }
-function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
-function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
 
-// DARK MODE
 document.getElementById("darkToggle").onclick = ()=>document.body.classList.toggle("dark");
 
-// SERVICE WORKER
+// Service Worker
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/service-worker.js")
     .then(()=>console.log("SW registered"))
     .catch(err=>console.warn("SW registration failed:", err));
 }
 
-// INSTALL BUTTON
+// Install Button
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
 window.addEventListener("beforeinstallprompt", e=>{
@@ -147,15 +84,14 @@ installBtn.addEventListener("click", async ()=>{
   installBtn.style.display="none";
   if(deferredPrompt){
     deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    console.log('User choice:', choice.outcome);
+    deferredPrompt.userChoice.then(choice=>console.log('User choice:', choice.outcome));
     deferredPrompt = null;
   }
 });
 
-// POPULATE COUNSELORS
-async function populateStudentCounselorDropdown(){
-  const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
+// Populate example counselors
+function populateStudentCounselorDropdown(){
+  const counselors=[{username:"c1",email:"c1@example.com"}];
   const grid=document.getElementById("counselorGrid");
   grid.innerHTML='';
   counselors.forEach(c=>{
@@ -166,8 +102,6 @@ async function populateStudentCounselorDropdown(){
   });
 }
 window.addEventListener("load", populateStudentCounselorDropdown);
-
-function openCrisisModal(){ console.log("Crisis modal"); }
 </script>
 </body>
 </html>
