@@ -1,6 +1,6 @@
 const CACHE_NAME = "tapout-student-v2";
 const ASSETS_TO_CACHE = [
-  "/student.html",
+  "/index.html",
   "/student-manifest.json",
   "/service-worker.js",
   "/style.css",
@@ -11,20 +11,29 @@ const ASSETS_TO_CACHE = [
   "/icons/icon-512-student.png"
 ];
 
+// INSTALL: cache all assets
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE)));
+  console.log("[SW] Installing student PWA...");
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE))
+  );
   self.skipWaiting();
 });
 
+// ACTIVATE: remove old caches
 self.addEventListener("activate", event => {
+  console.log("[SW] Activating student PWA...");
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      )
     )
   );
   self.clients.claim();
 });
 
+// FETCH: cache-first strategy
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
@@ -37,7 +46,8 @@ self.addEventListener("fetch", event => {
           return response;
         })
         .catch(() => {
-          if (event.request.mode === "navigate") return caches.match("/student.html");
+          // Offline fallback: serve index.html
+          if (event.request.mode === "navigate") return caches.match("/index.html");
         });
     })
   );
