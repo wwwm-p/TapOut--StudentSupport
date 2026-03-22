@@ -27,22 +27,13 @@ body{overflow-x:hidden;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
-.top-bar{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:12px 24px;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:100;}
-.top-bar .app-name{font-weight:bold;font-size:1.2em;}
-.top-bar .top-actions{display:flex;gap:16px;align-items:center;}
-.dark-toggle{padding:6px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;}
-body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
+
+/* Modal safety */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
+.modal-overlay.active{display:flex;}
 </style>
 </head>
 <body>
-
-<div class="top-bar">
-  <div class="app-name">TapOut! Student Support</div>
-  <div class="top-actions">
-    <button class="dark-toggle" id="darkToggle">Dark Mode</button>
-    <button class="install-btn" id="installBtn">Install App</button>
-  </div>
-</div>
 
 <div class="page active" id="page1">
   <img src="/page1.png" alt="Welcome Page">
@@ -118,47 +109,76 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 
 <!-- STUDENT MODAL -->
 <div class="modal-overlay" id="modalOverlay">
-
 <div class="modal">
-
 <h2>Submit Message</h2>
-
 <input id="firstName" placeholder="First Name">
-
 <input id="lastName" placeholder="Last Name">
-
 <input id="studentGrade" placeholder="Grade">
-
 <input id="studentId" placeholder="Student ID">
-
 <textarea id="extraNotes" placeholder="Additional notes"></textarea>
-
 <div class="modal-buttons">
-
 <button type="button" onclick="closeModal()">Cancel</button>
-
 <button type="button" onclick="submitMessage()">Submit</button>
-
 </div>
-
 </div>
-
 </div>
 
 <!-- SUCCESS MODAL -->
 <div class="modal-overlay" id="successOverlay">
-
 <div class="modal">
-
 <h2>Message Sent</h2>
-
 <button type="button" onclick="closeSuccess()">OK</button>
-
+</div>
 </div>
 
-</div>
+<script>
+let selectedReason = "";
+let selectedUrgency = "";
 
-<script src="/script.js"></script>
+/* NAVIGATION */
+function goToPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id)?.classList.add("active");
+}
+function chooseReason(reason){ selectedReason = reason; goToPage("page2"); }
+function chooseUrgency(urgency){
+  selectedUrgency = urgency;
+  urgency === "I’m in Crisis" ? openCrisisModal() : goToPage("page3");
+}
+
+/* CRISIS MODAL */
+function openCrisisModal(){
+  const overlay = document.getElementById("crisisOverlay");
+  if (overlay) overlay.classList.add("active");
+}
+function closeCrisisModal(){
+  const overlay = document.getElementById("crisisOverlay");
+  if (overlay) overlay.classList.remove("active");
+}
+function continueFromCrisis(){
+  closeCrisisModal();
+  goToPage("page3");
+}
+
+/* POPULATE COUNSELORS */
+async function populateStudentCounselorDropdown(){
+  const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
+  const grid=document.getElementById("counselorGrid");
+  grid.innerHTML='';
+  counselors.forEach(c=>{
+    const btn=document.createElement("button");
+    btn.textContent=c.email;
+    btn.onclick=()=>console.log("Open modal for", c.username,c.email);
+    grid.appendChild(btn);
+  });
+}
+window.addEventListener("load", populateStudentCounselorDropdown);
+
+/* PLACEHOLDERS FOR OTHER MODALS */
+function closeModal(){ document.getElementById("modalOverlay")?.classList.remove("active"); }
+function submitMessage(){ document.getElementById("successOverlay")?.classList.add("active"); }
+function closeSuccess(){ document.getElementById("successOverlay")?.classList.remove("active"); }
+</script>
 
 </body>
 </html>
