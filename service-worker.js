@@ -1,25 +1,28 @@
-const CACHE_NAME = "student-support-v1";
+const CACHE_NAME = "tapout-student-v2";
 const ASSETS_TO_CACHE = [
-  "/",
-  "/index.html",
+  "/student.html",
+  "/student-manifest.json",
+  "/service-worker.js",
   "/style.css",
   "/page1.png",
   "/page2.png",
   "/page3.png",
-  "/student-manifest.json",
-  "/service-worker.js",
   "/icons/icon-192-student.png",
   "/icons/icon-512-student.png"
 ];
 
-// INSTALL
+// INSTALL: cache all assets
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE)));
+  console.log("[SW] Installing...");
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE))
+  );
   self.skipWaiting();
 });
 
-// ACTIVATE
+// ACTIVATE: remove old caches
 self.addEventListener("activate", event => {
+  console.log("[SW] Activating...");
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
@@ -28,20 +31,22 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// FETCH
+// FETCH: cache-first strategy
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request)
         .then(response => {
+          // Only cache GET requests
           if (event.request.method === "GET") {
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, response.clone()));
           }
           return response;
         })
         .catch(() => {
-          if (event.request.mode === "navigate") return caches.match("/");
+          // Offline fallback for navigations
+          if (event.request.mode === "navigate") return caches.match("/student.html");
         });
     })
   );
