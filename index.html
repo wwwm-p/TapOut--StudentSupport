@@ -5,126 +5,348 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TapOut! Student Support</title>
 
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="style.css">
 
-<!-- PWA Manifest -->
-<link rel="manifest" href="/student-manifest.json">
+<!-- PWA -->
+<link rel="manifest" href="student-manifest.json">
 <meta name="theme-color" content="#0070c9">
-<link rel="apple-touch-icon" href="/icons/icon-192-student.png">
+<meta name="background-color" content="#ffffff">
+<meta name="application-name" content="TapOut! Student Support">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="TapOut! Student Support">
+<link rel="apple-touch-icon" href="icons/icon-192-student.svg">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{overflow-x:hidden;}
-.page{display:none;position:relative;}
-.page.active{display:block;text-align:center;}
-.page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
-.back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
-.counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
-.counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
-.install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
-.top-bar{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:12px 24px;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:100;}
-.top-bar .app-name{font-weight:bold;font-size:1.2em;}
-.top-bar .top-actions{display:flex;gap:16px;align-items:center;}
-.dark-toggle{padding:6px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;}
-body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
+*{box-sizing:border-box}
+body{margin:0;}
+
+.top-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 18px;
+  border-bottom:1px solid #e5e7eb;
+  background:#ffffff;
+  position:sticky;
+  top:0;
+  z-index:1200;
+}
+.top-bar .app-name{font-weight:700;}
+.top-bar .top-actions{display:flex; gap:10px; align-items:center;}
+.install-btn{
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid #0070c9;
+  background:#0070c9;
+  color:white;
+  cursor:pointer;
+  display:none;
+}
+
+/* PAGES */
+.page{
+display:none;
+text-align:center;
+position:relative;
+}
+
+.page.active{
+display:block;
+}
+
+.page img{
+width:100%;
+height:auto;
+display:block;
+}
+
+/* MODALS */
+.modal-overlay{
+position:fixed;
+inset:0;
+background:rgba(15,23,42,.55);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:1000;
+backdrop-filter:blur(6px);
+}
+
+.modal{
+width:360px;
+background:white;
+padding:26px;
+border-radius:18px;
+text-align:center;
+box-shadow:0 24px 60px rgba(0,0,0,.22);
+border:1px solid #eef2f7;
+}
+
+.modal h2{
+margin:0 0 14px;
+font-size:20px;
+font-weight:700;
+}
+
+.modal input,
+.modal textarea{
+width:100%;
+margin-bottom:12px;
+padding:11px;
+border-radius:12px;
+border:1px solid #e6e8ec;
+background:#f9fafb;
+text-align:center;
+}
+
+.modal textarea{
+height:90px;
+resize:none;
+}
+
+.modal-buttons{
+display:flex;
+gap:12px;
+justify-content:center;
+}
+
+.modal-buttons button{
+padding:9px 18px;
+border-radius:999px;
+border:none;
+cursor:pointer;
+}
+
+.modal-buttons button:first-child{
+background:#f1f5f9;
+}
+
+.modal-buttons button:last-child{
+background:#0070c9;
+color:white;
+}
+
+/* COUNSELOR GRID */
+.counselor-grid{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+margin-top:20px;
+}
+
+.counselor-grid button{
+padding:10px 14px;
+border-radius:12px;
+border:none;
+background:#0070c9;
+color:white;
+cursor:pointer;
+}
+
+/* BACK BUTTON */
+.back-button{
+margin-top:16px;
+padding:10px 14px;
+border-radius:12px;
+border:none;
+background:#d1d5db;
+cursor:pointer;
+}
+
+/* CRISIS MODAL */
+.crisis-modal { width:min(560px,92vw); text-align:left; }
+.crisis-modal h2 { text-align:center; }
+.crisis-list { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; font-size:14px; color:#0f172a; }
+.crisis-list strong { display:block; font-size:15px; }
+.crisis-section { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
+.crisis-actions { display:flex; justify-content:center; gap:12px; margin-top:14px; }
+.crisis-actions .secondary { background:#f1f5f9; color:#334155; }
+.crisis-actions .primary { background:#0070c9; color:white; }
 </style>
 </head>
+
 <body>
 
 <div class="top-bar">
   <div class="app-name">TapOut! Student Support</div>
   <div class="top-actions">
-    <button class="dark-toggle" id="darkToggle">Dark Mode</button>
-    <button class="install-btn" id="installBtn">Install App</button>
+    <button type="button" class="install-btn" id="installBtn">Install App</button>
   </div>
 </div>
 
+<!-- PAGE 1 -->
 <div class="page active" id="page1">
-  <img src="/page1.png" alt="Welcome Page">
-  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
-  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
-  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
-  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
-  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
-  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
-  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
-  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
+
+<img src="page1.png" alt="Page 1">
+
+<button type="button" onclick="chooseReason('Academic Stress')">Academic Stress</button>
+<button type="button" onclick="chooseReason('Anxiety or Panic Attacks')">Anxiety</button>
+<button type="button" onclick="chooseReason('Depression or Sadness')">Depression</button>
+<button type="button" onclick="chooseReason('Family Issues')">Family Issues</button>
+<button type="button" onclick="chooseReason('Relationship Problems')">Relationships</button>
+<button type="button" onclick="chooseReason('Bullying')">Bullying</button>
+<button type="button" onclick="chooseReason('Just Need Someone To Talk To')">Talk</button>
+<button type="button" onclick="chooseReason('Not Ready To Say')">Not Ready</button>
+
 </div>
 
+<!-- PAGE 2 -->
 <div class="page" id="page2">
-  <img src="/page2.png" alt="Urgency Page">
-  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
-  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
-  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
-  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
-  <button class="back-button" onclick="goToPage('page1')">Back</button>
+
+<img src="page2.png" alt="Page 2">
+
+<button type="button" onclick="chooseUrgency('I’m Doing Fine – Just Curious')">
+I'm Doing Fine
+</button>
+
+<button type="button" onclick="chooseUrgency('Feeling a Little Off')">
+Feeling A Little Off
+</button>
+
+<button type="button" onclick="chooseUrgency('I’m Not Coping Well')">
+Not Coping Well
+</button>
+
+<button type="button" onclick="chooseUrgency('I’m in Crisis')">
+I'm In Crisis
+</button>
+
+<button type="button" class="back-button" onclick="goToPage('page1')">
+Back
+</button>
+
 </div>
 
+<!-- PAGE 3 -->
 <div class="page" id="page3">
-  <img src="/page3.png" alt="Counselor Page">
-  <div class="counselor-grid" id="counselorGrid"></div>
-  <button class="back-button" onclick="goToPage('page2')">Back</button>
+
+<h2>Select Counselor</h2>
+
+<div class="counselor-grid">
+
+<button type="button" onclick="openModal('counselor1','counselor1@example.com')">
+counselor1@example.com
+</button>
+
+<button type="button" onclick="openModal('counselor2','counselor2@example.com')">
+counselor2@example.com
+</button>
+
+<button type="button" onclick="openModal('counselor3','counselor3@example.com')">
+counselor3@example.com
+</button>
+
+<button type="button" onclick="openModal('counselor4','counselor4@example.com')">
+counselor4@example.com
+</button>
+
+<button type="button" onclick="openModal('counselor5','counselor5@example.com')">
+counselor5@example.com
+</button>
+
+<button type="button" onclick="openModal('counselor6','counselor6@example.com')">
+counselor6@example.com
+</button>
+
 </div>
 
-<script>
-let selectedReason="", selectedUrgency="";
+<button type="button" class="back-button" onclick="goToPage('page2')">
+Back
+</button>
 
-// NAVIGATION
-function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
-}
-function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
-function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
+</div>
 
-// DARK MODE
-document.getElementById("darkToggle").onclick = ()=>document.body.classList.toggle("dark");
+<!-- CRISIS MODAL -->
+<div class="modal-overlay" id="crisisOverlay">
+<div class="modal crisis-modal">
+<h2>Immediate Support</h2>
+<ul class="crisis-list">
+  <li class="crisis-section">
+    <strong>Emergency</strong>
+    911 – Emergency services (police / ambulance / fire) for life-threatening crises.
+  </li>
+  <li class="crisis-section">
+    <strong>Mental Health & Crisis Support</strong>
+    988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
+    National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
+    Crisis Text Line – Text HOME to 741741 (24/7).
+  </li>
+  <li class="crisis-section">
+    <strong>Eating Disorder Support</strong>
+    National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
+    Text NEDA to 741741.
+  </li>
+  <li class="crisis-section">
+    <strong>Domestic Violence Support</strong>
+    National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
+    Text START to 88788.
+  </li>
+  <li class="crisis-section">
+    <strong>Sexual Assault Support</strong>
+    RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
+  </li>
+  <li class="crisis-section">
+    <strong>Substance Abuse & Addiction Support</strong>
+    SAMHSA National Helpline – 1-800-662-HELP (4357).
+  </li>
+  <li class="crisis-section">
+    <strong>LGBTQ Youth Support</strong>
+    The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
+  </li>
+</ul>
+<div class="crisis-actions">
+  <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
+  <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
+</div>
+</div>
+</div>
 
-// SERVICE WORKER
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("/service-worker.js")
-    .then(()=>console.log("SW registered"))
-    .catch(err=>console.warn("SW registration failed:", err));
-}
+<!-- STUDENT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
 
-// INSTALL BUTTON
-let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
-window.addEventListener("beforeinstallprompt", e=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = "inline-block";
-});
-installBtn.addEventListener("click", async ()=>{
-  installBtn.style.display="none";
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    console.log('User choice:', choice.outcome);
-    deferredPrompt = null;
-  }
-});
+<div class="modal">
 
-// POPULATE COUNSELORS
-async function populateStudentCounselorDropdown(){
-  const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
-  const grid=document.getElementById("counselorGrid");
-  grid.innerHTML='';
-  counselors.forEach(c=>{
-    const btn=document.createElement("button");
-    btn.textContent=c.email;
-    btn.onclick=()=>console.log("Open modal for", c.username,c.email);
-    grid.appendChild(btn);
-  });
-}
-window.addEventListener("load", populateStudentCounselorDropdown);
+<h2>Submit Message</h2>
 
-function openCrisisModal(){ console.log("Crisis modal"); }
-</script>
+<input id="firstName" placeholder="First Name">
+
+<input id="lastName" placeholder="Last Name">
+
+<input id="studentGrade" placeholder="Grade">
+
+<input id="studentId" placeholder="Student ID">
+
+<textarea id="extraNotes" placeholder="Additional notes"></textarea>
+
+<div class="modal-buttons">
+
+<button type="button" onclick="closeModal()">Cancel</button>
+
+<button type="button" onclick="submitMessage()">Submit</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successOverlay">
+
+<div class="modal">
+
+<h2>Message Sent</h2>
+
+<button type="button" onclick="closeSuccess()">OK</button>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
