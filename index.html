@@ -3,32 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TapOut! Student Support</title>
+<title>TapOut! – Student</title>
 
-<!-- PWA Manifest -->
+<link rel="stylesheet" href="style.css">
+
+<!-- PWA -->
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
 <link rel="apple-touch-icon" href="/icons/icon-192-student.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="TapOut! Student Support">
+<meta name="apple-mobile-web-app-title" content="TapOut! – Student">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{overflow-x:hidden;background:#fff;color:#111;}
-.page{display:none;position:relative;text-align:center;}
-.page.active{display:block;}
+body{overflow-x:hidden;}
+.page{display:none;position:relative;}
+.page.active{display:block;text-align:center;}
 .page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;background:transparent;border:none;}
+.hotspot{position:absolute;z-index:10;cursor:pointer;}
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
+.install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
 
-/* Modal visibility */
+/* Added for modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
-.modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;}
+.modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
 .crisis-list{list-style:none;padding:0;margin:12px 0;line-height:1.4;}
 .crisis-section{margin-bottom:12px;}
 .crisis-actions{display:flex;gap:10px;justify-content:flex-end;}
@@ -38,8 +41,13 @@ body{overflow-x:hidden;background:#fff;color:#111;}
 </head>
 <body>
 
+<!-- Added install button (your JS already expects #installBtn) -->
+<div style="padding:10px;text-align:center;">
+  <button class="install-btn" id="installBtn">Install App</button>
+</div>
+
 <div class="page active" id="page1">
-  <img src="/page1.png" alt="Welcome Page">
+  <img src="page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
   <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
   <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
@@ -51,7 +59,7 @@ body{overflow-x:hidden;background:#fff;color:#111;}
 </div>
 
 <div class="page" id="page2">
-  <img src="/page2.png" alt="Urgency Page">
+  <img src="page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
   <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
   <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
@@ -60,12 +68,12 @@ body{overflow-x:hidden;background:#fff;color:#111;}
 </div>
 
 <div class="page" id="page3">
-  <img src="/page3.png" alt="Counselor Page">
+  <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- CRISIS MODAL -->
+<!-- CRISIS MODAL (added) -->
 <div class="modal-overlay" id="crisisOverlay">
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
@@ -111,21 +119,20 @@ body{overflow-x:hidden;background:#fff;color:#111;}
 </div>
 
 <script>
-let selectedReason = "";
-let selectedUrgency = "";
+let selectedReason="", selectedUrgency="";
 
 /* NAVIGATION */
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
 }
-function chooseReason(reason){ selectedReason = reason; goToPage("page2"); }
+function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
 function chooseUrgency(urgency){
-  selectedUrgency = urgency;
-  urgency === "I’m in Crisis" ? openCrisisModal() : goToPage("page3");
+  selectedUrgency=urgency;
+  urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3");
 }
 
-/* CRISIS MODAL */
+/* CRISIS MODAL (added) */
 function openCrisisModal(){
   document.getElementById("crisisOverlay")?.classList.add("active");
 }
@@ -137,8 +144,35 @@ function continueFromCrisis(){
   goToPage("page3");
 }
 
+/* SERVICE WORKER */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/service-worker.js")
+    .then(()=>console.log("SW registered"))
+    .catch(err=>console.warn("SW registration failed:", err));
+}
+
+/* INSTALL BUTTON */
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+window.addEventListener("beforeinstallprompt", e=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBtn) installBtn.style.display = "inline-block";
+});
+if (installBtn) {
+  installBtn.addEventListener("click", async ()=>{
+    installBtn.style.display="none";
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      console.log('User choice:', choice.outcome);
+      deferredPrompt = null;
+    }
+  });
+}
+
 /* POPULATE COUNSELORS */
-function populateStudentCounselorDropdown(){
+async function populateStudentCounselorDropdown(){
   const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
   const grid=document.getElementById("counselorGrid");
   grid.innerHTML='';
@@ -151,6 +185,5 @@ function populateStudentCounselorDropdown(){
 }
 window.addEventListener("load", populateStudentCounselorDropdown);
 </script>
-
 </body>
 </html>
