@@ -28,7 +28,6 @@ body{overflow-x:hidden;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
 
-/* Modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
 .modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
@@ -47,73 +46,28 @@ body{overflow-x:hidden;}
 </div>
 
 <div class="page active" id="page1">
-  <img src="page1.png" alt="Welcome Page">
-  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
-  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
-  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
-  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
-  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
-  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
-  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
-  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
+  <img src="page1.png">
 </div>
 
 <div class="page" id="page2">
-  <img src="page2.png" alt="Urgency Page">
-  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
-  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
-  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
-  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
+  <img src="page2.png">
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
 <div class="page" id="page3">
-  <img src="page3.png" alt="Counselor Page">
+  <img src="page3.png">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
 <!-- CRISIS MODAL -->
 <div class="modal-overlay" id="crisisOverlay">
-  <div class="modal crisis-modal">
+  <div class="modal">
     <h2>Immediate Support</h2>
-    <ul class="crisis-list">
-      <li class="crisis-section">
-        <strong>Emergency</strong>
-        911 – Emergency services (police / ambulance / fire) for life-threatening crises.
-      </li>
-      <li class="crisis-section">
-        <strong>Mental Health & Crisis Support</strong>
-        988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
-        National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
-        Crisis Text Line – Text HOME to 741741 (24/7).
-      </li>
-      <li class="crisis-section">
-        <strong>Eating Disorder Support</strong>
-        National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
-        Text NEDA to 741741.
-      </li>
-      <li class="crisis-section">
-        <strong>Domestic Violence Support</strong>
-        National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
-        Text START to 88788.
-      </li>
-      <li class="crisis-section">
-        <strong>Sexual Assault Support</strong>
-        RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
-      </li>
-      <li class="crisis-section">
-        <strong>Substance Abuse & Addiction Support</strong>
-        SAMHSA National Helpline – 1-800-662-HELP (4357).
-      </li>
-      <li class="crisis-section">
-        <strong>LGBTQ Youth Support</strong>
-        The Trevor Project – 1-866-488-7386 or text START to 678-678.
-      </li>
-    </ul>
+    <p>If you're in danger, call 911 or 988.</p>
     <div class="crisis-actions">
-      <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
-      <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
+      <button class="secondary" onclick="closeCrisisModal()">Close</button>
+      <button class="primary" onclick="continueFromCrisis()">Continue</button>
     </div>
   </div>
 </div>
@@ -126,64 +80,58 @@ function goToPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
 }
-function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
-function chooseUrgency(urgency){
-  selectedUrgency=urgency;
-  urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3");
-}
 
-/* CRISIS MODAL */
-function openCrisisModal(){
-  document.getElementById("crisisOverlay")?.classList.add("active");
-}
-function closeCrisisModal(){
-  document.getElementById("crisisOverlay")?.classList.remove("active");
-}
-function continueFromCrisis(){
-  closeCrisisModal();
-  goToPage("page3");
-}
+/* CRISIS */
+function openCrisisModal(){ document.getElementById("crisisOverlay").classList.add("active"); }
+function closeCrisisModal(){ document.getElementById("crisisOverlay").classList.remove("active"); }
+function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
 
-/* SERVICE WORKER */
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("/service-worker.js")
-    .then(()=>console.log("SW registered"))
-    .catch(err=>console.warn("SW registration failed:", err));
+/* 🔥 SERVICE WORKER FIX */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js").then(reg => {
+    console.log("SW registered");
+
+    // FORCE CONTROL (THIS FIXES INSTALL BUTTON ISSUE)
+    if (!navigator.serviceWorker.controller) {
+      window.location.reload();
+    }
+  }).catch(err => console.warn("SW failed:", err));
 }
 
 /* INSTALL BUTTON */
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
+
 window.addEventListener("beforeinstallprompt", e=>{
   e.preventDefault();
   deferredPrompt = e;
-  if (installBtn) installBtn.style.display = "inline-block";
+  installBtn.style.display = "inline-block";
 });
-if (installBtn) {
-  installBtn.addEventListener("click", async ()=>{
-    installBtn.style.display="none";
-    if(deferredPrompt){
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      console.log("User choice:", choice.outcome);
-      deferredPrompt = null;
-    }
-  });
-}
 
-/* POPULATE COUNSELORS */
-async function populateStudentCounselorDropdown(){
-  const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
+installBtn.addEventListener("click", async ()=>{
+  installBtn.style.display="none";
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    console.log("User choice:", choice.outcome);
+    deferredPrompt = null;
+  }
+});
+
+/* COUNSELORS */
+function populateStudentCounselorDropdown(){
+  const counselors=[{username:"c1",email:"c1@example.com"}];
   const grid=document.getElementById("counselorGrid");
   grid.innerHTML='';
   counselors.forEach(c=>{
     const btn=document.createElement("button");
     btn.textContent=c.email;
-    btn.onclick=()=>console.log("Open modal for", c.username,c.email);
     grid.appendChild(btn);
   });
 }
+
 window.addEventListener("load", populateStudentCounselorDropdown);
 </script>
+
 </body>
 </html>
