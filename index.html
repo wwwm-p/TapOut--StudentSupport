@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TapOut! Student Support</title>
 
-<link rel="stylesheet" href="/style.css">
-
 <!-- PWA Manifest -->
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
@@ -18,19 +16,24 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{overflow-x:hidden;}
-.page{display:none;position:relative;}
-.page.active{display:block;text-align:center;}
+body{overflow-x:hidden;background:#fff;color:#111;}
+.page{display:none;position:relative;text-align:center;}
+.page.active{display:block;}
 .page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
+.hotspot{position:absolute;z-index:10;cursor:pointer;background:transparent;border:none;}
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
-.install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
 
-/* Modal safety */
+/* Modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
+.modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;}
+.crisis-list{list-style:none;padding:0;margin:12px 0;line-height:1.4;}
+.crisis-section{margin-bottom:12px;}
+.crisis-actions{display:flex;gap:10px;justify-content:flex-end;}
+.crisis-actions .primary{background:#0070c9;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
+.crisis-actions .secondary{background:#eee;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -64,71 +67,47 @@ body{overflow-x:hidden;}
 
 <!-- CRISIS MODAL -->
 <div class="modal-overlay" id="crisisOverlay">
-<div class="modal crisis-modal">
-<h2>Immediate Support</h2>
-<ul class="crisis-list">
-  <li class="crisis-section">
-    <strong>Emergency</strong>
-    911 – Emergency services (police / ambulance / fire) for life-threatening crises.
-  </li>
-  <li class="crisis-section">
-    <strong>Mental Health & Crisis Support</strong>
-    988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
-    National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
-    Crisis Text Line – Text HOME to 741741 (24/7).
-  </li>
-  <li class="crisis-section">
-    <strong>Eating Disorder Support</strong>
-    National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
-    Text NEDA to 741741.
-  </li>
-  <li class="crisis-section">
-    <strong>Domestic Violence Support</strong>
-    National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
-    Text START to 88788.
-  </li>
-  <li class="crisis-section">
-    <strong>Sexual Assault Support</strong>
-    RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
-  </li>
-  <li class="crisis-section">
-    <strong>Substance Abuse & Addiction Support</strong>
-    SAMHSA National Helpline – 1-800-662-HELP (4357).
-  </li>
-  <li class="crisis-section">
-    <strong>LGBTQ Youth Support</strong>
-    The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
-  </li>
-</ul>
-<div class="crisis-actions">
-  <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
-  <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
-</div>
-</div>
-</div>
-
-<!-- STUDENT MODAL -->
-<div class="modal-overlay" id="modalOverlay">
-<div class="modal">
-<h2>Submit Message</h2>
-<input id="firstName" placeholder="First Name">
-<input id="lastName" placeholder="Last Name">
-<input id="studentGrade" placeholder="Grade">
-<input id="studentId" placeholder="Student ID">
-<textarea id="extraNotes" placeholder="Additional notes"></textarea>
-<div class="modal-buttons">
-<button type="button" onclick="closeModal()">Cancel</button>
-<button type="button" onclick="submitMessage()">Submit</button>
-</div>
-</div>
-</div>
-
-<!-- SUCCESS MODAL -->
-<div class="modal-overlay" id="successOverlay">
-<div class="modal">
-<h2>Message Sent</h2>
-<button type="button" onclick="closeSuccess()">OK</button>
-</div>
+  <div class="modal crisis-modal">
+    <h2>Immediate Support</h2>
+    <ul class="crisis-list">
+      <li class="crisis-section">
+        <strong>Emergency</strong>
+        911 – Emergency services (police / ambulance / fire) for life-threatening crises.
+      </li>
+      <li class="crisis-section">
+        <strong>Mental Health & Crisis Support</strong>
+        988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
+        National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
+        Crisis Text Line – Text HOME to 741741 (24/7).
+      </li>
+      <li class="crisis-section">
+        <strong>Eating Disorder Support</strong>
+        National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
+        Text NEDA to 741741.
+      </li>
+      <li class="crisis-section">
+        <strong>Domestic Violence Support</strong>
+        National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
+        Text START to 88788.
+      </li>
+      <li class="crisis-section">
+        <strong>Sexual Assault Support</strong>
+        RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
+      </li>
+      <li class="crisis-section">
+        <strong>Substance Abuse & Addiction Support</strong>
+        SAMHSA National Helpline – 1-800-662-HELP (4357).
+      </li>
+      <li class="crisis-section">
+        <strong>LGBTQ Youth Support</strong>
+        The Trevor Project – 1-866-488-7386 or text START to 678-678.
+      </li>
+    </ul>
+    <div class="crisis-actions">
+      <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
+      <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -148,12 +127,10 @@ function chooseUrgency(urgency){
 
 /* CRISIS MODAL */
 function openCrisisModal(){
-  const overlay = document.getElementById("crisisOverlay");
-  if (overlay) overlay.classList.add("active");
+  document.getElementById("crisisOverlay")?.classList.add("active");
 }
 function closeCrisisModal(){
-  const overlay = document.getElementById("crisisOverlay");
-  if (overlay) overlay.classList.remove("active");
+  document.getElementById("crisisOverlay")?.classList.remove("active");
 }
 function continueFromCrisis(){
   closeCrisisModal();
@@ -161,7 +138,7 @@ function continueFromCrisis(){
 }
 
 /* POPULATE COUNSELORS */
-async function populateStudentCounselorDropdown(){
+function populateStudentCounselorDropdown(){
   const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
   const grid=document.getElementById("counselorGrid");
   grid.innerHTML='';
@@ -173,11 +150,6 @@ async function populateStudentCounselorDropdown(){
   });
 }
 window.addEventListener("load", populateStudentCounselorDropdown);
-
-/* PLACEHOLDERS FOR OTHER MODALS */
-function closeModal(){ document.getElementById("modalOverlay")?.classList.remove("active"); }
-function submitMessage(){ document.getElementById("successOverlay")?.classList.add("active"); }
-function closeSuccess(){ document.getElementById("successOverlay")?.classList.remove("active"); }
 </script>
 
 </body>
