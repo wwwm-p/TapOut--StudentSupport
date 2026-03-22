@@ -19,10 +19,49 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{overflow-x:hidden;}
-.page{display:none;position:relative;}
+.page{display:none;position:relative;min-height:100vh;}
 .page.active{display:block;text-align:center;}
 .page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
+.hotspot{position:absolute;z-index:10;cursor:pointer;background:transparent;border:none;}
+
+/* HOTSPOT POSITIONS */
+/* PAGE 1 (8 options, 2 columns) */
+.hotspot.academic{top:16%; left:6%; width:40%; height:9%;}
+.hotspot.anxiety{top:16%; left:54%; width:40%; height:9%;}
+.hotspot.depression{top:28%; left:6%; width:40%; height:9%;}
+.hotspot.family{top:28%; left:54%; width:40%; height:9%;}
+.hotspot.relationship{top:40%; left:6%; width:40%; height:9%;}
+.hotspot.bullying{top:40%; left:54%; width:40%; height:9%;}
+.hotspot.talk{top:52%; left:6%; width:40%; height:9%;}
+.hotspot.unsure{top:52%; left:54%; width:40%; height:9%;}
+
+/* PAGE 2 (single column) */
+.hotspot.fine{top:22%; left:10%; width:80%; height:10%;}
+.hotspot.littleoff{top:36%; left:10%; width:80%; height:10%;}
+.hotspot.coping{top:50%; left:10%; width:80%; height:10%;}
+.hotspot.crisis{top:64%; left:10%; width:80%; height:10%;}
+
+/* URGENCY NUMBER BADGES */
+.urgency-label{
+  position:absolute;
+  z-index:11;
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  background:#0070c9;
+  color:#fff;
+  font-weight:700;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+}
+.urgency-label.fine{top:24%; left:12%;}
+.urgency-label.littleoff{top:38%; left:12%;}
+.urgency-label.coping{top:52%; left:12%;}
+.urgency-label.crisis{top:66%; left:12%;}
+
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
@@ -58,6 +97,10 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 
 <div class="page" id="page2">
   <img src="/page2.png" alt="Urgency Page">
+  <div class="urgency-label fine">1</div>
+  <div class="urgency-label littleoff">2</div>
+  <div class="urgency-label coping">3</div>
+  <div class="urgency-label crisis">4</div>
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
   <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
   <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
