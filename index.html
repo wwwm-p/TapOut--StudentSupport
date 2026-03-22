@@ -28,7 +28,7 @@ body{overflow-x:hidden;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
 
-/* Added for modal visibility */
+/* Modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
 .modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
@@ -41,7 +41,7 @@ body{overflow-x:hidden;}
 </head>
 <body>
 
-<!-- Added install button (your JS already expects #installBtn) -->
+<!-- Install button -->
 <div style="padding:10px;text-align:center;">
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
@@ -73,7 +73,7 @@ body{overflow-x:hidden;}
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- CRISIS MODAL (added) -->
+<!-- CRISIS MODAL -->
 <div class="modal-overlay" id="crisisOverlay">
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
@@ -132,7 +132,7 @@ function chooseUrgency(urgency){
   urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3");
 }
 
-/* CRISIS MODAL (added) */
+/* CRISIS MODAL */
 function openCrisisModal(){
   document.getElementById("crisisOverlay")?.classList.add("active");
 }
@@ -165,7 +165,7 @@ if (installBtn) {
     if(deferredPrompt){
       deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
-      console.log('User choice:', choice.outcome);
+      console.log("User choice:", choice.outcome);
       deferredPrompt = null;
     }
   });
