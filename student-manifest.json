@@ -2,7 +2,7 @@
   "name": "TapOut! Student Support",
   "short_name": "Student",
   "description": "Student support app for connecting with counselors.",
-  "start_url": "/student.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
