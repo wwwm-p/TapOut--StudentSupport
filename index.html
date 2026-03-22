@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TapOut! – Student</title>
+<title>TapOut! Student Support</title>
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/style.css">
 
-<!-- PWA -->
+<!-- PWA Manifest -->
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
 <link rel="apple-touch-icon" href="/icons/icon-192-student.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="TapOut! – Student">
+<meta name="apple-mobile-web-app-title" content="TapOut! Student Support">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
@@ -37,7 +37,7 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 <body>
 
 <div class="top-bar">
-  <div class="app-name">TapOut! – Student</div>
+  <div class="app-name">TapOut! Student Support</div>
   <div class="top-actions">
     <button class="dark-toggle" id="darkToggle">Dark Mode</button>
     <button class="install-btn" id="installBtn">Install App</button>
@@ -45,7 +45,7 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 </div>
 
 <div class="page active" id="page1">
-  <img src="page1.png" alt="Welcome Page">
+  <img src="/page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
   <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
   <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
@@ -57,7 +57,7 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 </div>
 
 <div class="page" id="page2">
-  <img src="page2.png" alt="Urgency Page">
+  <img src="/page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
   <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
   <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
@@ -66,7 +66,7 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 </div>
 
 <div class="page" id="page3">
-  <img src="page3.png" alt="Counselor Page">
+  <img src="/page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
@@ -74,7 +74,7 @@ body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 <script>
 let selectedReason="", selectedUrgency="";
 
-/* NAVIGATION */
+// NAVIGATION
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
@@ -82,17 +82,17 @@ function goToPage(id){
 function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
 function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
 
-/* DARK MODE */
+// DARK MODE
 document.getElementById("darkToggle").onclick = ()=>document.body.classList.toggle("dark");
 
-/* SERVICE WORKER */
+// SERVICE WORKER
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/service-worker.js")
     .then(()=>console.log("SW registered"))
     .catch(err=>console.warn("SW registration failed:", err));
 }
 
-/* INSTALL BUTTON */
+// INSTALL BUTTON
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
 window.addEventListener("beforeinstallprompt", e=>{
@@ -110,7 +110,7 @@ installBtn.addEventListener("click", async ()=>{
   }
 });
 
-/* POPULATE COUNSELORS */
+// POPULATE COUNSELORS
 async function populateStudentCounselorDropdown(){
   const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
   const grid=document.getElementById("counselorGrid");
@@ -124,7 +124,6 @@ async function populateStudentCounselorDropdown(){
 }
 window.addEventListener("load", populateStudentCounselorDropdown);
 
-/* PLACEHOLDER */
 function openCrisisModal(){ console.log("Crisis modal"); }
 </script>
 </body>
