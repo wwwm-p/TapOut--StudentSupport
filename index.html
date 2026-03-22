@@ -3,75 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Support</title>
+<title>TapOut! – Student</title>
 
 <link rel="stylesheet" href="style.css">
 
 <!-- PWA -->
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
-
 <link rel="apple-touch-icon" href="/icons/icon-192-student.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Student Support">
+<meta name="apple-mobile-web-app-title" content="TapOut! – Student">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{overflow-x:hidden;}
 .page{display:none;position:relative;}
 .page.active{display:block;text-align:center;}
-.page img{width:100%;height:auto;display:block;pointer-events:none;user-select:none;}
+.page img{width:100%;height:auto;display:block;}
 .hotspot{position:absolute;z-index:10;cursor:pointer;}
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
-
-.install-btn{
-  padding:6px 10px;
-  border-radius:6px;
-  border:1px solid #0070c9;
-  background:#0070c9;
-  color:white;
-  cursor:pointer;
-  display:none;
-}
-
-.top-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#fff;
-  padding:12px 24px;
-  border-bottom:1px solid #ddd;
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-
+.install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
+.top-bar{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:12px 24px;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:100;}
 .top-bar .app-name{font-weight:bold;font-size:1.2em;}
 .top-bar .top-actions{display:flex;gap:16px;align-items:center;}
-
-.dark-toggle{
-  padding:6px 10px;
-  border-radius:6px;
-  border:1px solid #ddd;
-  background:#fff;
-  cursor:pointer;
-}
-
-body.dark .dark-toggle{
-  background:#111827;
-  color:#e5e7eb;
-  border-color:#1f2937;
-}
+.dark-toggle{padding:6px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;}
+body.dark .dark-toggle{background:#111827;color:#e5e7eb;border-color:#1f2937;}
 </style>
 </head>
-
 <body>
 
-<!-- Top Bar -->
 <div class="top-bar">
   <div class="app-name">TapOut! – Student</div>
   <div class="top-actions">
@@ -80,9 +44,8 @@ body.dark .dark-toggle{
   </div>
 </div>
 
-<!-- Pages -->
 <div class="page active" id="page1">
-  <img src="page1.png">
+  <img src="page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
   <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
   <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
@@ -94,7 +57,7 @@ body.dark .dark-toggle{
 </div>
 
 <div class="page" id="page2">
-  <img src="page2.png">
+  <img src="page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
   <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
   <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
@@ -103,7 +66,7 @@ body.dark .dark-toggle{
 </div>
 
 <div class="page" id="page3">
-  <img src="page3.png">
+  <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
@@ -117,62 +80,52 @@ function goToPage(id){
   document.getElementById(id)?.classList.add("active");
 }
 function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
-function chooseUrgency(urgency){
-  selectedUrgency=urgency;
-  urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3");
-}
+function chooseUrgency(urgency){ selectedUrgency=urgency; urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3"); }
 
 /* DARK MODE */
-document.getElementById("darkToggle").onclick = ()=>{
-  document.body.classList.toggle("dark");
-};
+document.getElementById("darkToggle").onclick = ()=>document.body.classList.toggle("dark");
 
 /* SERVICE WORKER */
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/service-worker.js")
-    .then(()=>console.log("SW registered"));
+    .then(()=>console.log("SW registered"))
+    .catch(err=>console.warn("SW registration failed:", err));
 }
 
-/* INSTALL BUTTON (FIXED + MATCHES ADMIN) */
+/* INSTALL BUTTON */
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
-
-window.addEventListener("beforeinstallprompt", (e)=>{
+window.addEventListener("beforeinstallprompt", e=>{
   e.preventDefault();
   deferredPrompt = e;
   installBtn.style.display = "inline-block";
 });
-
 installBtn.addEventListener("click", async ()=>{
   installBtn.style.display="none";
-  deferredPrompt.prompt();
-  const choice = await deferredPrompt.userChoice;
-  console.log("User choice:", choice.outcome);
-  deferredPrompt = null;
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    console.log('User choice:', choice.outcome);
+    deferredPrompt = null;
+  }
 });
 
-/* COUNSELORS */
+/* POPULATE COUNSELORS */
 async function populateStudentCounselorDropdown(){
-  const counselors=[
-    {username:"counselor1",email:"counselor1@example.com"}
-  ];
+  const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
   const grid=document.getElementById("counselorGrid");
   grid.innerHTML='';
   counselors.forEach(c=>{
     const btn=document.createElement("button");
     btn.textContent=c.email;
-    btn.onclick=()=>openModal(c.username,c.email);
+    btn.onclick=()=>console.log("Open modal for", c.username,c.email);
     grid.appendChild(btn);
   });
 }
-
-/* PLACEHOLDERS */
-function openModal(u,e){ console.log("Open modal:", u,e); }
-function openCrisisModal(){ console.log("Crisis modal"); }
-
-/* INIT */
 window.addEventListener("load", populateStudentCounselorDropdown);
-</script>
 
+/* PLACEHOLDER */
+function openCrisisModal(){ console.log("Crisis modal"); }
+</script>
 </body>
 </html>
