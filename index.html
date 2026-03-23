@@ -27,6 +27,8 @@ body{overflow-x:hidden;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
+
+/* Modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
 .modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
@@ -44,7 +46,7 @@ body{overflow-x:hidden;}
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
-<!-- PAGE 1: Reasons -->
+<!-- PAGE 1: Reason selection -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
@@ -57,7 +59,7 @@ body{overflow-x:hidden;}
   <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
 </div>
 
-<!-- PAGE 2: Urgency -->
+<!-- PAGE 2: Urgency selection -->
 <div class="page" id="page2">
   <img src="page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
@@ -67,13 +69,10 @@ body{overflow-x:hidden;}
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
-<!-- PAGE 3: Counselor Grid -->
+<!-- PAGE 3: Counselor selection -->
 <div class="page" id="page3">
   <img src="page3.png" alt="Counselor Page">
-  <div class="counselor-grid" id="counselorGrid">
-    <!-- Example placeholder, will be replaced by API -->
-    <p>Loading counselors...</p>
-  </div>
+  <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
@@ -82,7 +81,30 @@ body{overflow-x:hidden;}
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
     <ul class="crisis-list">
-      <!-- Static content, can stay as-is -->
+      <li class="crisis-section">
+        <strong>Emergency</strong> – 911
+      </li>
+      <li class="crisis-section">
+        <strong>Mental Health & Crisis Support</strong><br>
+        988 Suicide & Crisis Lifeline – Call or text 988<br>
+        National Suicide Prevention Lifeline – 1-800-273-TALK<br>
+        Crisis Text Line – Text HOME to 741741
+      </li>
+      <li class="crisis-section">
+        <strong>Eating Disorder Support</strong> – 1-800-931-2237
+      </li>
+      <li class="crisis-section">
+        <strong>Domestic Violence Support</strong> – 1-800-799-7233
+      </li>
+      <li class="crisis-section">
+        <strong>Sexual Assault Support</strong> – 1-800-656-4673
+      </li>
+      <li class="crisis-section">
+        <strong>Substance Abuse & Addiction Support</strong> – 1-800-662-4357
+      </li>
+      <li class="crisis-section">
+        <strong>LGBTQ Youth Support</strong> – 1-866-488-7386
+      </li>
     </ul>
     <div class="crisis-actions">
       <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
@@ -92,42 +114,57 @@ body{overflow-x:hidden;}
 </div>
 
 <script>
-let selectedReason="", selectedUrgency="";
+let selectedReason = "", selectedUrgency = "";
 
 /* NAVIGATION */
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const page = document.getElementById(id);
+  if(page) page.classList.add("active");
 }
-function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
+function chooseReason(reason){
+  selectedReason = reason;
+  goToPage('page2');
+}
 function chooseUrgency(urgency){
-  selectedUrgency=urgency;
-  urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3");
+  selectedUrgency = urgency;
+  if(urgency === "I’m in Crisis"){
+    openCrisisModal();
+  } else {
+    goToPage('page3');
+  }
 }
 
 /* CRISIS MODAL */
-function openCrisisModal(){ document.getElementById("crisisOverlay")?.classList.add("active"); }
-function closeCrisisModal(){ document.getElementById("crisisOverlay")?.classList.remove("active"); }
-function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
+function openCrisisModal(){
+  document.getElementById('crisisOverlay').classList.add('active');
+}
+function closeCrisisModal(){
+  document.getElementById('crisisOverlay').classList.remove('active');
+}
+function continueFromCrisis(){
+  closeCrisisModal();
+  goToPage('page3');
+}
 
 /* SERVICE WORKER */
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("/service-worker.js")
-    .then(()=>console.log("SW registered"))
-    .catch(err=>console.warn("SW registration failed:", err));
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(() => console.log('Service Worker registered'))
+    .catch(err => console.warn('SW registration failed:', err));
 }
 
 /* INSTALL BUTTON */
 let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
-window.addEventListener("beforeinstallprompt", e=>{
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  if (installBtn) installBtn.style.display = "inline-block";
+  if(installBtn) installBtn.style.display = 'inline-block';
 });
-if (installBtn) {
-  installBtn.addEventListener("click", async ()=>{
-    installBtn.style.display="none";
+if(installBtn){
+  installBtn.addEventListener('click', async () => {
+    installBtn.style.display = 'none';
     if(deferredPrompt){
       deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
@@ -137,39 +174,34 @@ if (installBtn) {
   });
 }
 
-/* POPULATE COUNSELORS FROM API */
+/* POPULATE COUNSELORS (example data for API integration) */
+const exampleCounselors = [
+  { username: 'counselor1', email: 'counselor1@example.com' },
+  { username: 'counselor2', email: 'counselor2@example.com' }
+];
+
 async function populateStudentCounselorDropdown(){
+  const grid = document.getElementById('counselorGrid');
+  grid.innerHTML = '';
   try {
-    // Example API fetch, replace '/api/counselors' with your real endpoint
-    const res = await fetch('/api/counselors');
-    const counselors = await res.json();
-
-    const grid = document.getElementById("counselorGrid");
-    grid.innerHTML = ''; // clear loading placeholder
-
-    if(counselors.length === 0){
-      grid.innerHTML = '<p>No counselors assigned yet.</p>';
-    }
-
+    // TODO: replace with real API fetch
+    // const res = await fetch('/api/counselors');
+    // const counselors = await res.json();
+    const counselors = exampleCounselors;
     counselors.forEach(c => {
-      const btn = document.createElement("button");
-      btn.textContent = c.email;          // display email, could be c.name
-      btn.dataset.username = c.username;  // store backend id
-      btn.onclick = () => openCounselorModal(c); // placeholder function
+      const btn = document.createElement('button');
+      btn.textContent = c.email;
+      btn.dataset.username = c.username;
+      btn.onclick = () => console.log('Open modal for', c.username, c.email);
       grid.appendChild(btn);
     });
-  } catch(err) {
-    console.error('Failed to load counselors', err);
-    document.getElementById("counselorGrid").innerHTML = '<p>Error loading counselors</p>';
+  } catch(err){
+    grid.innerHTML = 'Error loading counselors';
+    console.error(err);
   }
 }
-
-// Placeholder function for when a counselor button is clicked
-function openCounselorModal(counselor){
-  alert(`Open modal for ${counselor.username} (${counselor.email})`);
-}
-
-window.addEventListener("load", populateStudentCounselorDropdown);
+window.addEventListener('load', populateStudentCounselorDropdown);
 </script>
+
 </body>
 </html>
