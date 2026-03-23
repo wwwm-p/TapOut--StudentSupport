@@ -22,11 +22,13 @@ body{overflow-x:hidden;}
 .page{display:none;position:relative;}
 .page.active{display:block;text-align:center;}
 .page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:20;cursor:pointer;background:rgba(0,0,0,0.001);border:none;} /* transparent but clickable */
+.hotspot{position:absolute;z-index:10;cursor:pointer;}
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
+
+/* Modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
 .modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
@@ -44,20 +46,30 @@ body{overflow-x:hidden;}
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
-<!-- PAGE 1 -->
+<!-- PAGE 1: Reason selection -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
-  <div id="hotspotContainerPage1" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
+  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
+  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
+  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
+  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
+  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
+  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
+  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
 </div>
 
-<!-- PAGE 2 -->
+<!-- PAGE 2: Urgency selection -->
 <div class="page" id="page2">
   <img src="page2.png" alt="Urgency Page">
-  <div id="hotspotContainerPage2" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
+  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
+  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
+  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
-<!-- PAGE 3 -->
+<!-- PAGE 3: Counselor selection -->
 <div class="page" id="page3">
   <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
@@ -68,7 +80,32 @@ body{overflow-x:hidden;}
 <div class="modal-overlay" id="crisisOverlay">
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
-    <ul class="crisis-list" id="crisisList"></ul>
+    <ul class="crisis-list">
+      <li class="crisis-section">
+        <strong>Emergency</strong> – 911
+      </li>
+      <li class="crisis-section">
+        <strong>Mental Health & Crisis Support</strong><br>
+        988 Suicide & Crisis Lifeline – Call or text 988<br>
+        National Suicide Prevention Lifeline – 1-800-273-TALK<br>
+        Crisis Text Line – Text HOME to 741741
+      </li>
+      <li class="crisis-section">
+        <strong>Eating Disorder Support</strong> – 1-800-931-2237
+      </li>
+      <li class="crisis-section">
+        <strong>Domestic Violence Support</strong> – 1-800-799-7233
+      </li>
+      <li class="crisis-section">
+        <strong>Sexual Assault Support</strong> – 1-800-656-4673
+      </li>
+      <li class="crisis-section">
+        <strong>Substance Abuse & Addiction Support</strong> – 1-800-662-4357
+      </li>
+      <li class="crisis-section">
+        <strong>LGBTQ Youth Support</strong> – 1-866-488-7386
+      </li>
+    </ul>
     <div class="crisis-actions">
       <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
       <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
@@ -77,13 +114,13 @@ body{overflow-x:hidden;}
 </div>
 
 <script>
-let selectedReason = "";
-let selectedUrgency = "";
+let selectedReason = "", selectedUrgency = "";
 
 /* NAVIGATION */
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
+  const page = document.getElementById(id);
+  if(page) page.classList.add("active");
 }
 function chooseReason(reason){
   selectedReason = reason;
@@ -91,7 +128,7 @@ function chooseReason(reason){
 }
 function chooseUrgency(urgency){
   selectedUrgency = urgency;
-  if(urgency === "I'm in Crisis"){
+  if(urgency === "I’m in Crisis"){
     openCrisisModal();
   } else {
     goToPage('page3');
@@ -99,14 +136,21 @@ function chooseUrgency(urgency){
 }
 
 /* CRISIS MODAL */
-function openCrisisModal(){ document.getElementById('crisisOverlay').classList.add('active'); }
-function closeCrisisModal(){ document.getElementById('crisisOverlay').classList.remove('active'); }
-function continueFromCrisis(){ closeCrisisModal(); goToPage('page3'); }
+function openCrisisModal(){
+  document.getElementById('crisisOverlay').classList.add('active');
+}
+function closeCrisisModal(){
+  document.getElementById('crisisOverlay').classList.remove('active');
+}
+function continueFromCrisis(){
+  closeCrisisModal();
+  goToPage('page3');
+}
 
 /* SERVICE WORKER */
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/service-worker.js')
-    .then(() => console.log('SW registered'))
+    .then(() => console.log('Service Worker registered'))
     .catch(err => console.warn('SW registration failed:', err));
 }
 
@@ -124,90 +168,39 @@ if(installBtn){
     if(deferredPrompt){
       deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
+      console.log('User choice:', choice.outcome);
       deferredPrompt = null;
     }
   });
 }
 
-/* HOTSPOTS CREATION */
-function createHotspots(containerId, hotspots){
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  hotspots.forEach(h => {
-    const btn = document.createElement('button');
-    btn.className = 'hotspot ' + h.class;
-    btn.style.position = 'absolute';
-    btn.style.top = h.top;
-    btn.style.left = h.left;
-    btn.style.width = h.width;
-    btn.style.height = h.height;
-    btn.onclick = () => h.onClick();
-    container.appendChild(btn);
-  });
-}
-
-/* PAGE 1 HOTSPOTS */
-createHotspots('hotspotContainerPage1', [
-  {class:'academic', top:'10%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Academic stress or pressure')},
-  {class:'anxiety', top:'20%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Anxiety or panic attacks')},
-  {class:'depression', top:'30%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Depression or sadness')},
-  {class:'family', top:'40%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Family issues or home stress')},
-  {class:'relationship', top:'50%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Relationship or friendship problems')},
-  {class:'bullying', top:'60%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Bullying or harassment')},
-  {class:'talk', top:'70%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('I just need someone to talk to')},
-  {class:'unsure', top:'80%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason("I'm not ready to say")}
-]);
-
-/* PAGE 2 HOTSPOTS */
-createHotspots('hotspotContainerPage2', [
-  {class:'fine', top:'10%', left:'10%', width:'25%', height:'8%', onClick:() => chooseUrgency("I'm Doing Fine – Just Curious")},
-  {class:'littleoff', top:'25%', left:'10%', width:'25%', height:'8%', onClick:() => chooseUrgency('Feeling a Little Off')},
-  {class:'coping', top:'40%', left:'10%', width:'25%', height:'8%', onClick:() => chooseUrgency("I'm Not Coping Well")},
-  {class:'crisis', top:'55%', left:'10%', width:'25%', height:'8%', onClick:() => chooseUrgency("I'm in Crisis")}
-]);
-
-/* COUNSELORS */
+/* POPULATE COUNSELORS (example data for API integration) */
 const exampleCounselors = [
   { username: 'counselor1', email: 'counselor1@example.com' },
   { username: 'counselor2', email: 'counselor2@example.com' }
 ];
-function populateStudentCounselorDropdown(){
+
+async function populateStudentCounselorDropdown(){
   const grid = document.getElementById('counselorGrid');
   grid.innerHTML = '';
-  exampleCounselors.forEach(c => {
-    const btn = document.createElement('button');
-    btn.textContent = c.email;
-    btn.onclick = () => console.log('Open modal for', c.username, c.email);
-    grid.appendChild(btn);
-  });
+  try {
+    // TODO: replace with real API fetch
+    // const res = await fetch('/api/counselors');
+    // const counselors = await res.json();
+    const counselors = exampleCounselors;
+    counselors.forEach(c => {
+      const btn = document.createElement('button');
+      btn.textContent = c.email;
+      btn.dataset.username = c.username;
+      btn.onclick = () => console.log('Open modal for', c.username, c.email);
+      grid.appendChild(btn);
+    });
+  } catch(err){
+    grid.innerHTML = 'Error loading counselors';
+    console.error(err);
+  }
 }
-
-/* CRISIS DATA */
-const exampleCrisis = [
-  {title:'Emergency', info:'Call 911 for life-threatening crises'},
-  {title:'Suicide & Crisis', info:'Call or text 988 (24/7, free, confidential)'},
-  {title:'Eating Disorder Support', info:'Call 1-800-931-2237'},
-  {title:'Domestic Violence Support', info:'Call 1-800-799-7233'},
-  {title:'Sexual Assault Support', info:'Call 1-800-656-4673'},
-  {title:'Substance Abuse & Addiction Support', info:'Call 1-800-662-4357'},
-  {title:'LGBTQ Youth Support', info:'Call 1-866-488-7386'}
-];
-function populateCrisisList(){
-  const list = document.getElementById('crisisList');
-  list.innerHTML = '';
-  exampleCrisis.forEach(c => {
-    const li = document.createElement('li');
-    li.className = 'crisis-section';
-    li.innerHTML = `<strong>${c.title}</strong><br>${c.info}`;
-    list.appendChild(li);
-  });
-}
-populateCrisisList();
-
-/* INIT */
-window.addEventListener('load', () => {
-  populateStudentCounselorDropdown();
-});
+window.addEventListener('load', populateStudentCounselorDropdown);
 </script>
 
 </body>
