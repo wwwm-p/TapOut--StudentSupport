@@ -22,13 +22,11 @@ body{overflow-x:hidden;}
 .page{display:none;position:relative;}
 .page.active{display:block;text-align:center;}
 .page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
+.hotspot{position:absolute;z-index:10;cursor:pointer;background:transparent;border:none;}
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
-
-/* Modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
 .modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
@@ -37,11 +35,6 @@ body{overflow-x:hidden;}
 .crisis-actions{display:flex;gap:10px;justify-content:flex-end;}
 .crisis-actions .primary{background:#0070c9;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
 .crisis-actions .secondary{background:#eee;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
-
-/* Student details container */
-#studentDetails{display:none;margin-top:20px;text-align:left;}
-#studentDetails h3{margin-bottom:10px;}
-#studentDetails ul{margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -51,88 +44,31 @@ body{overflow-x:hidden;}
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
-<!-- PAGE 1: Reason Selection -->
+<!-- Pages -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
-  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
-  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
-  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
-  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
-  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
-  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
-  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
-  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
+  <div id="hotspotContainerPage1"></div>
 </div>
 
-<!-- PAGE 2: Urgency Selection -->
 <div class="page" id="page2">
   <img src="page2.png" alt="Urgency Page">
-  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
-  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
-  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
-  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
+  <div id="hotspotContainerPage2"></div>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
-<!-- PAGE 3: Counselor Selection -->
 <div class="page" id="page3">
   <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
+  <div id="appointmentContainer"></div>
+  <div id="notesContainer"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- DYNAMIC STUDENT DETAILS -->
-<div id="studentDetails">
-  <h3 id="studentName"></h3>
-  <div id="studentAppointments">
-    <h4>Past Appointments</h4>
-    <ul></ul>
-  </div>
-  <div id="studentNotes">
-    <h4>Notes</h4>
-    <ul></ul>
-  </div>
-  <button onclick="backToCounselors()">Back</button>
-</div>
-
-<!-- CRISIS MODAL -->
+<!-- Crisis Modal -->
 <div class="modal-overlay" id="crisisOverlay">
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
-    <ul class="crisis-list">
-      <li class="crisis-section">
-        <strong>Emergency</strong>
-        911 – Emergency services (police / ambulance / fire) for life-threatening crises.
-      </li>
-      <li class="crisis-section">
-        <strong>Mental Health & Crisis Support</strong>
-        988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
-        National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
-        Crisis Text Line – Text HOME to 741741 (24/7).
-      </li>
-      <li class="crisis-section">
-        <strong>Eating Disorder Support</strong>
-        National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
-        Text NEDA to 741741.
-      </li>
-      <li class="crisis-section">
-        <strong>Domestic Violence Support</strong>
-        National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
-        Text START to 88788.
-      </li>
-      <li class="crisis-section">
-        <strong>Sexual Assault Support</strong>
-        RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
-      </li>
-      <li class="crisis-section">
-        <strong>Substance Abuse & Addiction Support</strong>
-        SAMHSA National Helpline – 1-800-662-HELP (4357).
-      </li>
-      <li class="crisis-section">
-        <strong>LGBTQ Youth Support</strong>
-        The Trevor Project – 1-866-488-7386 or text START to 678-678.
-      </li>
-    </ul>
+    <ul class="crisis-list" id="crisisList"></ul>
     <div class="crisis-actions">
       <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
       <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
@@ -141,68 +77,104 @@ body{overflow-x:hidden;}
 </div>
 
 <script>
-let selectedReason="", selectedUrgency="";
+let selectedReason = "", selectedUrgency = "";
 
-/* NAVIGATION */
+/* ---------------- NAVIGATION ---------------- */
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
-  document.getElementById('studentDetails').style.display = 'none';
 }
-function backToCounselors(){
-  document.getElementById('studentDetails').style.display = 'none';
-  document.getElementById('page3').classList.add('active');
-}
-
-/* SELECTION */
 function chooseReason(reason){ selectedReason = reason; goToPage('page2'); }
 function chooseUrgency(urgency){
   selectedUrgency = urgency;
   urgency === "I’m in Crisis" ? openCrisisModal() : goToPage('page3');
 }
 
-/* CRISIS MODAL */
-function openCrisisModal(){ document.getElementById('crisisOverlay').classList.add('active'); }
-function closeCrisisModal(){ document.getElementById('crisisOverlay').classList.remove('active'); }
+/* ---------------- CRISIS MODAL ---------------- */
+function openCrisisModal(){ document.getElementById("crisisOverlay")?.classList.add("active"); }
+function closeCrisisModal(){ document.getElementById("crisisOverlay")?.classList.remove("active"); }
 function continueFromCrisis(){ closeCrisisModal(); goToPage('page3'); }
 
-/* SERVICE WORKER */
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/service-worker.js')
-    .then(()=>console.log('SW registered'))
-    .catch(err=>console.warn('SW registration failed:', err));
+/* Populate crisis list dynamically */
+function populateCrisisList(data){
+  const list = document.getElementById('crisisList');
+  list.innerHTML = '';
+  data.forEach(item => {
+    const li = document.createElement('li');
+    li.className = 'crisis-section';
+    li.innerHTML = `<strong>${item.title}</strong><br>${item.info}`;
+    list.appendChild(li);
+  });
 }
 
-/* INSTALL BUTTON */
+/* ---------------- SERVICE WORKER ---------------- */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/service-worker.js")
+    .then(()=>console.log("SW registered"))
+    .catch(err=>console.warn("SW registration failed:", err));
+}
+
+/* ---------------- INSTALL BUTTON ---------------- */
 let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', e=>{
+const installBtn = document.getElementById("installBtn");
+window.addEventListener("beforeinstallprompt", e=>{
   e.preventDefault();
   deferredPrompt = e;
-  installBtn.style.display = 'inline-block';
+  if(installBtn) installBtn.style.display = 'inline-block';
 });
-installBtn.addEventListener('click', async ()=>{
-  installBtn.style.display = 'none';
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choice => {
+if(installBtn){
+  installBtn.addEventListener("click", async ()=>{
+    installBtn.style.display = 'none';
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
       console.log('User choice:', choice.outcome);
       deferredPrompt = null;
-    });
-  }
-});
+    }
+  });
+}
 
-/* DYNAMIC COUNSELORS */
+/* ---------------- DYNAMIC HOTSPOTS ---------------- */
+function createHotspots(containerId, hotspots){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  hotspots.forEach(h => {
+    const btn = document.createElement('button');
+    btn.className = `hotspot ${h.class}`;
+    btn.style.position = 'absolute';
+    btn.style.top = h.top;
+    btn.style.left = h.left;
+    btn.style.width = h.width;
+    btn.style.height = h.height;
+    btn.onclick = h.onClick;
+    container.appendChild(btn);
+  });
+}
+
+/* Example dynamic hotspots */
+createHotspots('hotspotContainerPage1', [
+  {class:'academic', top:'10%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Academic stress')},
+  {class:'anxiety', top:'25%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Anxiety')}
+]);
+createHotspots('hotspotContainerPage2', [
+  {class:'fine', top:'10%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency('I’m Doing Fine')},
+  {class:'crisis', top:'25%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency('I’m in Crisis')}
+]);
+
+/* ---------------- DYNAMIC COUNSELORS ---------------- */
 async function loadCounselors(){
   const grid = document.getElementById('counselorGrid');
   grid.innerHTML = '';
   try {
-    // Example API placeholder
-    const counselors = await fetch('/api/counselors').then(r=>r.json());
-    counselors.forEach(c=>{
+    // Example dynamic array
+    const counselors = [
+      {id:1, name:'Alice', email:'alice@example.com'},
+      {id:2, name:'Bob', email:'bob@example.com'}
+    ];
+    counselors.forEach(c => {
       const btn = document.createElement('button');
       btn.textContent = c.email;
-      btn.onclick = () => showStudentDetails(c.id);
+      btn.onclick = ()=>loadStudentData(c.id);
       grid.appendChild(btn);
     });
   } catch(err){
@@ -211,45 +183,41 @@ async function loadCounselors(){
   }
 }
 
-/* DYNAMIC STUDENT DETAILS */
-async function showStudentDetails(studentId){
-  const details = document.getElementById('studentDetails');
-  const nameElem = document.getElementById('studentName');
-  const appointmentsList = document.querySelector('#studentAppointments ul');
-  const notesList = document.querySelector('#studentNotes ul');
+/* ---------------- DYNAMIC APPOINTMENTS / NOTES ---------------- */
+function loadStudentData(counselorId){
+  const appointmentContainer = document.getElementById('appointmentContainer');
+  const notesContainer = document.getElementById('notesContainer');
 
-  try {
-    // Example API placeholders
-    const student = await fetch(`/api/student/${studentId}`).then(r=>r.json());
-    nameElem.textContent = student.name || 'Unknown Student';
+  // Example data
+  const appointments = [
+    {id:1, date:'2026-03-22', topic:'Stress check-in'},
+    {id:2, date:'2026-03-23', topic:'Homework help'}
+  ];
+  const notes = [
+    {id:1, text:'Student reported feeling anxious.'},
+    {id:2, text:'Follow-up on family discussion.'}
+  ];
 
-    appointmentsList.innerHTML = '';
-    (student.appointments || []).forEach(a=>{
-      const li = document.createElement('li');
-      li.textContent = `${a.date}: ${a.reason}`;
-      appointmentsList.appendChild(li);
-    });
-
-    notesList.innerHTML = '';
-    (student.notes || []).forEach(n=>{
-      const li = document.createElement('li');
-      li.textContent = n.note;
-      notesList.appendChild(li);
-    });
-
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    details.style.display = 'block';
-
-  } catch(err){
-    appointmentsList.innerHTML = '<li>Error loading appointments</li>';
-    notesList.innerHTML = '<li>Error loading notes</li>';
-    console.error(err);
-    details.style.display = 'block';
-  }
+  appointmentContainer.innerHTML = `<h3>Appointments</h3><ul>${appointments.map(a=>`<li>${a.date}: ${a.topic}</li>`).join('')}</ul>`;
+  notesContainer.innerHTML = `<h3>Notes</h3><ul>${notes.map(n=>`<li>${n.text}</li>`).join('')}</ul>`;
 }
 
-/* INIT */
-window.addEventListener('load', loadCounselors);
+/* ---------------- INIT CRISIS DATA ---------------- */
+const crisisData = [
+  {title:'Emergency', info:'911 – Emergency services (police / ambulance / fire) for life-threatening crises.'},
+  {title:'Mental Health & Crisis Support', info:'988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>Crisis Text Line – Text HOME to 741741 (24/7).'},
+  {title:'Eating Disorder Support', info:'National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>Text NEDA to 741741.'},
+  {title:'Domestic Violence Support', info:'National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>Text START to 88788.'},
+  {title:'Sexual Assault Support', info:'RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).'},
+  {title:'Substance Abuse & Addiction Support', info:'SAMHSA National Helpline – 1-800-662-HELP (4357).'},
+  {title:'LGBTQ Youth Support', info:'The Trevor Project – 1-866-488-7386 or text START to 678-678.'}
+];
+populateCrisisList(crisisData);
+
+/* ---------------- INIT ---------------- */
+window.addEventListener('load', () => {
+  loadCounselors();
+});
 </script>
 </body>
 </html>
