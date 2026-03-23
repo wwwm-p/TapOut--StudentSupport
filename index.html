@@ -7,26 +7,28 @@
 
 <link rel="stylesheet" href="/style.css">
 
-<!-- PWA manifest & icons -->
+<!-- PWA -->
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
 <link rel="apple-touch-icon" href="/icons/icon-192-student.png">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="TapOut! – Student">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{overflow-x:hidden;}
 .page{display:none;position:relative;}
-.page.active{display:block;text-align:center;}
+.page.active{display:block;text-align:center;background:#f7f7f7;}
 .page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
+.hotspot{position:absolute;z-index:10;cursor:pointer;background:rgba(255,0,0,0.2);border:1px solid red;}
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
 
-/* Modal */
+/* Modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
 .modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
@@ -47,23 +49,24 @@ body{overflow-x:hidden;}
 <!-- PAGE 1: Reason selection -->
 <div class="page active" id="page1">
   <img src="/page1.png" alt="Welcome Page">
-  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
-  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
-  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
-  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
-  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
-  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
-  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
-  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
+  <!-- Visible test hotspots -->
+  <button class="hotspot" style="top:10%;left:10%;width:120px;height:50px;" onclick="chooseReason('Academic stress or pressure')">Academic</button>
+  <button class="hotspot" style="top:20%;left:10%;width:120px;height:50px;" onclick="chooseReason('Anxiety or panic attacks')">Anxiety</button>
+  <button class="hotspot" style="top:30%;left:10%;width:120px;height:50px;" onclick="chooseReason('Depression or sadness')">Depression</button>
+  <button class="hotspot" style="top:40%;left:10%;width:120px;height:50px;" onclick="chooseReason('Family issues or home stress')">Family</button>
+  <button class="hotspot" style="top:50%;left:10%;width:120px;height:50px;" onclick="chooseReason('Relationship or friendship problems')">Relationship</button>
+  <button class="hotspot" style="top:60%;left:10%;width:120px;height:50px;" onclick="chooseReason('Bullying or harassment')">Bullying</button>
+  <button class="hotspot" style="top:70%;left:10%;width:120px;height:50px;" onclick="chooseReason('I just need someone to talk to')">Talk</button>
+  <button class="hotspot" style="top:80%;left:10%;width:120px;height:50px;" onclick="chooseReason('I’m not ready to say')">Unsure</button>
 </div>
 
 <!-- PAGE 2: Urgency selection -->
 <div class="page" id="page2">
   <img src="/page2.png" alt="Urgency Page">
-  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
-  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
-  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
-  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
+  <button class="hotspot" style="top:10%;left:10%;width:150px;height:50px;" onclick="chooseUrgency('I’m Doing Fine – Just Curious')">Fine</button>
+  <button class="hotspot" style="top:20%;left:10%;width:150px;height:50px;" onclick="chooseUrgency('Feeling a Little Off')">Little Off</button>
+  <button class="hotspot" style="top:30%;left:10%;width:150px;height:50px;" onclick="chooseUrgency('I’m Not Coping Well')">Coping</button>
+  <button class="hotspot" style="top:40%;left:10%;width:150px;height:50px;" onclick="chooseUrgency('I’m in Crisis')">Crisis</button>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
@@ -80,7 +83,11 @@ body{overflow-x:hidden;}
     <h2>Immediate Support</h2>
     <ul class="crisis-list">
       <li class="crisis-section"><strong>Emergency</strong> – 911</li>
-      <li class="crisis-section"><strong>Mental Health & Crisis Support</strong><br>988 Suicide & Crisis Lifeline – Call or text 988<br>National Suicide Prevention Lifeline – 1-800-273-TALK<br>Crisis Text Line – Text HOME to 741741</li>
+      <li class="crisis-section"><strong>Mental Health & Crisis Support</strong><br>
+        988 Suicide & Crisis Lifeline – Call or text 988<br>
+        National Suicide Prevention Lifeline – 1-800-273-TALK<br>
+        Crisis Text Line – Text HOME to 741741
+      </li>
       <li class="crisis-section"><strong>Eating Disorder Support</strong> – 1-800-931-2237</li>
       <li class="crisis-section"><strong>Domestic Violence Support</strong> – 1-800-799-7233</li>
       <li class="crisis-section"><strong>Sexual Assault Support</strong> – 1-800-656-4673</li>
@@ -95,19 +102,25 @@ body{overflow-x:hidden;}
 </div>
 
 <script>
-let selectedReason="", selectedUrgency="";
+let selectedReason = "", selectedUrgency = "";
 
 /* NAVIGATION */
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  const page=document.getElementById(id);
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const page = document.getElementById(id);
   if(page) page.classList.add("active");
 }
-function chooseReason(reason){selectedReason=reason; goToPage('page2');}
+function chooseReason(reason){
+  selectedReason = reason;
+  goToPage('page2');
+}
 function chooseUrgency(urgency){
-  selectedUrgency=urgency;
-  if(urgency==="I’m in Crisis"){openCrisisModal();}
-  else{goToPage('page3');}
+  selectedUrgency = urgency;
+  if(urgency === "I’m in Crisis"){
+    openCrisisModal();
+  } else {
+    goToPage('page3');
+  }
 }
 
 /* CRISIS MODAL */
@@ -117,59 +130,45 @@ function continueFromCrisis(){closeCrisisModal(); goToPage('page3');}
 
 /* SERVICE WORKER */
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
+  window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
-      .then(reg=>console.log('SW registered', reg.scope))
-      .catch(err=>console.error('SW failed', err));
+      .then(() => console.log('Service Worker registered'))
+      .catch(err => console.warn('SW registration failed:', err));
   });
 }
 
 /* INSTALL BUTTON */
 let deferredPrompt;
-const installBtn=document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', e=>{
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
-  deferredPrompt=e;
-  installBtn.style.display='inline-block';
+  deferredPrompt = e;
+  installBtn.style.display = 'inline-block';
 });
-installBtn.addEventListener('click', async ()=>{
+installBtn.addEventListener('click', async () => {
   if(!deferredPrompt) return;
   deferredPrompt.prompt();
-  const choice=await deferredPrompt.userChoice;
-  console.log('Install result:', choice.outcome);
-  deferredPrompt=null;
-  installBtn.style.display='none';
+  const choice = await deferredPrompt.userChoice;
+  console.log('User choice:', choice.outcome);
+  deferredPrompt = null;
+  installBtn.style.display = 'none';
 });
 
-/* COUNSELORS API with fallback */
+/* COUNSELORS fallback */
 async function populateStudentCounselorDropdown(){
-  const grid=document.getElementById('counselorGrid');
-  grid.innerHTML='';
-  try {
-    const res=await fetch('/api/get-counselors');
-    if(!res.ok) throw new Error('API failed');
-    const counselors=await res.json();
-    counselors.forEach(c=>{
-      const btn=document.createElement('button');
-      btn.textContent=c.email;
-      btn.onclick=()=>alert(`Selected: ${c.email}`);
-      grid.appendChild(btn);
-    });
-  } catch(err){
-    console.warn('API failed, using fallback', err);
-    const fallback=[
-      {username:'counselor1',email:'counselor1@example.com'},
-      {username:'counselor2',email:'counselor2@example.com'}
-    ];
-    fallback.forEach(c=>{
-      const btn=document.createElement('button');
-      btn.textContent=c.email;
-      btn.onclick=()=>alert(`Selected: ${c.email}`);
-      grid.appendChild(btn);
-    });
-  }
+  const grid = document.getElementById('counselorGrid');
+  grid.innerHTML = '';
+  const fallback=[
+    {username:'counselor1',email:'counselor1@example.com'},
+    {username:'counselor2',email:'counselor2@example.com'}
+  ];
+  fallback.forEach(c=>{
+    const btn = document.createElement('button');
+    btn.textContent = c.email;
+    btn.onclick = ()=>alert(`Selected: ${c.email}`);
+    grid.appendChild(btn);
+  });
 }
-
 window.addEventListener('load', populateStudentCounselorDropdown);
 </script>
 
