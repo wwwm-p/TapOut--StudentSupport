@@ -37,6 +37,11 @@ body{overflow-x:hidden;}
 .crisis-actions{display:flex;gap:10px;justify-content:flex-end;}
 .crisis-actions .primary{background:#0070c9;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
 .crisis-actions .secondary{background:#eee;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
+
+/* Student details container */
+#studentDetails{display:none;margin-top:20px;text-align:left;}
+#studentDetails h3{margin-bottom:10px;}
+#studentDetails ul{margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -46,7 +51,7 @@ body{overflow-x:hidden;}
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
-<!-- PAGE 1: Reason selection -->
+<!-- PAGE 1: Reason Selection -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
@@ -59,7 +64,7 @@ body{overflow-x:hidden;}
   <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
 </div>
 
-<!-- PAGE 2: Urgency selection -->
+<!-- PAGE 2: Urgency Selection -->
 <div class="page" id="page2">
   <img src="page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
@@ -69,11 +74,25 @@ body{overflow-x:hidden;}
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
-<!-- PAGE 3: Counselor selection -->
+<!-- PAGE 3: Counselor Selection -->
 <div class="page" id="page3">
   <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
+</div>
+
+<!-- DYNAMIC STUDENT DETAILS -->
+<div id="studentDetails">
+  <h3 id="studentName"></h3>
+  <div id="studentAppointments">
+    <h4>Past Appointments</h4>
+    <ul></ul>
+  </div>
+  <div id="studentNotes">
+    <h4>Notes</h4>
+    <ul></ul>
+  </div>
+  <button onclick="backToCounselors()">Back</button>
 </div>
 
 <!-- CRISIS MODAL -->
@@ -82,28 +101,36 @@ body{overflow-x:hidden;}
     <h2>Immediate Support</h2>
     <ul class="crisis-list">
       <li class="crisis-section">
-        <strong>Emergency</strong> – 911
+        <strong>Emergency</strong>
+        911 – Emergency services (police / ambulance / fire) for life-threatening crises.
       </li>
       <li class="crisis-section">
-        <strong>Mental Health & Crisis Support</strong><br>
-        988 Suicide & Crisis Lifeline – Call or text 988<br>
-        National Suicide Prevention Lifeline – 1-800-273-TALK<br>
-        Crisis Text Line – Text HOME to 741741
+        <strong>Mental Health & Crisis Support</strong>
+        988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>
+        National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>
+        Crisis Text Line – Text HOME to 741741 (24/7).
       </li>
       <li class="crisis-section">
-        <strong>Eating Disorder Support</strong> – 1-800-931-2237
+        <strong>Eating Disorder Support</strong>
+        National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>
+        Text NEDA to 741741.
       </li>
       <li class="crisis-section">
-        <strong>Domestic Violence Support</strong> – 1-800-799-7233
+        <strong>Domestic Violence Support</strong>
+        National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>
+        Text START to 88788.
       </li>
       <li class="crisis-section">
-        <strong>Sexual Assault Support</strong> – 1-800-656-4673
+        <strong>Sexual Assault Support</strong>
+        RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
       </li>
       <li class="crisis-section">
-        <strong>Substance Abuse & Addiction Support</strong> – 1-800-662-4357
+        <strong>Substance Abuse & Addiction Support</strong>
+        SAMHSA National Helpline – 1-800-662-HELP (4357).
       </li>
       <li class="crisis-section">
-        <strong>LGBTQ Youth Support</strong> – 1-866-488-7386
+        <strong>LGBTQ Youth Support</strong>
+        The Trevor Project – 1-866-488-7386 or text START to 678-678.
       </li>
     </ul>
     <div class="crisis-actions">
@@ -114,94 +141,115 @@ body{overflow-x:hidden;}
 </div>
 
 <script>
-let selectedReason = "", selectedUrgency = "";
+let selectedReason="", selectedUrgency="";
 
 /* NAVIGATION */
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const page = document.getElementById(id);
-  if(page) page.classList.add("active");
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id)?.classList.add("active");
+  document.getElementById('studentDetails').style.display = 'none';
 }
-function chooseReason(reason){
-  selectedReason = reason;
-  goToPage('page2');
+function backToCounselors(){
+  document.getElementById('studentDetails').style.display = 'none';
+  document.getElementById('page3').classList.add('active');
 }
+
+/* SELECTION */
+function chooseReason(reason){ selectedReason = reason; goToPage('page2'); }
 function chooseUrgency(urgency){
   selectedUrgency = urgency;
-  if(urgency === "I’m in Crisis"){
-    openCrisisModal();
-  } else {
-    goToPage('page3');
-  }
+  urgency === "I’m in Crisis" ? openCrisisModal() : goToPage('page3');
 }
 
 /* CRISIS MODAL */
-function openCrisisModal(){
-  document.getElementById('crisisOverlay').classList.add('active');
-}
-function closeCrisisModal(){
-  document.getElementById('crisisOverlay').classList.remove('active');
-}
-function continueFromCrisis(){
-  closeCrisisModal();
-  goToPage('page3');
-}
+function openCrisisModal(){ document.getElementById('crisisOverlay').classList.add('active'); }
+function closeCrisisModal(){ document.getElementById('crisisOverlay').classList.remove('active'); }
+function continueFromCrisis(){ closeCrisisModal(); goToPage('page3'); }
 
 /* SERVICE WORKER */
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/service-worker.js')
-    .then(() => console.log('Service Worker registered'))
-    .catch(err => console.warn('SW registration failed:', err));
+    .then(()=>console.log('SW registered'))
+    .catch(err=>console.warn('SW registration failed:', err));
 }
 
 /* INSTALL BUTTON */
 let deferredPrompt;
 const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', e => {
+window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredPrompt = e;
-  if(installBtn) installBtn.style.display = 'inline-block';
+  installBtn.style.display = 'inline-block';
 });
-if(installBtn){
-  installBtn.addEventListener('click', async () => {
-    installBtn.style.display = 'none';
-    if(deferredPrompt){
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
+installBtn.addEventListener('click', async ()=>{
+  installBtn.style.display = 'none';
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
       console.log('User choice:', choice.outcome);
       deferredPrompt = null;
-    }
-  });
-}
+    });
+  }
+});
 
-/* POPULATE COUNSELORS (example data for API integration) */
-const exampleCounselors = [
-  { username: 'counselor1', email: 'counselor1@example.com' },
-  { username: 'counselor2', email: 'counselor2@example.com' }
-];
-
-async function populateStudentCounselorDropdown(){
+/* DYNAMIC COUNSELORS */
+async function loadCounselors(){
   const grid = document.getElementById('counselorGrid');
   grid.innerHTML = '';
   try {
-    // TODO: replace with real API fetch
-    // const res = await fetch('/api/counselors');
-    // const counselors = await res.json();
-    const counselors = exampleCounselors;
-    counselors.forEach(c => {
+    // Example API placeholder
+    const counselors = await fetch('/api/counselors').then(r=>r.json());
+    counselors.forEach(c=>{
       const btn = document.createElement('button');
       btn.textContent = c.email;
-      btn.dataset.username = c.username;
-      btn.onclick = () => console.log('Open modal for', c.username, c.email);
+      btn.onclick = () => showStudentDetails(c.id);
       grid.appendChild(btn);
     });
   } catch(err){
-    grid.innerHTML = 'Error loading counselors';
+    grid.innerHTML = '<p>Error loading counselors</p>';
     console.error(err);
   }
 }
-window.addEventListener('load', populateStudentCounselorDropdown);
-</script>
 
+/* DYNAMIC STUDENT DETAILS */
+async function showStudentDetails(studentId){
+  const details = document.getElementById('studentDetails');
+  const nameElem = document.getElementById('studentName');
+  const appointmentsList = document.querySelector('#studentAppointments ul');
+  const notesList = document.querySelector('#studentNotes ul');
+
+  try {
+    // Example API placeholders
+    const student = await fetch(`/api/student/${studentId}`).then(r=>r.json());
+    nameElem.textContent = student.name || 'Unknown Student';
+
+    appointmentsList.innerHTML = '';
+    (student.appointments || []).forEach(a=>{
+      const li = document.createElement('li');
+      li.textContent = `${a.date}: ${a.reason}`;
+      appointmentsList.appendChild(li);
+    });
+
+    notesList.innerHTML = '';
+    (student.notes || []).forEach(n=>{
+      const li = document.createElement('li');
+      li.textContent = n.note;
+      notesList.appendChild(li);
+    });
+
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    details.style.display = 'block';
+
+  } catch(err){
+    appointmentsList.innerHTML = '<li>Error loading appointments</li>';
+    notesList.innerHTML = '<li>Error loading notes</li>';
+    console.error(err);
+    details.style.display = 'block';
+  }
+}
+
+/* INIT */
+window.addEventListener('load', loadCounselors);
+</script>
 </body>
 </html>
