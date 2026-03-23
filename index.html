@@ -7,15 +7,11 @@
 
 <link rel="stylesheet" href="/style.css">
 
-<!-- PWA -->
+<!-- PWA manifest & icons -->
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
-<meta name="description" content="TapOut Student Support App">
-
-<!-- iOS support -->
 <link rel="apple-touch-icon" href="/icons/icon-192-student.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="TapOut! – Student">
 
 <style>
@@ -99,25 +95,19 @@ body{overflow-x:hidden;}
 </div>
 
 <script>
-let selectedReason = "", selectedUrgency = "";
+let selectedReason="", selectedUrgency="";
 
 /* NAVIGATION */
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const page = document.getElementById(id);
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  const page=document.getElementById(id);
   if(page) page.classList.add("active");
 }
-function chooseReason(reason){
-  selectedReason = reason;
-  goToPage('page2');
-}
+function chooseReason(reason){selectedReason=reason; goToPage('page2');}
 function chooseUrgency(urgency){
-  selectedUrgency = urgency;
-  if(urgency === "I’m in Crisis"){
-    openCrisisModal();
-  } else {
-    goToPage('page3');
-  }
+  selectedUrgency=urgency;
+  if(urgency==="I’m in Crisis"){openCrisisModal();}
+  else{goToPage('page3');}
 }
 
 /* CRISIS MODAL */
@@ -127,47 +117,59 @@ function continueFromCrisis(){closeCrisisModal(); goToPage('page3');}
 
 /* SERVICE WORKER */
 if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
+  window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('/service-worker.js')
-      .then(reg => console.log('SW registered', reg.scope))
-      .catch(err => console.error('SW failed', err));
+      .then(reg=>console.log('SW registered', reg.scope))
+      .catch(err=>console.error('SW failed', err));
   });
 }
 
 /* INSTALL BUTTON */
 let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', (e) => {
+const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = 'inline-block';
-  console.log("🔥 INSTALL EVENT TRIGGERED");
+  deferredPrompt=e;
+  installBtn.style.display='inline-block';
 });
-installBtn.addEventListener('click', async () => {
+installBtn.addEventListener('click', async ()=>{
   if(!deferredPrompt) return;
   deferredPrompt.prompt();
-  const choice = await deferredPrompt.userChoice;
+  const choice=await deferredPrompt.userChoice;
   console.log('Install result:', choice.outcome);
-  deferredPrompt = null;
-  installBtn.style.display = 'none';
+  deferredPrompt=null;
+  installBtn.style.display='none';
 });
 
-/* COUNSELORS */
-const exampleCounselors = [
-  { username: 'counselor1', email: 'counselor1@example.com' },
-  { username: 'counselor2', email: 'counselor2@example.com' }
-];
-
-function populateStudentCounselorDropdown(){
-  const grid = document.getElementById('counselorGrid');
-  grid.innerHTML = '';
-  exampleCounselors.forEach(c => {
-    const btn = document.createElement('button');
-    btn.textContent = c.email;
-    btn.onclick = () => alert(`Selected: ${c.email}`);
-    grid.appendChild(btn);
-  });
+/* COUNSELORS API with fallback */
+async function populateStudentCounselorDropdown(){
+  const grid=document.getElementById('counselorGrid');
+  grid.innerHTML='';
+  try {
+    const res=await fetch('/api/get-counselors');
+    if(!res.ok) throw new Error('API failed');
+    const counselors=await res.json();
+    counselors.forEach(c=>{
+      const btn=document.createElement('button');
+      btn.textContent=c.email;
+      btn.onclick=()=>alert(`Selected: ${c.email}`);
+      grid.appendChild(btn);
+    });
+  } catch(err){
+    console.warn('API failed, using fallback', err);
+    const fallback=[
+      {username:'counselor1',email:'counselor1@example.com'},
+      {username:'counselor2',email:'counselor2@example.com'}
+    ];
+    fallback.forEach(c=>{
+      const btn=document.createElement('button');
+      btn.textContent=c.email;
+      btn.onclick=()=>alert(`Selected: ${c.email}`);
+      grid.appendChild(btn);
+    });
+  }
 }
+
 window.addEventListener('load', populateStudentCounselorDropdown);
 </script>
 
