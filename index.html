@@ -5,39 +5,80 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TapOut! – Student</title>
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/style.css">
 
 <!-- PWA -->
-<link rel="manifest" href="./student-manifest.json">
+<link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
-<meta name="description" content="Student support app to connect with counselors quickly">
+<meta name="description" content="Student support app">
 
-<link rel="apple-touch-icon" href="icons/icon-192-student.png">
+<link rel="apple-touch-icon" href="/icons/icon-192-student.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="TapOut">
 
 <style>
-/* (your styles unchanged) */
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{overflow-x:hidden;}
 .page{display:none;position:relative;}
 .page.active{display:block;text-align:center;}
 .page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
-.back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
-.counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
-.counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
-.install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
-.modal-overlay.active{display:flex;}
-.modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
-.crisis-list{list-style:none;padding:0;margin:12px 0;line-height:1.4;}
-.crisis-section{margin-bottom:12px;}
-.crisis-actions{display:flex;gap:10px;justify-content:flex-end;}
-.crisis-actions .primary{background:#0070c9;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
-.crisis-actions .secondary{background:#eee;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
+
+/* 🔥 HOTSPOTS RESTORED */
+.hotspot{
+  position:absolute;
+  z-index:10;
+  cursor:pointer;
+  background:rgba(255,0,0,0.2); /* remove later if needed */
+  border:1px solid red;
+}
+
+/* EXAMPLE POSITIONS (adjust to your design) */
+.academic{top:10%;left:10%;width:120px;height:50px;}
+.anxiety{top:20%;left:10%;width:120px;height:50px;}
+.depression{top:30%;left:10%;width:120px;height:50px;}
+.family{top:40%;left:10%;width:120px;height:50px;}
+.relationship{top:50%;left:10%;width:120px;height:50px;}
+.bullying{top:60%;left:10%;width:120px;height:50px;}
+.talk{top:70%;left:10%;width:120px;height:50px;}
+.unsure{top:80%;left:10%;width:120px;height:50px;}
+
+.fine{top:20%;left:10%;width:150px;height:50px;}
+.littleoff{top:30%;left:10%;width:150px;height:50px;}
+.coping{top:40%;left:10%;width:150px;height:50px;}
+.crisis{top:50%;left:10%;width:150px;height:50px;}
+
+.back-button{
+  margin-top:10px;
+  padding:8px 12px;
+  border-radius:12px;
+  border:none;
+  background:#ccc;
+  cursor:pointer;
+}
+
+.counselor-grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
+}
+
+.counselor-grid button{
+  padding:8px 12px;
+  border-radius:12px;
+  border:none;
+  background:#0070c9;
+  color:white;
+}
+
+.install-btn{
+  padding:6px 10px;
+  border-radius:6px;
+  border:none;
+  background:#0070c9;
+  color:white;
+  display:none;
+}
 </style>
 </head>
 
@@ -47,94 +88,93 @@ body{overflow-x:hidden;}
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
-<!-- (your pages unchanged) -->
-<!-- KEEP ALL YOUR EXISTING HTML EXACTLY AS IS BELOW -->
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <img src="/page1.png">
+  <button class="hotspot academic" onclick="chooseReason('Academic')"></button>
+  <button class="hotspot anxiety" onclick="chooseReason('Anxiety')"></button>
+  <button class="hotspot depression" onclick="chooseReason('Depression')"></button>
+  <button class="hotspot family" onclick="chooseReason('Family')"></button>
+  <button class="hotspot relationship" onclick="chooseReason('Relationship')"></button>
+  <button class="hotspot bullying" onclick="chooseReason('Bullying')"></button>
+  <button class="hotspot talk" onclick="chooseReason('Talk')"></button>
+  <button class="hotspot unsure" onclick="chooseReason('Unsure')"></button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <img src="/page2.png">
+  <button class="hotspot fine" onclick="chooseUrgency('Fine')"></button>
+  <button class="hotspot littleoff" onclick="chooseUrgency('Off')"></button>
+  <button class="hotspot coping" onclick="chooseUrgency('Coping')"></button>
+  <button class="hotspot crisis" onclick="chooseUrgency('Crisis')"></button>
+  <button class="back-button" onclick="goToPage('page1')">Back</button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+  <img src="/page3.png">
+  <div class="counselor-grid" id="counselorGrid"></div>
+  <button class="back-button" onclick="goToPage('page2')">Back</button>
+</div>
 
 <script>
 let selectedReason="", selectedUrgency="";
 
-/* NAVIGATION */
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  const page=document.getElementById(id);
-  if(page) page.classList.add("active");
-}
-function chooseReason(reason){
-  selectedReason=reason;
-  goToPage('page2');
-}
-function chooseUrgency(urgency){
-  selectedUrgency=urgency;
-  if(urgency==="I’m in Crisis"){openCrisisModal();}
-  else{goToPage('page3');}
+  document.getElementById(id).classList.add("active");
 }
 
-/* MODAL */
-function openCrisisModal(){document.getElementById('crisisOverlay').classList.add('active');}
-function closeCrisisModal(){document.getElementById('crisisOverlay').classList.remove('active');}
-function continueFromCrisis(){closeCrisisModal(); goToPage('page3');}
+function chooseReason(r){
+  selectedReason=r;
+  goToPage("page2");
+}
 
-/* SERVICE WORKER (improved) */
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(reg=>console.log('SW registered:',reg.scope))
-      .catch(err=>console.error('SW failed:',err));
+function chooseUrgency(u){
+  selectedUrgency=u;
+  goToPage("page3");
+}
+
+/* EXAMPLE COUNSELORS ONLY */
+const counselors=[
+  {email:"counselor1@example.com"},
+  {email:"counselor2@example.com"}
+];
+
+function loadCounselors(){
+  const grid=document.getElementById("counselorGrid");
+  grid.innerHTML="";
+  counselors.forEach(c=>{
+    const btn=document.createElement("button");
+    btn.textContent=c.email;
+    grid.appendChild(btn);
+  });
+}
+window.onload=loadCounselors;
+
+/* SERVICE WORKER */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("/service-worker.js");
   });
 }
 
 /* INSTALL BUTTON */
 let deferredPrompt;
-const installBtn=document.getElementById('installBtn');
+const installBtn=document.getElementById("installBtn");
 
-window.addEventListener('beforeinstallprompt', e=>{
+window.addEventListener("beforeinstallprompt", e=>{
   e.preventDefault();
   deferredPrompt=e;
-  installBtn.style.display='inline-block';
+  installBtn.style.display="inline-block";
 });
 
-installBtn.addEventListener('click', async ()=>{
-  if(!deferredPrompt) return;
+installBtn.onclick=async ()=>{
   deferredPrompt.prompt();
   await deferredPrompt.userChoice;
-  deferredPrompt=null;
-  installBtn.style.display='none';
-});
-
-/* iOS INSTALL TIP */
-function isIOS(){
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-function isStandalone(){
-  return window.navigator.standalone;
-}
-if(isIOS() && !isStandalone()){
-  const div=document.createElement("div");
-  div.innerHTML="Tap Share → Add to Home Screen";
-  div.style.background="#0070c9";
-  div.style.color="#fff";
-  div.style.padding="8px";
-  div.style.textAlign="center";
-  document.body.prepend(div);
-}
-
-/* COUNSELORS */
-const exampleCounselors=[
-  {username:'c1',email:'counselor1@example.com'},
-  {username:'c2',email:'counselor2@example.com'}
-];
-
-function populateStudentCounselorDropdown(){
-  const grid=document.getElementById('counselorGrid');
-  grid.innerHTML='';
-  exampleCounselors.forEach(c=>{
-    const btn=document.createElement('button');
-    btn.textContent=c.email;
-    btn.onclick=()=>console.log(c);
-    grid.appendChild(btn);
-  });
-}
-window.addEventListener('load', populateStudentCounselorDropdown);
+  installBtn.style.display="none";
+};
 </script>
 
 </body>
