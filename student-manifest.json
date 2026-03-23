@@ -2,24 +2,22 @@
   "name": "TapOut! Student Support",
   "short_name": "TapOut",
   "description": "Connect with counselors and get help instantly.",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f7f7f7",
   "theme_color": "#0070c9",
   "icons": [
     {
-      "src": "icons/icon-192-student.png",
+      "src": "/icons/icon-192-student.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icons/icon-512-student.png",
+      "src": "/icons/icon-512-student.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
