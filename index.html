@@ -11,86 +11,34 @@
 <link rel="manifest" href="/student-manifest.json">
 <meta name="theme-color" content="#0070c9">
 <meta name="description" content="Student support app">
-
 <link rel="apple-touch-icon" href="/icons/icon-192-student.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{overflow-x:hidden;}
 .page{display:none;position:relative;}
-.page.active{display:block;text-align:center;}
+.page.active{display:block;text-align:center;background:#f7f7f7;}
 .page img{width:100%;height:auto;display:block;}
-
-/* 🔥 HOTSPOTS RESTORED */
-.hotspot{
-  position:absolute;
-  z-index:10;
-  cursor:pointer;
-  background:rgba(255,0,0,0.2); /* remove later if needed */
-  border:1px solid red;
-}
-
-/* EXAMPLE POSITIONS (adjust to your design) */
-.academic{top:10%;left:10%;width:120px;height:50px;}
-.anxiety{top:20%;left:10%;width:120px;height:50px;}
-.depression{top:30%;left:10%;width:120px;height:50px;}
-.family{top:40%;left:10%;width:120px;height:50px;}
-.relationship{top:50%;left:10%;width:120px;height:50px;}
-.bullying{top:60%;left:10%;width:120px;height:50px;}
-.talk{top:70%;left:10%;width:120px;height:50px;}
-.unsure{top:80%;left:10%;width:120px;height:50px;}
-
-.fine{top:20%;left:10%;width:150px;height:50px;}
-.littleoff{top:30%;left:10%;width:150px;height:50px;}
-.coping{top:40%;left:10%;width:150px;height:50px;}
-.crisis{top:50%;left:10%;width:150px;height:50px;}
-
-.back-button{
-  margin-top:10px;
-  padding:8px 12px;
-  border-radius:12px;
-  border:none;
-  background:#ccc;
-  cursor:pointer;
-}
-
-.counselor-grid{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  margin-top:10px;
-}
-
-.counselor-grid button{
-  padding:8px 12px;
-  border-radius:12px;
-  border:none;
-  background:#0070c9;
-  color:white;
-}
-
-.install-btn{
-  padding:6px 10px;
-  border-radius:6px;
-  border:none;
-  background:#0070c9;
-  color:white;
-  display:none;
-}
+.hotspot{position:absolute;z-index:10;cursor:pointer;}
+.back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;background:#ccc;cursor:pointer;}
+.counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
+.counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
+.install-btn{padding:6px 10px;border-radius:6px;border:none;background:#0070c9;color:white;cursor:pointer;display:none;}
 </style>
 </head>
 
 <body>
 
+<!-- Install button -->
 <div style="padding:10px;text-align:center;">
-  <button class="install-btn" id="installBtn">Install App</button>
+  <button id="installBtn" class="install-btn">Install App</button>
 </div>
 
 <!-- PAGE 1 -->
 <div class="page active" id="page1">
-  <img src="/page1.png">
+  <img src="/page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic')"></button>
   <button class="hotspot anxiety" onclick="chooseReason('Anxiety')"></button>
   <button class="hotspot depression" onclick="chooseReason('Depression')"></button>
@@ -103,7 +51,7 @@
 
 <!-- PAGE 2 -->
 <div class="page" id="page2">
-  <img src="/page2.png">
+  <img src="/page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('Fine')"></button>
   <button class="hotspot littleoff" onclick="chooseUrgency('Off')"></button>
   <button class="hotspot coping" onclick="chooseUrgency('Coping')"></button>
@@ -113,7 +61,7 @@
 
 <!-- PAGE 3 -->
 <div class="page" id="page3">
-  <img src="/page3.png">
+  <img src="/page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
@@ -121,16 +69,15 @@
 <script>
 let selectedReason="", selectedUrgency="";
 
+/* NAVIGATION */
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
-
 function chooseReason(r){
   selectedReason=r;
   goToPage("page2");
 }
-
 function chooseUrgency(u){
   selectedUrgency=u;
   goToPage("page3");
@@ -148,32 +95,32 @@ function loadCounselors(){
   counselors.forEach(c=>{
     const btn=document.createElement("button");
     btn.textContent=c.email;
+    btn.onclick=()=>alert("Selected: "+c.email);
     grid.appendChild(btn);
   });
 }
-window.onload=loadCounselors;
+window.addEventListener("load", loadCounselors);
 
 /* SERVICE WORKER */
-if("serviceWorker" in navigator){
-  window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register("/service-worker.js");
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
   });
 }
 
 /* INSTALL BUTTON */
 let deferredPrompt;
-const installBtn=document.getElementById("installBtn");
-
-window.addEventListener("beforeinstallprompt", e=>{
+const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredPrompt=e;
-  installBtn.style.display="inline-block";
+  installBtn.style.display='block';
 });
-
 installBtn.onclick=async ()=>{
+  if(!deferredPrompt) return;
   deferredPrompt.prompt();
   await deferredPrompt.userChoice;
-  installBtn.style.display="none";
+  installBtn.style.display='none';
 };
 </script>
 
