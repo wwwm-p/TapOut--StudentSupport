@@ -23,19 +23,26 @@ body {overflow-x:hidden;}
 .page.active {display:block;text-align:center;}
 .page img {width:100%;height:auto;display:block;}
 
-/* HOTSPOTS: now visible & clickable */
+/* HOTSPOT BUTTONS: now have positions and sizes */
 .hotspot {position:absolute; z-index:10; cursor:pointer; border:none; background:rgba(255,0,0,0.2);}
 
-/* Example positions — adjust these to match your page1.png layout */
-.hotspot.academic {top:20%; left:10%; width:20%; height:10%;}
-.hotspot.anxiety {top:20%; left:40%; width:20%; height:10%;}
-.hotspot.depression {top:35%; left:10%; width:20%; height:10%;}
-.hotspot.family {top:35%; left:40%; width:20%; height:10%;}
-.hotspot.relationship {top:50%; left:10%; width:20%; height:10%;}
-.hotspot.bullying {top:50%; left:40%; width:20%; height:10%;}
-.hotspot.talk {top:65%; left:10%; width:20%; height:10%;}
-.hotspot.unsure {top:65%; left:40%; width:20%; height:10%;}
+/* Page1 placements — adjust percentages to match your page1.png */
+.hotspot.academic    {top:15%; left:10%; width:20%; height:10%;}
+.hotspot.anxiety     {top:15%; left:40%; width:20%; height:10%;}
+.hotspot.depression  {top:30%; left:10%; width:20%; height:10%;}
+.hotspot.family      {top:30%; left:40%; width:20%; height:10%;}
+.hotspot.relationship{top:45%; left:10%; width:20%; height:10%;}
+.hotspot.bullying    {top:45%; left:40%; width:20%; height:10%;}
+.hotspot.talk        {top:60%; left:10%; width:20%; height:10%;}
+.hotspot.unsure      {top:60%; left:40%; width:20%; height:10%;}
 
+/* Page2 placements */
+.hotspot.fine        {top:20%; left:10%; width:35%; height:15%;}
+.hotspot.littleoff   {top:20%; left:55%; width:35%; height:15%;}
+.hotspot.coping      {top:50%; left:10%; width:35%; height:15%;}
+.hotspot.crisis      {top:50%; left:55%; width:35%; height:15%;}
+
+/* Buttons, grids, install */
 .back-button {margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
@@ -54,12 +61,12 @@ body {overflow-x:hidden;}
 </head>
 <body>
 
-<!-- Install button -->
+<!-- INSTALL BUTTON -->
 <div style="padding:10px;text-align:center;">
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
-<!-- PAGES -->
+<!-- PAGE 1 -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
@@ -72,6 +79,7 @@ body {overflow-x:hidden;}
   <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
 </div>
 
+<!-- PAGE 2 -->
 <div class="page" id="page2">
   <img src="page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
@@ -81,6 +89,7 @@ body {overflow-x:hidden;}
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
+<!-- PAGE 3 -->
 <div class="page" id="page3">
   <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
@@ -94,11 +103,11 @@ body {overflow-x:hidden;}
     <ul class="crisis-list">
       <li class="crisis-section"><strong>Emergency</strong> 911 – Emergency services.</li>
       <li class="crisis-section"><strong>Mental Health & Crisis Support</strong> 988 Suicide & Crisis Lifeline – Call or text 988.</li>
-      <!-- Add remaining items -->
+      <!-- Add remaining sections as needed -->
     </ul>
     <div class="crisis-actions">
-      <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
-      <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
+      <button class="secondary" onclick="closeCrisisModal()">Close</button>
+      <button class="primary" onclick="continueFromCrisis()">Continue</button>
     </div>
   </div>
 </div>
@@ -142,7 +151,7 @@ installBtn.addEventListener("click", async ()=>{
   if(deferredPrompt){
     deferredPrompt.prompt();
     const choice = await deferredPrompt.userChoice;
-    console.log("User choice:", choice.outcome);
+    console.log('User choice:', choice.outcome);
     deferredPrompt = null;
   }
 });
