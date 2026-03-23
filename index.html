@@ -44,27 +44,27 @@ body{overflow-x:hidden;}
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
-<!-- Pages -->
+<!-- PAGE 1: Reason selection -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
   <div id="hotspotContainerPage1"></div>
 </div>
 
+<!-- PAGE 2: Urgency selection -->
 <div class="page" id="page2">
   <img src="page2.png" alt="Urgency Page">
   <div id="hotspotContainerPage2"></div>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
+<!-- PAGE 3: Counselor selection -->
 <div class="page" id="page3">
   <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
-  <div id="appointmentContainer"></div>
-  <div id="notesContainer"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
-<!-- Crisis Modal -->
+<!-- CRISIS MODAL -->
 <div class="modal-overlay" id="crisisOverlay">
   <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
@@ -83,50 +83,51 @@ let selectedUrgency = "";
 /* ---------------- NAVIGATION ---------------- */
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id)?.classList.add("active");
+  const page = document.getElementById(id);
+  if(page) page.classList.add("active");
 }
-function chooseReason(reason){ 
-  selectedReason = reason; 
-  goToPage('page2'); 
+function chooseReason(reason){
+  selectedReason = reason;
+  goToPage('page2');
 }
 function chooseUrgency(urgency){
   selectedUrgency = urgency;
-  urgency === "I'm in Crisis" ? openCrisisModal() : goToPage('page3');
+  if(urgency === "I'm in Crisis"){
+    openCrisisModal();
+  } else {
+    goToPage('page3');
+  }
 }
 
 /* ---------------- CRISIS MODAL ---------------- */
-function openCrisisModal(){ document.getElementById("crisisOverlay")?.classList.add("active"); }
-function closeCrisisModal(){ document.getElementById("crisisOverlay")?.classList.remove("active"); }
-function continueFromCrisis(){ closeCrisisModal(); goToPage('page3'); }
-
-function populateCrisisList(crisisData){
-  const list = document.getElementById('crisisList');
-  list.innerHTML = '';
-  crisisData.forEach(c => {
-    const li = document.createElement('li');
-    li.className = 'crisis-section';
-    li.innerHTML = `<strong>${c.title}</strong><br>${c.info}`;
-    list.appendChild(li);
-  });
+function openCrisisModal(){
+  document.getElementById('crisisOverlay').classList.add('active');
+}
+function closeCrisisModal(){
+  document.getElementById('crisisOverlay').classList.remove('active');
+}
+function continueFromCrisis(){
+  closeCrisisModal();
+  goToPage('page3');
 }
 
 /* ---------------- SERVICE WORKER ---------------- */
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("/service-worker.js")
-    .then(()=>console.log("SW registered"))
-    .catch(err=>console.warn("SW registration failed:", err));
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(() => console.log('Service Worker registered'))
+    .catch(err => console.warn('SW registration failed:', err));
 }
 
 /* ---------------- INSTALL BUTTON ---------------- */
 let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
-window.addEventListener("beforeinstallprompt", e=>{
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
   if(installBtn) installBtn.style.display = 'inline-block';
 });
 if(installBtn){
-  installBtn.addEventListener("click", async ()=>{
+  installBtn.addEventListener('click', async () => {
     installBtn.style.display = 'none';
     if(deferredPrompt){
       deferredPrompt.prompt();
@@ -143,87 +144,84 @@ function createHotspots(containerId, hotspots){
   container.innerHTML = '';
   hotspots.forEach(h => {
     const btn = document.createElement('button');
-    btn.className = `hotspot ${h.class}`;
+    btn.className = 'hotspot ' + h.class;
     btn.style.position = 'absolute';
     btn.style.top = h.top;
     btn.style.left = h.left;
     btn.style.width = h.width;
     btn.style.height = h.height;
-    btn.onclick = () => h.onClick(); // properly bind function
+    btn.onclick = () => h.onClick();
     container.appendChild(btn);
   });
 }
 
-/* Example hotspots for page1 and page2 */
+/* Example hotspots for page1 and page2 (all enabled) */
 createHotspots('hotspotContainerPage1', [
-  {class:'academic', top:'10%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Academic stress')},
-  {class:'anxiety', top:'25%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Anxiety')},
-  {class:'depression', top:'40%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Depression')}
+  {class:'academic', top:'10%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Academic stress or pressure')},
+  {class:'anxiety', top:'25%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Anxiety or panic attacks')},
+  {class:'depression', top:'40%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Depression or sadness')},
+  {class:'family', top:'55%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Family issues or home stress')},
+  {class:'relationship', top:'70%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Relationship or friendship problems')},
+  {class:'bullying', top:'85%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Bullying or harassment')},
+  {class:'talk', top:'10%', left:'30%', width:'15%', height:'10%', onClick:() => chooseReason('I just need someone to talk to')},
+  {class:'unsure', top:'25%', left:'30%', width:'15%', height:'10%', onClick:() => chooseReason("I'm not ready to say")}
 ]);
 createHotspots('hotspotContainerPage2', [
-  {class:'fine', top:'10%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency("I'm Doing Fine")},
-  {class:'littleoff', top:'25%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency("Feeling a Little Off")},
-  {class:'coping', top:'40%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency("I'm Not Coping Well")},
-  {class:'crisis', top:'55%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency("I'm in Crisis")}
+  {class:'fine', top:'10%', left:'10%', width:'15%', height:'10%', onClick:() => chooseUrgency("I'm Doing Fine – Just Curious")},
+  {class:'littleoff', top:'25%', left:'10%', width:'15%', height:'10%', onClick:() => chooseUrgency('Feeling a Little Off')},
+  {class:'coping', top:'40%', left:'10%', width:'15%', height:'10%', onClick:() => chooseUrgency("I'm Not Coping Well")},
+  {class:'crisis', top:'55%', left:'10%', width:'15%', height:'10%', onClick:() => chooseUrgency("I'm in Crisis")}
 ]);
 
 /* ---------------- DYNAMIC COUNSELORS ---------------- */
-async function loadCounselors(){
+const exampleCounselors = [
+  { username: 'counselor1', email: 'counselor1@example.com' },
+  { username: 'counselor2', email: 'counselor2@example.com' }
+];
+
+function populateStudentCounselorDropdown(){
   const grid = document.getElementById('counselorGrid');
   grid.innerHTML = '';
   try {
-    // Example dynamic array (replace with API call)
-    const counselors = [
-      {id:1, name:'Alice', email:'alice@example.com'},
-      {id:2, name:'Bob', email:'bob@example.com'}
-    ];
-    counselors.forEach(c => {
+    exampleCounselors.forEach(c => {
       const btn = document.createElement('button');
       btn.textContent = c.email;
-      btn.onclick = () => loadStudentData(c.id);
+      btn.onclick = () => console.log('Open modal for', c.username, c.email);
       grid.appendChild(btn);
     });
   } catch(err){
-    grid.innerHTML = '<p>Error loading counselors</p>';
+    grid.innerHTML = 'Error loading counselors';
     console.error(err);
   }
 }
 
-/* ---------------- DYNAMIC APPOINTMENTS / NOTES ---------------- */
-function loadStudentData(counselorId){
-  const appointmentContainer = document.getElementById('appointmentContainer');
-  const notesContainer = document.getElementById('notesContainer');
-
-  // Example data (replace with API)
-  const appointments = [
-    {id:1, date:'2026-03-22', topic:'Stress check-in'},
-    {id:2, date:'2026-03-23', topic:'Homework help'}
-  ];
-  const notes = [
-    {id:1, text:'Student reported feeling anxious.'},
-    {id:2, text:'Follow-up on family discussion.'}
-  ];
-
-  appointmentContainer.innerHTML = `<h3>Appointments</h3><ul>${appointments.map(a=>`<li>${a.date}: ${a.topic}</li>`).join('')}</ul>`;
-  notesContainer.innerHTML = `<h3>Notes</h3><ul>${notes.map(n=>`<li>${n.text}</li>`).join('')}</ul>`;
-}
-
-/* ---------------- DYNAMIC CRISIS DATA ---------------- */
+/* ---------------- CRISIS DATA ---------------- */
 const exampleCrisis = [
   {title:'Emergency', info:'Call 911 for life-threatening crises'},
   {title:'Suicide & Crisis', info:'Call or text 988 (24/7, free, confidential)'},
-  {title:'Eating Disorder', info:'NEDA Helpline – 1-800-931-2237'},
-  {title:'Domestic Violence', info:'National DV Hotline – 1-800-799-7233'},
-  {title:'Sexual Assault', info:'RAINN – 1-800-656-4673'},
-  {title:'Substance Abuse', info:'SAMHSA Helpline – 1-800-662-4357'},
-  {title:'LGBTQ Youth', info:'The Trevor Project – 1-866-488-7386'}
+  {title:'Eating Disorder Support', info:'Call 1-800-931-2237'},
+  {title:'Domestic Violence Support', info:'Call 1-800-799-7233'},
+  {title:'Sexual Assault Support', info:'Call 1-800-656-4673'},
+  {title:'Substance Abuse & Addiction Support', info:'Call 1-800-662-4357'},
+  {title:'LGBTQ Youth Support', info:'Call 1-866-488-7386'}
 ];
-populateCrisisList(exampleCrisis);
+function populateCrisisList(){
+  const list = document.getElementById('crisisList');
+  list.innerHTML = '';
+  exampleCrisis.forEach(c => {
+    const li = document.createElement('li');
+    li.className = 'crisis-section';
+    li.innerHTML = `<strong>${c.title}</strong><br>${c.info}`;
+    list.appendChild(li);
+  });
+}
+populateCrisisList();
 
 /* ---------------- INIT ---------------- */
 window.addEventListener('load', () => {
-  loadCounselors();
+  populateStudentCounselorDropdown();
 });
 </script>
+
 </body>
 </html>
