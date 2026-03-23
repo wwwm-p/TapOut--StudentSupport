@@ -77,17 +77,21 @@ body{overflow-x:hidden;}
 </div>
 
 <script>
-let selectedReason = "", selectedUrgency = "";
+let selectedReason = "";
+let selectedUrgency = "";
 
 /* ---------------- NAVIGATION ---------------- */
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
 }
-function chooseReason(reason){ selectedReason = reason; goToPage('page2'); }
+function chooseReason(reason){ 
+  selectedReason = reason; 
+  goToPage('page2'); 
+}
 function chooseUrgency(urgency){
   selectedUrgency = urgency;
-  urgency === "I’m in Crisis" ? openCrisisModal() : goToPage('page3');
+  urgency === "I'm in Crisis" ? openCrisisModal() : goToPage('page3');
 }
 
 /* ---------------- CRISIS MODAL ---------------- */
@@ -145,28 +149,22 @@ function createHotspots(containerId, hotspots){
     btn.style.left = h.left;
     btn.style.width = h.width;
     btn.style.height = h.height;
-    btn.onclick = h.onClick;  // All buttons are enabled
+    btn.onclick = () => h.onClick(); // properly bind function
     container.appendChild(btn);
   });
 }
 
-/* Example hotspots for page1 and page2 (all enabled) */
+/* Example hotspots for page1 and page2 */
 createHotspots('hotspotContainerPage1', [
   {class:'academic', top:'10%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Academic stress')},
   {class:'anxiety', top:'25%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Anxiety')},
-  {class:'depression', top:'40%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Depression')},
-  {class:'family', top:'55%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Family issues')},
-  {class:'relationship', top:'70%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Relationship problems')},
-  {class:'bullying', top:'85%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Bullying')},
-  {class:'talk', top:'10%', left:'30%', width:'15%', height:'10%', onClick:()=>chooseReason('Just need to talk')},
-  {class:'unsure', top:'25%', left:'30%', width:'15%', height:'10%', onClick:()=>chooseReason('Not ready to say')}
+  {class:'depression', top:'40%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Depression')}
 ]);
-
 createHotspots('hotspotContainerPage2', [
-  {class:'fine', top:'10%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency('I’m Doing Fine')},
-  {class:'littleoff', top:'25%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency('Feeling a Little Off')},
-  {class:'coping', top:'40%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency('Not Coping Well')},
-  {class:'crisis', top:'55%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency('I’m in Crisis')}
+  {class:'fine', top:'10%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency("I'm Doing Fine")},
+  {class:'littleoff', top:'25%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency("Feeling a Little Off")},
+  {class:'coping', top:'40%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency("I'm Not Coping Well")},
+  {class:'crisis', top:'55%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseUrgency("I'm in Crisis")}
 ]);
 
 /* ---------------- DYNAMIC COUNSELORS ---------------- */
@@ -174,6 +172,7 @@ async function loadCounselors(){
   const grid = document.getElementById('counselorGrid');
   grid.innerHTML = '';
   try {
+    // Example dynamic array (replace with API call)
     const counselors = [
       {id:1, name:'Alice', email:'alice@example.com'},
       {id:2, name:'Bob', email:'bob@example.com'}
@@ -181,7 +180,7 @@ async function loadCounselors(){
     counselors.forEach(c => {
       const btn = document.createElement('button');
       btn.textContent = c.email;
-      btn.onclick = ()=>loadStudentData(c.id);
+      btn.onclick = () => loadStudentData(c.id);
       grid.appendChild(btn);
     });
   } catch(err){
@@ -195,6 +194,7 @@ function loadStudentData(counselorId){
   const appointmentContainer = document.getElementById('appointmentContainer');
   const notesContainer = document.getElementById('notesContainer');
 
+  // Example data (replace with API)
   const appointments = [
     {id:1, date:'2026-03-22', topic:'Stress check-in'},
     {id:2, date:'2026-03-23', topic:'Homework help'}
@@ -212,11 +212,11 @@ function loadStudentData(counselorId){
 const exampleCrisis = [
   {title:'Emergency', info:'Call 911 for life-threatening crises'},
   {title:'Suicide & Crisis', info:'Call or text 988 (24/7, free, confidential)'},
-  {title:'Eating Disorder', info:'Text NEDA to 741741 or call 1-800-931-2237'},
-  {title:'Domestic Violence', info:'Call 1-800-799-7233 or text START to 88788'},
-  {title:'Sexual Assault', info:'Call 1-800-656-4673'},
-  {title:'Substance Abuse', info:'Call 1-800-662-4357'},
-  {title:'LGBTQ Youth', info:'Call 1-866-488-7386 or text START to 678-678'}
+  {title:'Eating Disorder', info:'NEDA Helpline – 1-800-931-2237'},
+  {title:'Domestic Violence', info:'National DV Hotline – 1-800-799-7233'},
+  {title:'Sexual Assault', info:'RAINN – 1-800-656-4673'},
+  {title:'Substance Abuse', info:'SAMHSA Helpline – 1-800-662-4357'},
+  {title:'LGBTQ Youth', info:'The Trevor Project – 1-866-488-7386'}
 ];
 populateCrisisList(exampleCrisis);
 
