@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TapOut! – Student</title>
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/style.css">
 
 <!-- PWA -->
 <link rel="manifest" href="/student-manifest.json">
@@ -19,7 +19,6 @@
 <meta name="apple-mobile-web-app-title" content="TapOut! – Student">
 
 <style>
-/* (your existing CSS) */
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{overflow-x:hidden;}
 .page{display:none;position:relative;}
@@ -44,13 +43,14 @@ body{overflow-x:hidden;}
 </head>
 <body>
 
+<!-- Install button -->
 <div style="padding:10px;text-align:center;">
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
 <!-- PAGE 1: Reason selection -->
 <div class="page active" id="page1">
-  <img src="page1.png" alt="Welcome Page">
+  <img src="/page1.png" alt="Welcome Page">
   <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
   <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
   <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
@@ -63,7 +63,7 @@ body{overflow-x:hidden;}
 
 <!-- PAGE 2: Urgency selection -->
 <div class="page" id="page2">
-  <img src="page2.png" alt="Urgency Page">
+  <img src="/page2.png" alt="Urgency Page">
   <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
   <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
   <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
@@ -73,7 +73,7 @@ body{overflow-x:hidden;}
 
 <!-- PAGE 3: Counselor selection -->
 <div class="page" id="page3">
-  <img src="page3.png" alt="Counselor Page">
+  <img src="/page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
@@ -121,23 +121,16 @@ function chooseUrgency(urgency){
 }
 
 /* CRISIS MODAL */
-function openCrisisModal(){
-  document.getElementById('crisisOverlay').classList.add('active');
-}
-function closeCrisisModal(){
-  document.getElementById('crisisOverlay').classList.remove('active');
-}
-function continueFromCrisis(){
-  closeCrisisModal();
-  goToPage('page3');
-}
+function openCrisisModal(){document.getElementById('crisisOverlay').classList.add('active');}
+function closeCrisisModal(){document.getElementById('crisisOverlay').classList.remove('active');}
+function continueFromCrisis(){closeCrisisModal(); goToPage('page3');}
 
 /* SERVICE WORKER */
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
-      .then(reg => console.log('SW registered:', reg.scope))
-      .catch(err => console.warn('SW registration failed:', err));
+      .then(reg => console.log('SW registered', reg.scope))
+      .catch(err => console.error('SW failed', err));
   });
 }
 
@@ -145,10 +138,10 @@ if('serviceWorker' in navigator){
 let deferredPrompt;
 const installBtn = document.getElementById('installBtn');
 window.addEventListener('beforeinstallprompt', (e) => {
-  console.log("🔥 INSTALL EVENT TRIGGERED");
   e.preventDefault();
   deferredPrompt = e;
   installBtn.style.display = 'inline-block';
+  console.log("🔥 INSTALL EVENT TRIGGERED");
 });
 installBtn.addEventListener('click', async () => {
   if(!deferredPrompt) return;
