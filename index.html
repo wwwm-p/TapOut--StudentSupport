@@ -22,7 +22,7 @@ body{overflow-x:hidden;}
 .page{display:none;position:relative;}
 .page.active{display:block;text-align:center;}
 .page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;background:transparent;border:none;}
+.hotspot{position:absolute;z-index:20;cursor:pointer;background:rgba(0,0,0,0.001);border:none;} /* transparent but clickable */
 .back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
@@ -44,20 +44,20 @@ body{overflow-x:hidden;}
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
-<!-- PAGE 1: Reason selection -->
+<!-- PAGE 1 -->
 <div class="page active" id="page1">
   <img src="page1.png" alt="Welcome Page">
-  <div id="hotspotContainerPage1"></div>
+  <div id="hotspotContainerPage1" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
 </div>
 
-<!-- PAGE 2: Urgency selection -->
+<!-- PAGE 2 -->
 <div class="page" id="page2">
   <img src="page2.png" alt="Urgency Page">
-  <div id="hotspotContainerPage2"></div>
+  <div id="hotspotContainerPage2" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
-<!-- PAGE 3: Counselor selection -->
+<!-- PAGE 3 -->
 <div class="page" id="page3">
   <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
@@ -80,11 +80,10 @@ body{overflow-x:hidden;}
 let selectedReason = "";
 let selectedUrgency = "";
 
-/* ---------------- NAVIGATION ---------------- */
+/* NAVIGATION */
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const page = document.getElementById(id);
-  if(page) page.classList.add("active");
+  document.getElementById(id)?.classList.add("active");
 }
 function chooseReason(reason){
   selectedReason = reason;
@@ -99,26 +98,19 @@ function chooseUrgency(urgency){
   }
 }
 
-/* ---------------- CRISIS MODAL ---------------- */
-function openCrisisModal(){
-  document.getElementById('crisisOverlay').classList.add('active');
-}
-function closeCrisisModal(){
-  document.getElementById('crisisOverlay').classList.remove('active');
-}
-function continueFromCrisis(){
-  closeCrisisModal();
-  goToPage('page3');
-}
+/* CRISIS MODAL */
+function openCrisisModal(){ document.getElementById('crisisOverlay').classList.add('active'); }
+function closeCrisisModal(){ document.getElementById('crisisOverlay').classList.remove('active'); }
+function continueFromCrisis(){ closeCrisisModal(); goToPage('page3'); }
 
-/* ---------------- SERVICE WORKER ---------------- */
+/* SERVICE WORKER */
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/service-worker.js')
-    .then(() => console.log('Service Worker registered'))
+    .then(() => console.log('SW registered'))
     .catch(err => console.warn('SW registration failed:', err));
 }
 
-/* ---------------- INSTALL BUTTON ---------------- */
+/* INSTALL BUTTON */
 let deferredPrompt;
 const installBtn = document.getElementById('installBtn');
 window.addEventListener('beforeinstallprompt', e => {
@@ -132,13 +124,12 @@ if(installBtn){
     if(deferredPrompt){
       deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
-      console.log('User choice:', choice.outcome);
       deferredPrompt = null;
     }
   });
 }
 
-/* ---------------- DYNAMIC HOTSPOTS ---------------- */
+/* HOTSPOTS CREATION */
 function createHotspots(containerId, hotspots){
   const container = document.getElementById(containerId);
   container.innerHTML = '';
@@ -155,47 +146,43 @@ function createHotspots(containerId, hotspots){
   });
 }
 
-/* Example hotspots for page1 and page2 (all enabled) */
+/* PAGE 1 HOTSPOTS */
 createHotspots('hotspotContainerPage1', [
-  {class:'academic', top:'10%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Academic stress or pressure')},
-  {class:'anxiety', top:'25%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Anxiety or panic attacks')},
-  {class:'depression', top:'40%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Depression or sadness')},
-  {class:'family', top:'55%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Family issues or home stress')},
-  {class:'relationship', top:'70%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Relationship or friendship problems')},
-  {class:'bullying', top:'85%', left:'10%', width:'15%', height:'10%', onClick:() => chooseReason('Bullying or harassment')},
-  {class:'talk', top:'10%', left:'30%', width:'15%', height:'10%', onClick:() => chooseReason('I just need someone to talk to')},
-  {class:'unsure', top:'25%', left:'30%', width:'15%', height:'10%', onClick:() => chooseReason("I'm not ready to say")}
-]);
-createHotspots('hotspotContainerPage2', [
-  {class:'fine', top:'10%', left:'10%', width:'15%', height:'10%', onClick:() => chooseUrgency("I'm Doing Fine – Just Curious")},
-  {class:'littleoff', top:'25%', left:'10%', width:'15%', height:'10%', onClick:() => chooseUrgency('Feeling a Little Off')},
-  {class:'coping', top:'40%', left:'10%', width:'15%', height:'10%', onClick:() => chooseUrgency("I'm Not Coping Well")},
-  {class:'crisis', top:'55%', left:'10%', width:'15%', height:'10%', onClick:() => chooseUrgency("I'm in Crisis")}
+  {class:'academic', top:'10%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Academic stress or pressure')},
+  {class:'anxiety', top:'20%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Anxiety or panic attacks')},
+  {class:'depression', top:'30%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Depression or sadness')},
+  {class:'family', top:'40%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Family issues or home stress')},
+  {class:'relationship', top:'50%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Relationship or friendship problems')},
+  {class:'bullying', top:'60%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('Bullying or harassment')},
+  {class:'talk', top:'70%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason('I just need someone to talk to')},
+  {class:'unsure', top:'80%', left:'10%', width:'20%', height:'8%', onClick:() => chooseReason("I'm not ready to say")}
 ]);
 
-/* ---------------- DYNAMIC COUNSELORS ---------------- */
+/* PAGE 2 HOTSPOTS */
+createHotspots('hotspotContainerPage2', [
+  {class:'fine', top:'10%', left:'10%', width:'25%', height:'8%', onClick:() => chooseUrgency("I'm Doing Fine – Just Curious")},
+  {class:'littleoff', top:'25%', left:'10%', width:'25%', height:'8%', onClick:() => chooseUrgency('Feeling a Little Off')},
+  {class:'coping', top:'40%', left:'10%', width:'25%', height:'8%', onClick:() => chooseUrgency("I'm Not Coping Well")},
+  {class:'crisis', top:'55%', left:'10%', width:'25%', height:'8%', onClick:() => chooseUrgency("I'm in Crisis")}
+]);
+
+/* COUNSELORS */
 const exampleCounselors = [
   { username: 'counselor1', email: 'counselor1@example.com' },
   { username: 'counselor2', email: 'counselor2@example.com' }
 ];
-
 function populateStudentCounselorDropdown(){
   const grid = document.getElementById('counselorGrid');
   grid.innerHTML = '';
-  try {
-    exampleCounselors.forEach(c => {
-      const btn = document.createElement('button');
-      btn.textContent = c.email;
-      btn.onclick = () => console.log('Open modal for', c.username, c.email);
-      grid.appendChild(btn);
-    });
-  } catch(err){
-    grid.innerHTML = 'Error loading counselors';
-    console.error(err);
-  }
+  exampleCounselors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.textContent = c.email;
+    btn.onclick = () => console.log('Open modal for', c.username, c.email);
+    grid.appendChild(btn);
+  });
 }
 
-/* ---------------- CRISIS DATA ---------------- */
+/* CRISIS DATA */
 const exampleCrisis = [
   {title:'Emergency', info:'Call 911 for life-threatening crises'},
   {title:'Suicide & Crisis', info:'Call or text 988 (24/7, free, confidential)'},
@@ -217,7 +204,7 @@ function populateCrisisList(){
 }
 populateCrisisList();
 
-/* ---------------- INIT ---------------- */
+/* INIT */
 window.addEventListener('load', () => {
   populateStudentCounselorDropdown();
 });
