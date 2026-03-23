@@ -82,7 +82,7 @@ let selectedReason = "", selectedUrgency = "";
 
 /* ---------------- NAVIGATION ---------------- */
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
 }
 function chooseReason(reason){ selectedReason = reason; goToPage('page2'); }
@@ -96,27 +96,16 @@ function openCrisisModal(){ document.getElementById("crisisOverlay")?.classList.
 function closeCrisisModal(){ document.getElementById("crisisOverlay")?.classList.remove("active"); }
 function continueFromCrisis(){ closeCrisisModal(); goToPage('page3'); }
 
-/* ---------------- DYNAMIC CRISIS LIST ---------------- */
-const crisisData = [
-  {title:'Emergency', info:'911 – Emergency services (police / ambulance / fire) for life-threatening crises.'},
-  {title:'Mental Health & Crisis Support', info:'988 Suicide & Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br>National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br>Crisis Text Line – Text HOME to 741741 (24/7).'},
-  {title:'Eating Disorder Support', info:'National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br>Text NEDA to 741741.'},
-  {title:'Domestic Violence Support', info:'National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br>Text START to 88788.'},
-  {title:'Sexual Assault Support', info:'RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).'},
-  {title:'Substance Abuse & Addiction Support', info:'SAMHSA National Helpline – 1-800-662-HELP (4357).'},
-  {title:'LGBTQ Youth Support', info:'The Trevor Project – 1-866-488-7386 or text START to 678-678.'}
-];
-function populateCrisisList(data){
+function populateCrisisList(crisisData){
   const list = document.getElementById('crisisList');
   list.innerHTML = '';
-  data.forEach(item=>{
+  crisisData.forEach(c => {
     const li = document.createElement('li');
     li.className = 'crisis-section';
-    li.innerHTML = `<strong>${item.title}</strong><br>${item.info}`;
+    li.innerHTML = `<strong>${c.title}</strong><br>${c.info}`;
     list.appendChild(li);
   });
 }
-populateCrisisList(crisisData);
 
 /* ---------------- SERVICE WORKER ---------------- */
 if("serviceWorker" in navigator){
@@ -146,27 +135,27 @@ if(installBtn){
 }
 
 /* ---------------- DYNAMIC HOTSPOTS ---------------- */
-function createHotspots(containerId, hotspotArray){
+function createHotspots(containerId, hotspots){
   const container = document.getElementById(containerId);
   container.innerHTML = '';
-  hotspotArray.forEach(h=>{
+  hotspots.forEach(h => {
     const btn = document.createElement('button');
     btn.className = `hotspot ${h.class}` + (h.disabled ? ' disabled':'');
-    btn.style.position='absolute';
-    btn.style.top=h.top;
-    btn.style.left=h.left;
-    btn.style.width=h.width;
-    btn.style.height=h.height;
+    btn.style.position = 'absolute';
+    btn.style.top = h.top;
+    btn.style.left = h.left;
+    btn.style.width = h.width;
+    btn.style.height = h.height;
     if(!h.disabled) btn.onclick = h.onClick;
     container.appendChild(btn);
   });
 }
 
-/* Example dynamic hotspots for demo */
+/* Example dynamic hotspots */
 createHotspots('hotspotContainerPage1', [
   {class:'academic', top:'10%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Academic stress'), disabled:false},
   {class:'anxiety', top:'25%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Anxiety'), disabled:false},
-  {class:'depression', top:'40%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Depression'), disabled:true} // disabled example
+  {class:'depression', top:'40%', left:'10%', width:'15%', height:'10%', onClick:()=>chooseReason('Depression'), disabled:true}
 ]);
 
 createHotspots('hotspotContainerPage2', [
@@ -179,11 +168,12 @@ async function loadCounselors(){
   const grid = document.getElementById('counselorGrid');
   grid.innerHTML = '';
   try {
+    // Replace with API call
     const counselors = [
       {id:1, name:'Alice', email:'alice@example.com'},
       {id:2, name:'Bob', email:'bob@example.com'}
     ];
-    counselors.forEach(c=>{
+    counselors.forEach(c => {
       const btn = document.createElement('button');
       btn.textContent = c.email;
       btn.onclick = ()=>loadStudentData(c.id);
@@ -200,7 +190,7 @@ function loadStudentData(counselorId){
   const appointmentContainer = document.getElementById('appointmentContainer');
   const notesContainer = document.getElementById('notesContainer');
 
-  // Example dynamic data
+  // Replace with API call
   const appointments = [
     {id:1, date:'2026-03-22', topic:'Stress check-in'},
     {id:2, date:'2026-03-23', topic:'Homework help'}
@@ -213,6 +203,18 @@ function loadStudentData(counselorId){
   appointmentContainer.innerHTML = `<h3>Appointments</h3><ul>${appointments.map(a=>`<li>${a.date}: ${a.topic}</li>`).join('')}</ul>`;
   notesContainer.innerHTML = `<h3>Notes</h3><ul>${notes.map(n=>`<li>${n.text}</li>`).join('')}</ul>`;
 }
+
+/* ---------------- DYNAMIC CRISIS DATA ---------------- */
+const exampleCrisis = [
+  {title:'Emergency', info:'Call 911 for life-threatening crises'},
+  {title:'Suicide & Crisis', info:'Call or text 988 (24/7, free, confidential)'},
+  {title:'Eating Disorder Support', info:'Call 1-800-931-2237 or text NEDA to 741741'},
+  {title:'Domestic Violence', info:'Call 1-800-799-7233 or text START to 88788'},
+  {title:'Sexual Assault Support', info:'Call 1-800-656-4673'},
+  {title:'Substance Abuse', info:'Call 1-800-662-HELP'},
+  {title:'LGBTQ Youth', info:'Call 1-866-488-7386 or text START to 678-678'}
+];
+populateCrisisList(exampleCrisis);
 
 /* ---------------- INIT ---------------- */
 window.addEventListener('load', ()=>{
