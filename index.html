@@ -17,17 +17,31 @@
 <meta name="apple-mobile-web-app-title" content="TapOut! – Student">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{overflow-x:hidden;}
-.page{display:none;position:relative;}
-.page.active{display:block;text-align:center;}
-.page img{width:100%;height:auto;display:block;}
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
-.back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
+* {margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body {overflow-x:hidden;}
+.page {display:none;position:relative;}
+.page.active {display:block;text-align:center;}
+.page img {width:100%;height:auto;display:block;}
+
+/* HOTSPOTS: now visible & clickable */
+.hotspot {position:absolute; z-index:10; cursor:pointer; border:none; background:rgba(255,0,0,0.2);}
+
+/* Example positions — adjust these to match your page1.png layout */
+.hotspot.academic {top:20%; left:10%; width:20%; height:10%;}
+.hotspot.anxiety {top:20%; left:40%; width:20%; height:10%;}
+.hotspot.depression {top:35%; left:10%; width:20%; height:10%;}
+.hotspot.family {top:35%; left:40%; width:20%; height:10%;}
+.hotspot.relationship {top:50%; left:10%; width:20%; height:10%;}
+.hotspot.bullying {top:50%; left:40%; width:20%; height:10%;}
+.hotspot.talk {top:65%; left:10%; width:20%; height:10%;}
+.hotspot.unsure {top:65%; left:40%; width:20%; height:10%;}
+
+.back-button {margin-top:10px;padding:8px 12px;border-radius:12px;border:none;cursor:pointer;background:#ccc;}
 .counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
 .counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
 .install-btn{padding:6px 10px;border-radius:6px;border:1px solid #0070c9;background:#0070c9;color:white;cursor:pointer;display:none;}
 
+/* Modal visibility */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;}
 .modal-overlay.active{display:flex;}
 .modal{background:#fff;max-width:560px;width:90%;padding:20px;border-radius:12px;text-align:left;}
@@ -45,29 +59,46 @@ body{overflow-x:hidden;}
   <button class="install-btn" id="installBtn">Install App</button>
 </div>
 
+<!-- PAGES -->
 <div class="page active" id="page1">
-  <img src="page1.png">
+  <img src="page1.png" alt="Welcome Page">
+  <button class="hotspot academic" onclick="chooseReason('Academic stress or pressure')"></button>
+  <button class="hotspot anxiety" onclick="chooseReason('Anxiety or panic attacks')"></button>
+  <button class="hotspot depression" onclick="chooseReason('Depression or sadness')"></button>
+  <button class="hotspot family" onclick="chooseReason('Family issues or home stress')"></button>
+  <button class="hotspot relationship" onclick="chooseReason('Relationship or friendship problems')"></button>
+  <button class="hotspot bullying" onclick="chooseReason('Bullying or harassment')"></button>
+  <button class="hotspot talk" onclick="chooseReason('I just need someone to talk to')"></button>
+  <button class="hotspot unsure" onclick="chooseReason('I’m not ready to say')"></button>
 </div>
 
 <div class="page" id="page2">
-  <img src="page2.png">
+  <img src="page2.png" alt="Urgency Page">
+  <button class="hotspot fine" onclick="chooseUrgency('I’m Doing Fine – Just Curious')"></button>
+  <button class="hotspot littleoff" onclick="chooseUrgency('Feeling a Little Off')"></button>
+  <button class="hotspot coping" onclick="chooseUrgency('I’m Not Coping Well')"></button>
+  <button class="hotspot crisis" onclick="chooseUrgency('I’m in Crisis')"></button>
   <button class="back-button" onclick="goToPage('page1')">Back</button>
 </div>
 
 <div class="page" id="page3">
-  <img src="page3.png">
+  <img src="page3.png" alt="Counselor Page">
   <div class="counselor-grid" id="counselorGrid"></div>
   <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
 <!-- CRISIS MODAL -->
 <div class="modal-overlay" id="crisisOverlay">
-  <div class="modal">
+  <div class="modal crisis-modal">
     <h2>Immediate Support</h2>
-    <p>If you're in danger, call 911 or 988.</p>
+    <ul class="crisis-list">
+      <li class="crisis-section"><strong>Emergency</strong> 911 – Emergency services.</li>
+      <li class="crisis-section"><strong>Mental Health & Crisis Support</strong> 988 Suicide & Crisis Lifeline – Call or text 988.</li>
+      <!-- Add remaining items -->
+    </ul>
     <div class="crisis-actions">
-      <button class="secondary" onclick="closeCrisisModal()">Close</button>
-      <button class="primary" onclick="continueFromCrisis()">Continue</button>
+      <button type="button" class="secondary" onclick="closeCrisisModal()">Close</button>
+      <button type="button" class="primary" onclick="continueFromCrisis()">Continue</button>
     </div>
   </div>
 </div>
@@ -80,34 +111,32 @@ function goToPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id)?.classList.add("active");
 }
+function chooseReason(reason){ selectedReason=reason; goToPage("page2"); }
+function chooseUrgency(urgency){
+  selectedUrgency=urgency;
+  urgency==="I’m in Crisis"?openCrisisModal():goToPage("page3");
+}
 
-/* CRISIS */
-function openCrisisModal(){ document.getElementById("crisisOverlay").classList.add("active"); }
-function closeCrisisModal(){ document.getElementById("crisisOverlay").classList.remove("active"); }
+/* CRISIS MODAL */
+function openCrisisModal(){ document.getElementById("crisisOverlay")?.classList.add("active"); }
+function closeCrisisModal(){ document.getElementById("crisisOverlay")?.classList.remove("active"); }
 function continueFromCrisis(){ closeCrisisModal(); goToPage("page3"); }
 
-/* 🔥 SERVICE WORKER FIX */
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js").then(reg => {
-    console.log("SW registered");
-
-    // FORCE CONTROL (THIS FIXES INSTALL BUTTON ISSUE)
-    if (!navigator.serviceWorker.controller) {
-      window.location.reload();
-    }
-  }).catch(err => console.warn("SW failed:", err));
+/* SERVICE WORKER */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/service-worker.js")
+    .then(()=>console.log("SW registered"))
+    .catch(err=>console.warn("SW registration failed:", err));
 }
 
 /* INSTALL BUTTON */
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
-
 window.addEventListener("beforeinstallprompt", e=>{
   e.preventDefault();
   deferredPrompt = e;
-  installBtn.style.display = "inline-block";
+  installBtn.style.display="inline-block";
 });
-
 installBtn.addEventListener("click", async ()=>{
   installBtn.style.display="none";
   if(deferredPrompt){
@@ -118,20 +147,19 @@ installBtn.addEventListener("click", async ()=>{
   }
 });
 
-/* COUNSELORS */
-function populateStudentCounselorDropdown(){
-  const counselors=[{username:"c1",email:"c1@example.com"}];
+/* POPULATE COUNSELORS */
+async function populateStudentCounselorDropdown(){
+  const counselors=[{username:"counselor1",email:"counselor1@example.com"}];
   const grid=document.getElementById("counselorGrid");
   grid.innerHTML='';
   counselors.forEach(c=>{
     const btn=document.createElement("button");
     btn.textContent=c.email;
+    btn.onclick=()=>console.log("Open modal for", c.username,c.email);
     grid.appendChild(btn);
   });
 }
-
 window.addEventListener("load", populateStudentCounselorDropdown);
 </script>
-
 </body>
 </html>
