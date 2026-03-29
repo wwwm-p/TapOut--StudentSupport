@@ -1,449 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SIS Counselor Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapOut! – Student</title>
+
+<link rel="stylesheet" href="/style.css">
+
+<!-- PWA -->
+<link rel="manifest" href="/student-manifest.json">
+<meta name="theme-color" content="#0070c9">
+<meta name="description" content="Student support app">
+
+<link rel="apple-touch-icon" href="/icons/icon-192-student.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
 <style>
-:root{
-  --bg:#f7f6f2;
-  --surface:#ffffff;
-  --muted:#64748b;
-  --text:#0f172a;
-  --accent:#0f8de0;
-  --accent-dark:#0070c9;
-  --border:#e5e7eb;
-  --danger:#ef4444;
-  --warn:#f59e0b;
-  --ok:#10b981;
-  --shadow:0 8px 20px rgba(15,23,42,0.12);
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{overflow-x:hidden;}
+.page{display:none;position:relative;}
+.page.active{display:block;text-align:center;}
+.page.active{display:block;text-align:center;background:#f7f7f7;}
+.page img{width:100%;height:auto;display:block;}
+
+/* 🔥 HOTSPOTS RESTORED */
+.hotspot{
+  position:absolute;
+  z-index:10;
+  cursor:pointer;
+  background:rgba(255,0,0,0.2); /* remove later if needed */
+  border:1px solid red;
 }
-body{ margin:0; font-family:system-ui, sans-serif; background:var(--bg); color:var(--text); }
-body.dark{
-  --bg:#0b1220;
-  --surface:#0f172a;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-  --border:#1f2937;
-  --shadow:0 8px 20px rgba(0,0,0,0.35);
+
+/* EXAMPLE POSITIONS (adjust to your design) */
+.academic{top:10%;left:10%;width:120px;height:50px;}
+.anxiety{top:20%;left:10%;width:120px;height:50px;}
+.depression{top:30%;left:10%;width:120px;height:50px;}
+.family{top:40%;left:10%;width:120px;height:50px;}
+.relationship{top:50%;left:10%;width:120px;height:50px;}
+.bullying{top:60%;left:10%;width:120px;height:50px;}
+.talk{top:70%;left:10%;width:120px;height:50px;}
+.unsure{top:80%;left:10%;width:120px;height:50px;}
+
+.fine{top:20%;left:10%;width:150px;height:50px;}
+.littleoff{top:30%;left:10%;width:150px;height:50px;}
+.coping{top:40%;left:10%;width:150px;height:50px;}
+.crisis{top:50%;left:10%;width:150px;height:50px;}
+
+.back-button{
+  margin-top:10px;
+  padding:8px 12px;
+  border-radius:12px;
+  border:none;
+  background:#ccc;
+  cursor:pointer;
 }
-*{ box-sizing:border-box; }
-button{ font-family:inherit; }
 
-/* Layout */
-.app{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
-.sidebar{ background:var(--surface); border-right:1px solid var(--border); padding:20px; }
-.main{ display:flex; flex-direction:column; min-height:100vh; }
-
-/* Header */
-.header{ background:var(--surface); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-.school{ display:flex; align-items:center; gap:12px; }
-.school-logo{ width:42px; height:42px; border-radius:10px; background:#fff; border:2px solid var(--accent-dark); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--accent-dark); overflow:hidden; }
-.school-name{ font-weight:700; }
-.header-actions{ display:flex; align-items:center; gap:10px; }
-.icon-btn{ width:40px; height:40px; border-radius:999px; border:1px solid var(--border); background:var(--surface); cursor:pointer; display:flex; align-items:center; justify-content:center; position:relative; }
-.notif-dot{ width:8px; height:8px; border-radius:50%; background:var(--danger); position:absolute; top:8px; right:8px; display:none; box-shadow:0 0 0 2px var(--surface); }
-
-/* Sidebar */
-.brand{ font-weight:800; font-size:18px; margin-bottom:16px; }
-.nav{ display:flex; flex-direction:column; gap:10px; }
-.nav button{ text-align:left; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-weight:600; }
-.nav button.active{ border-color:var(--accent-dark); box-shadow:0 0 0 2px rgba(0,112,201,0.12); }
-
-/* Content */
-.content{ padding:24px; display:grid; gap:20px; }
-.panel{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:var(--shadow); }
-.panel h3{ margin:0 0 12px 0; }
-
-/* Student list */
-.student-list{ display:grid; gap:10px; }
-.student-card{ display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid var(--border); border-radius:12px; padding:12px; background:rgba(255,255,255,0.4); flex-wrap:wrap; }
-body.dark .student-card{ background:#111827; }
-.student-info{ display:flex; align-items:center; gap:12px; }
-.avatar{ width:42px; height:42px; border-radius:50%; background:#e2e8f0; overflow:hidden; display:flex; align-items:center; justify-content:center; font-weight:700; color:#334155; }
-.student-name{ font-weight:700; }
-.student-meta{ font-size:12px; color:var(--muted); }
-.student-actions{ display:flex; gap:8px; flex-wrap:wrap; }
-.pill-btn{ padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-weight:600; }
-.pill-btn.primary{ background:var(--accent-dark); color:#fff; border-color:var(--accent-dark); }
-
-/* Urgency summary cards */
-.urgency-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:12px; }
-.urgency-card{ border:1px solid var(--border); border-radius:12px; padding:12px; }
-.urgency-card .label{ font-weight:700; margin-bottom:6px; }
-.urgency-card.low{ border-left:6px solid var(--ok); }
-.urgency-card.med{ border-left:6px solid var(--warn); }
-.urgency-card.high{ border-left:6px solid var(--danger); }
-.message-item{ font-size:13px; color:var(--muted); margin-top:6px; }
-
-/* Calendar */
-.calendar{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
-.calendar .day{ border:1px solid var(--border); border-radius:8px; padding:6px; min-height:70px; font-size:12px; }
-.calendar .day .dot{ width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:6px; }
-.dot.low{ background:var(--ok); }
-.dot.med{ background:var(--warn); }
-.dot.high{ background:var(--danger); }
-
-/* Notes list */
-.notes-group{ border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; }
-.notes-group h4{ margin:0 0 6px 0; }
-.note-item{ font-size:13px; margin-bottom:6px; color:var(--muted); }
-
-/* Modals */
-.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.55); display:none; align-items:center; justify-content:center; z-index:2000; }
-.modal{ width:min(760px, 92vw); background:var(--surface); border-radius:16px; padding:18px; box-shadow:var(--shadow); }
-.modal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
-.modal-header h3{ margin:0; }
-.modal-body{ max-height:60vh; overflow:auto; }
-
-/* Faces */
-.face { width:44px; height:44px; border-radius:50%; position:relative; flex:0 0 44px; }
-.eye { width:6px; height:8px; background:#3b3b3b; border-radius:50%; position:absolute; top:15px; }
-.eye.left { left:13px; } .eye.right { right:13px; }
-.mouth { position:absolute; left:50%; bottom:10px; transform:translateX(-50%); width:22px; height:12px; border:4px solid #3b3b3b; border-color:#3b3b3b transparent transparent transparent; border-radius:50%; }
-.sad .mouth { transform:translateX(-50%) rotate(180deg); }
-.neutral .mouth { border:none; width:24px; height:4px; background:#3b3b3b; border-radius:6px; }
-.green-face .mouth { border-color:transparent transparent #3b3b3b transparent; height:12px; }
-.orange-face.sad .mouth { width:18px; height:9px; border:3px solid #3b3b3b; border-color:#3b3b3b transparent transparent transparent; border-radius:50%; transform:translateX(-50%); bottom:4px; }
-.red-face.sad .mouth { width:26px; height:12px; border:4px solid #3b3b3b; border-color:#3b3b3b transparent transparent transparent; border-radius:50%; transform:translateX(-50%); bottom:2px; }
-.red-face { background:#ff5a4e; } .orange-face { background:#ffb02e; } .yellow-face { background:#ffe31a; } .green-face { background:#a9cf4f; }
-
-/* Login */
-.login-screen{ display:flex; align-items:center; justify-content:center; min-height:100vh; background:var(--bg); }
-.login-box{ width:min(420px, 92vw); background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; box-shadow:var(--shadow); }
-.login-box h2{ margin:0 0 12px 0; }
-.login-box label{ font-size:13px; color:var(--muted); }
-.login-box input{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; margin:6px 0 12px 0; background:var(--surface); color:var(--text); }
-
-@media (max-width: 980px){
-  .app{ grid-template-columns:1fr; }
-  .sidebar{ display:none; }
+.counselor-grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
 }
+
+.counselor-grid button{
+  padding:8px 12px;
+  border-radius:12px;
+  border:none;
+  background:#0070c9;
+  color:white;
+}
+
+.install-btn{
+  padding:6px 10px;
+  border-radius:6px;
+  border:none;
+  background:#0070c9;
+  color:white;
+  display:none;
+}
+.hotspot{position:absolute;z-index:10;cursor:pointer;}
+.back-button{margin-top:10px;padding:8px 12px;border-radius:12px;border:none;background:#ccc;cursor:pointer;}
+.counselor-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;}
+.counselor-grid button{padding:8px 12px;border-radius:12px;border:none;background:#0070c9;color:white;cursor:pointer;}
+.install-btn{padding:6px 10px;border-radius:6px;border:none;background:#0070c9;color:white;cursor:pointer;display:none;}
 </style>
 </head>
+
 <body>
-<div id="loginScreen" class="login-screen">
-  <form id="loginForm" class="login-box">
-    <h2>Counselor Login</h2>
-    <label>Email</label>
-    <input id="loginEmail" type="email" required placeholder="name@school.edu" />
-    <label>Password</label>
-    <input id="loginPassword" type="password" required placeholder="••••••••" />
-    <div style="display:flex; justify-content:flex-end;">
-      <button type="submit" class="pill-btn primary">Sign In</button>
-    </div>
-    <div style="margin-top:10px; font-size:12px; color:var(--muted);">
-      Demo counselors: Alice Johnson, Bob Smith
-    </div>
-  </form>
+
+<!-- Install button -->
+<div style="padding:10px;text-align:center;">
+  <button class="install-btn" id="installBtn">Install App</button>
+  <button id="installBtn" class="install-btn">Install App</button>
 </div>
 
-<div id="app" class="app" style="display:none;">
-  <aside class="sidebar">
-    <div class="brand">Counselor Dashboard</div>
-    <div class="nav">
-      <button class="active" data-view="home">Home</button>
-      <button data-view="students">Students</button>
-      <button data-view="notes">Notes</button>
-      <button id="urgencyNavBtn">Urgency</button>
-      <button data-view="calendar">Calendar</button>
-    </div>
-  </aside>
-
-  <div class="main">
-    <header class="header">
-      <div class="school">
-        <div class="school-logo" id="schoolLogo">LOGO</div>
-        <div>
-          <div class="school-name" id="schoolName">School Name</div>
-          <div class="student-meta" id="schoolTerm">Term</div>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button class="icon-btn" id="notifBtn" title="Notifications">🔔<span class="notif-dot" id="notifDot"></span></button>
-        <button class="icon-btn" id="darkModeBtn" title="Toggle Dark Mode">🌓</button>
-        <button class="pill-btn" id="logoutBtn">Sign Out</button>
-      </div>
-    </header>
-
-    <div class="content">
-      <div class="panel view" id="homeView">
-        <h3>Overview</h3>
-        <div class="urgency-grid" id="urgencyGrid"></div>
-      </div>
-
-      <div class="panel view" id="studentsView" style="display:none;">
-        <h3>Students</h3>
-        <div class="student-list" id="studentList"></div>
-      </div>
-
-      <div class="panel view" id="notesView" style="display:none;">
-        <h3>Notes (A–Z Students, Recent Notes First)</h3>
-        <div id="allNotesList"></div>
-      </div>
-
-      <div class="panel view" id="calendarView" style="display:none;">
-        <h3>Calendar (Read‑Only)</h3>
-        <div class="calendar" id="calendarGrid"></div>
-      </div>
-    </div>
-  </div>
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <img src="/page1.png">
+  <img src="/page1.png" alt="Welcome Page">
+  <button class="hotspot academic" onclick="chooseReason('Academic')"></button>
+  <button class="hotspot anxiety" onclick="chooseReason('Anxiety')"></button>
+  <button class="hotspot depression" onclick="chooseReason('Depression')"></button>
+  <button class="hotspot family" onclick="chooseReason('Family')"></button>
+  <button class="hotspot relationship" onclick="chooseReason('Relationship')"></button>
+  <button class="hotspot bullying" onclick="chooseReason('Bullying')"></button>
+  <button class="hotspot talk" onclick="chooseReason('Talk')"></button>
+  <button class="hotspot unsure" onclick="chooseReason('Unsure')"></button>
 </div>
 
-<div id="urgencyOverlay" class="overlay">
-  <div class="modal" style="width:min(980px, 96vw);">
-    <div class="modal-header">
-      <h3>Urgency Breakdown</h3>
-      <button class="pill-btn" onclick="closeUrgency()">Close</button>
-    </div>
-    <div class="modal-body">
-      <div class="urgency-row" id="red-row">
-        <div class="urgency-left"><div class="urgency-header"><div class="face red-face sad"><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div></div><h2>Crisis</h2></div></div>
-        <div class="messages" id="urgencyRed"></div>
-      </div>
-      <div class="urgency-row" id="orange-row">
-        <div class="urgency-left"><div class="urgency-header"><div class="face orange-face sad"><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div></div><h2>Elevated Risk</h2></div></div>
-        <div class="messages" id="urgencyOrange"></div>
-      </div>
-      <div class="urgency-row" id="yellow-row">
-        <div class="urgency-left"><div class="urgency-header"><div class="face yellow-face neutral"><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div></div><h2>Moderate</h2></div></div>
-        <div class="messages" id="urgencyYellow"></div>
-      </div>
-      <div class="urgency-row" id="green-row">
-        <div class="urgency-left"><div class="urgency-header"><div class="face green-face"><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div></div><h2>Low Urgency</h2></div></div>
-        <div class="messages" id="urgencyGreen"></div>
-      </div>
-    </div>
-  </div>
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <img src="/page2.png">
+  <img src="/page2.png" alt="Urgency Page">
+  <button class="hotspot fine" onclick="chooseUrgency('Fine')"></button>
+  <button class="hotspot littleoff" onclick="chooseUrgency('Off')"></button>
+  <button class="hotspot coping" onclick="chooseUrgency('Coping')"></button>
+  <button class="hotspot crisis" onclick="chooseUrgency('Crisis')"></button>
+  <button class="back-button" onclick="goToPage('page1')">Back</button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+  <img src="/page3.png">
+  <img src="/page3.png" alt="Counselor Page">
+  <div class="counselor-grid" id="counselorGrid"></div>
+  <button class="back-button" onclick="goToPage('page2')">Back</button>
 </div>
 
 <script>
-// ---- MOCK DATA ----
-const mockData = {
-  counselors: [
-    { id:"c1", name:"Alice Johnson", email:"alice@school.edu", password:"alice123" },
-    { id:"c2", name:"Bob Smith", email:"bob@school.edu", password:"bob123" }
-  ],
-  schoolInfo: { name:"Riverside High", term:"Fall 2026", logoUrl:"" },
-  studentsByCounselor: {
-    c1: [
-      { id:"s1", firstName:"Maya", lastName:"Foster", grade:"10" },
-      { id:"s2", firstName:"Noah", lastName:"Garcia", grade:"9" },
-      { id:"s3", firstName:"Olivia", lastName:"Harris", grade:"11" }
-    ]
-  },
-  notesByStudent: {
-    s1: [
-      { text:"Discussed study plan.", timestamp:"2026-02-15 09:20" },
-      { text:"Follow-up on attendance.", timestamp:"2026-02-12 08:10" }
-    ],
-    s2: [
-      { text:"Schedule change request.", timestamp:"2026-02-14 14:30" }
-    ]
-  },
-  messagesByCounselor: {
-    c1: [
-      { student:"Maya Foster", urgency:"high", text:"I’m in Crisis", ts:"2026-02-15 10:12", read:false },
-      { student:"Noah Garcia", urgency:"med", text:"Feeling a Little Off", ts:"2026-02-15 11:00", read:false },
-      { student:"Olivia Harris", urgency:"low", text:"Just checking in", ts:"2026-02-15 12:20", read:false }
-    ]
-  }
-};
+let selectedReason="", selectedUrgency="";
 
-let currentCounselor = null;
-let students = [];
-let notifications = [];
-
-// ---- LOGIN ----
-const loginScreen = document.getElementById("loginScreen");
-const app = document.getElementById("app");
-
-document.getElementById("loginForm").onsubmit = (e)=>{
-  e.preventDefault();
-  const email = loginEmail.value.trim();
-  const password = loginPassword.value.trim();
-  const match = mockData.counselors.find(c => c.email === email && c.password === password);
-  if(!match) return alert("Invalid credentials");
-  localStorage.setItem("loggedInCounselor", match.id);
-  currentCounselor = match;
-  openDashboard();
-};
-
-// ---- DASHBOARD ----
-function openDashboard(){
-  loginScreen.style.display = "none";
-  app.style.display = "grid";
-  loadSchoolInfo();
-  loadStudents();
-  loadNotifications();
-  renderCalendar();
-  renderAllNotes();
+/* NAVIGATION */
+function goToPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
-function loadSchoolInfo(){
-  const data = mockData.schoolInfo;
-  schoolName.textContent = data.name;
-  schoolTerm.textContent = data.term;
+function chooseReason(r){
+  selectedReason=r;
+  goToPage("page2");
 }
 
-function loadStudents(){
-  students = mockData.studentsByCounselor[currentCounselor.id] || [];
-  renderStudents();
+function chooseUrgency(u){
+  selectedUrgency=u;
+  goToPage("page3");
 }
 
-// --- RENDER STUDENTS ---
-function renderStudents(){
-  const list = studentList;
-  list.innerHTML = "";
-  students.forEach(s=>{
-    const card = document.createElement("div");
-    card.className = "student-card";
+/* EXAMPLE COUNSELORS ONLY */
+const counselors=[
+  {email:"counselor1@example.com"},
+  {email:"counselor2@example.com"}
+];
 
-    const infoDiv = document.createElement("div");
-    infoDiv.className = "student-info";
-    infoDiv.innerHTML = `
-      <div class="avatar">${s.firstName[0]}${s.lastName[0]}</div>
-      <div>
-        <div class="student-name">${s.firstName} ${s.lastName}</div>
-        <div class="student-meta">Grade ${s.grade}</div>
-      </div>
-    `;
-
-    const actionsDiv = document.createElement("div");
-    actionsDiv.className = "student-actions";
-
-    const notesBtn = document.createElement("button");
-    notesBtn.className = "pill-btn";
-    notesBtn.textContent = "Notes";
-    notesBtn.onclick = e=>{
-      e.stopPropagation();
-      document.querySelector(".nav button[data-view='notes']").click();
-      renderAllNotes();
-    };
-
-    const urgencyBtn = document.createElement("button");
-    urgencyBtn.className = "pill-btn";
-    urgencyBtn.textContent = "Urgency";
-    urgencyBtn.onclick = e=>{
-      e.stopPropagation();
-      openUrgency();
-    };
-
-    const profileBtn = document.createElement("button");
-    profileBtn.className = "pill-btn primary";
-    profileBtn.textContent = "Profile";
-    profileBtn.onclick = e=>{
-      e.stopPropagation();
-      alert(`Profile for ${s.firstName} ${s.lastName} (Grade ${s.grade})`);
-    };
-
-    actionsDiv.append(notesBtn, urgencyBtn, profileBtn);
-    card.append(infoDiv, actionsDiv);
-    list.appendChild(card);
-  });
-}
-
-// ---- NOTES ----
-function renderAllNotes(){
-  const container = allNotesList;
-  container.innerHTML="";
-  students.forEach(s=>{
-    const notes = mockData.notesByStudent[s.id] || [];
-    if(notes.length===0) return;
-    const group = document.createElement("div");
-    group.className="notes-group";
-    group.innerHTML = `<h4>${s.firstName} ${s.lastName}</h4>`;
-    notes.forEach(n=>{
-      const noteDiv = document.createElement("div");
-      noteDiv.className="note-item";
-      noteDiv.textContent = `[${n.timestamp}] ${n.text}`;
-      group.appendChild(noteDiv);
-    });
-    container.appendChild(group);
-  });
-}
-
-// ---- URGENCY ----
-function loadNotifications(){
-  notifications = mockData.messagesByCounselor[currentCounselor.id] || [];
-  renderUrgency();
-}
-
-function renderUrgency(){
-  const grid = urgencyGrid;
+function loadCounselors(){
+  const grid=document.getElementById("counselorGrid");
   grid.innerHTML="";
-  const counts = {high:0, med:0, low:0};
-  notifications.forEach(n=>{
-    counts[n.urgency] = (counts[n.urgency]||0)+1;
+  counselors.forEach(c=>{
+    const btn=document.createElement("button");
+    btn.textContent=c.email;
+    btn.onclick=()=>alert("Selected: "+c.email);
+    grid.appendChild(btn);
   });
-
-  const highCard = document.createElement("div");
-  highCard.className="urgency-card high";
-  highCard.innerHTML=`<div class="label">Crisis</div><div class="message-item">${counts.high} messages</div>`;
-  const medCard = document.createElement("div");
-  medCard.className="urgency-card med";
-  medCard.innerHTML=`<div class="label">Elevated</div><div class="message-item">${counts.med} messages</div>`;
-  const lowCard = document.createElement("div");
-  lowCard.className="urgency-card low";
-  lowCard.innerHTML=`<div class="label">Low</div><div class="message-item">${counts.low} messages</div>`;
-
-  grid.append(highCard, medCard, lowCard);
 }
+window.onload=loadCounselors;
+window.addEventListener("load", loadCounselors);
 
-function openUrgency(){
-  urgencyOverlay.style.display="flex";
-  renderUrgencyRows();
-}
-
-function closeUrgency(){
-  urgencyOverlay.style.display="none";
-}
-
-function renderUrgencyRows(){
-  ["Red","Orange","Yellow","Green"].forEach(c=>{
-    document.getElementById(`urgency${c}`).innerHTML="";
-  });
-
-  notifications.forEach(n=>{
-    const card = document.createElement("div");
-    card.className="message-item";
-    card.innerHTML=`<strong>${n.student}</strong>: ${n.text} <div class="message-meta">${n.ts}</div>`;
-    if(n.urgency==="high") urgencyRed.appendChild(card);
-    else if(n.urgency==="med") urgencyOrange.appendChild(card);
-    else if(n.urgency==="low") urgencyGreen.appendChild(card);
-    else urgencyYellow.appendChild(card);
+/* SERVICE WORKER */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("/service-worker.js");
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
   });
 }
 
-// ---- CALENDAR MOCK ----
-function renderCalendar(){
-  calendarGrid.innerHTML="";
-  for(let i=1;i<=30;i++){
-    const day = document.createElement("div");
-    day.className="day";
-    day.innerHTML=`<div>${i}</div>`;
-    if(i%5===0){
-      const dot = document.createElement("span");
-      dot.className="dot high";
-      day.appendChild(dot);
-    }
-    calendarGrid.appendChild(day);
-  }
-}
+/* INSTALL BUTTON */
+let deferredPrompt;
+const installBtn=document.getElementById("installBtn");
 
-// ---- NAVIGATION ----
-document.querySelectorAll(".nav button[data-view]").forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll(".view").forEach(v=>v.style.display="none");
-    const target = btn.getAttribute("data-view")+"View";
-    document.getElementById(target).style.display="block";
-    document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-  };
+window.addEventListener("beforeinstallprompt", e=>{
+const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  installBtn.style.display="inline-block";
+  installBtn.style.display='block';
 });
-urgencyNavBtn.onclick=openUrgency;
-darkModeBtn.onclick=()=>document.body.classList.toggle("dark");
-logoutBtn.onclick=()=>location.reload();
+
+installBtn.onclick=async ()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  installBtn.style.display="none";
+  installBtn.style.display='none';
+};
 </script>
+
 </body>
 </html>
