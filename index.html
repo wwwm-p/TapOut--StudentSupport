@@ -1,183 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TapOut! – Student</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapOut! - Student</title>
 
-  <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="/style.css">
 
-  <!-- PWA -->
-  <link rel="manifest" href="student-manifest.json" />
-  <meta name="theme-color" content="#0070c9" />
-  <meta name="description" content="Student support app" />
+<!-- PWA -->
+<link rel="manifest" href="/student-manifest.json">
+<meta name="theme-color" content="#0070c9">
+<meta name="description" content="Student support app">
+<link rel="apple-touch-icon" href="/icons/icon-192-student.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{overflow-x:hidden;}
+.page{display:none;position:relative;}
+.page.active{display:block;text-align:center;background:#f7f7f7;}
+.page img{width:100%;height:auto;display:block;}
 
-  <!-- Layout + hotspot positions (adjust to match your images) -->
-  <style>
-    .page { display: none; position: relative; text-align: center; }
-    .page.active { display: block; background: #f7f7f7; }
-    .page img { width: 100%; height: auto; display: block; }
+.hotspot{position:absolute;z-index:10;cursor:pointer;}
 
-    .hotspot {
-      position: absolute;
-      z-index: 10;
-      cursor: pointer;
-      padding: 0;
-      background: rgba(255, 0, 0, 0.2);
-      border: 1px solid rgba(255, 0, 0, 0.85);
-      border-radius: 8px;
-    }
+.back-button{
+  margin-top:10px;
+  padding:8px 12px;
+  border-radius:12px;
+  border:none;
+  background:#ccc;
+  cursor:pointer;
+}
 
-    .academic { top: 10%; left: 10%; width: 120px; height: 50px; }
-    .anxiety { top: 20%; left: 10%; width: 120px; height: 50px; }
-    .depression { top: 30%; left: 10%; width: 120px; height: 50px; }
-    .family { top: 40%; left: 10%; width: 120px; height: 50px; }
-    .relationship { top: 50%; left: 10%; width: 120px; height: 50px; }
-    .bullying { top: 60%; left: 10%; width: 120px; height: 50px; }
-    .talk { top: 70%; left: 10%; width: 120px; height: 50px; }
-    .unsure { top: 80%; left: 10%; width: 120px; height: 50px; }
+.counselor-grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
+}
 
-    .fine { top: 20%; left: 10%; width: 150px; height: 50px; }
-    .littleoff { top: 30%; left: 10%; width: 150px; height: 50px; }
-    .coping { top: 40%; left: 10%; width: 150px; height: 50px; }
-    .crisis { top: 50%; left: 10%; width: 150px; height: 50px; }
-  </style>
+.counselor-grid button{
+  padding:8px 12px;
+  border-radius:12px;
+  border:none;
+  background:#0070c9;
+  color:white;
+  cursor:pointer;
+}
+
+/* Crisis modal */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:rgba(15,23,42,0.55);
+  z-index:1000;
+  padding:18px;
+}
+.modal{
+  width:min(560px,92vw);
+  background:#fff;
+  padding:22px 20px;
+  border-radius:18px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.22);
+  border:1px solid #eef2f7;
+}
+.crisis-modal h2{
+  margin:0 0 14px 0;
+  font-size:20px;
+  font-weight:700;
+  color:#0f172a;
+  text-align:center;
+}
+.crisis-list{
+  margin:0;
+  padding:0;
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  font-size:14px;
+  color:#0f172a;
+}
+.crisis-section{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  padding:12px;
+}
+.crisis-section strong{
+  display:block;
+  font-size:15px;
+  margin-bottom:4px;
+}
+.crisis-actions{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:14px;
+}
+.crisis-actions button{
+  padding:10px 18px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:600;
+}
+.crisis-actions .secondary{background:#f1f5f9;color:#334155;}
+.crisis-actions .primary{background:#0070c9;color:#fff;}
+</style>
 </head>
+
 <body>
-  <!-- PAGE 1 -->
-  <div class="page active" id="page1">
-    <img src="page1.png" alt="Welcome Page" />
-    <button class="hotspot academic" type="button" onclick="chooseReason('Academic')"></button>
-    <button class="hotspot anxiety" type="button" onclick="chooseReason('Anxiety')"></button>
-    <button class="hotspot depression" type="button" onclick="chooseReason('Depression')"></button>
-    <button class="hotspot family" type="button" onclick="chooseReason('Family')"></button>
-    <button class="hotspot relationship" type="button" onclick="chooseReason('Relationship')"></button>
-    <button class="hotspot bullying" type="button" onclick="chooseReason('Bullying')"></button>
-    <button class="hotspot talk" type="button" onclick="chooseReason('Talk')"></button>
-    <button class="hotspot unsure" type="button" onclick="chooseReason('Unsure')"></button>
-  </div>
 
-  <!-- PAGE 2 -->
-  <div class="page" id="page2">
-    <img src="page2.png" alt="Urgency Page" />
-    <button class="hotspot fine" type="button" onclick="chooseUrgency('Fine')"></button>
-    <button class="hotspot littleoff" type="button" onclick="chooseUrgency('Off')"></button>
-    <button class="hotspot coping" type="button" onclick="chooseUrgency('Coping')"></button>
-    <button class="hotspot crisis" type="button" onclick="chooseUrgency('Crisis')"></button>
-    <button class="back-button" type="button" onclick="goToPage('page1')">Back</button>
-  </div>
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <img src="/page1.png" alt="Welcome Page">
 
-  <!-- PAGE 3 -->
-  <div class="page" id="page3">
-    <img src="page3.png" alt="Counselor Page" />
-    <div class="counselor-grid" id="counselorGrid"></div>
-    <button class="back-button" type="button" onclick="goToPage('page2')">Back</button>
-  </div>
+  <button class="hotspot academic" onclick="chooseReason('Academic')"></button>
+  <button class="hotspot anxiety" onclick="chooseReason('Anxiety')"></button>
+  <button class="hotspot depression" onclick="chooseReason('Depression')"></button>
+  <button class="hotspot family" onclick="chooseReason('Family')"></button>
+  <button class="hotspot relationship" onclick="chooseReason('Relationship')"></button>
+  <button class="hotspot bullying" onclick="chooseReason('Bullying')"></button>
+  <button class="hotspot talk" onclick="chooseReason('Talk')"></button>
+  <button class="hotspot unsure" onclick="chooseReason('Unsure')"></button>
+</div>
 
-  <!-- Crisis Numbers Modal -->
-  <div class="modal-overlay" id="crisisOverlay" role="dialog" aria-modal="true" aria-labelledby="crisisTitle">
-    <div class="modal crisis-modal">
-      <h2 id="crisisTitle">Immediate Support</h2>
-      <ul class="crisis-list">
-        <li class="crisis-section"><strong>Emergency</strong>911 – Emergency services (police / ambulance / fire) for life-threatening crises.</li>
-        <li class="crisis-section"><strong>Mental Health & Crisis Support</strong>
-          988 Suicide &amp; Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br />
-          National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br />
-          Crisis Text Line – Text HOME to 741741 (24/7).
-        </li>
-        <li class="crisis-section"><strong>Eating Disorder Support</strong>
-          National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br />
-          Text NEDA to 741741.
-        </li>
-        <li class="crisis-section"><strong>Domestic Violence Support</strong>
-          National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br />
-          Text START to 88788.
-        </li>
-        <li class="crisis-section"><strong>Sexual Assault Support</strong>
-          RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
-        </li>
-        <li class="crisis-section"><strong>Substance Abuse &amp; Addiction Support</strong>
-          SAMHSA National Helpline – 1-800-662-HELP (4357).
-        </li>
-        <li class="crisis-section"><strong>LGBTQ Youth Support</strong>
-          The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
-        </li>
-      </ul>
-      <div class="crisis-actions">
-        <button class="secondary" type="button" onclick="closeCrisisModal()">Close</button>
-        <button class="primary" type="button" onclick="continueFromCrisis()">Continue to Counselor</button>
-      </div>
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <img src="/page2.png" alt="Urgency Page">
+
+  <button class="hotspot fine" onclick="chooseUrgency('Fine')"></button>
+  <button class="hotspot littleoff" onclick="chooseUrgency('Off')"></button>
+  <button class="hotspot coping" onclick="chooseUrgency('Coping')"></button>
+  <button class="hotspot crisis" onclick="chooseUrgency('Crisis')"></button>
+
+  <button class="back-button" onclick="goToPage('page1')">Back</button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+  <img src="/page3.png" alt="Counselor Page">
+
+  <div class="counselor-grid" id="counselorGrid"></div>
+
+  <button class="back-button" onclick="goToPage('page2')">Back</button>
+</div>
+
+<!-- Crisis Numbers Modal -->
+<div class="modal-overlay" id="crisisOverlay">
+  <div class="modal crisis-modal">
+    <h2>Immediate Support</h2>
+    <ul class="crisis-list">
+      <li class="crisis-section"><strong>Emergency</strong>911 – Emergency services (police / ambulance / fire) for life-threatening crises.</li>
+      <li class="crisis-section"><strong>Mental Health &amp; Crisis Support</strong>
+        988 Suicide &amp; Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br />
+        National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br />
+        Crisis Text Line – Text HOME to 741741 (24/7).
+      </li>
+      <li class="crisis-section"><strong>Eating Disorder Support</strong>
+        National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br />
+        Text NEDA to 741741.
+      </li>
+      <li class="crisis-section"><strong>Domestic Violence Support</strong>
+        National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br />
+        Text START to 88788.
+      </li>
+      <li class="crisis-section"><strong>Sexual Assault Support</strong>
+        RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
+      </li>
+      <li class="crisis-section"><strong>Substance Abuse &amp; Addiction Support</strong>
+        SAMHSA National Helpline – 1-800-662-HELP (4357).
+      </li>
+      <li class="crisis-section"><strong>LGBTQ Youth Support</strong>
+        The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
+      </li>
+    </ul>
+    <div class="crisis-actions">
+      <button class="secondary" type="button" onclick="closeCrisisModal()">Close</button>
+      <button class="primary" type="button" onclick="continueFromCrisis()">Continue to Counselor</button>
     </div>
   </div>
+</div>
 
-  <script>
-    let selectedReason = "";
-    let selectedUrgency = "";
+<script>
+let selectedReason = "", selectedUrgency = "";
 
-    function openCrisisModal() {
-      const overlay = document.getElementById("crisisOverlay");
-      if (overlay) overlay.style.display = "flex";
-    }
+/* NAVIGATION */
+function goToPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 
-    function closeCrisisModal() {
-      const overlay = document.getElementById("crisisOverlay");
-      if (overlay) overlay.style.display = "none";
-    }
+function chooseReason(r){
+  selectedReason = r;
+  goToPage("page2");
+}
 
-    function continueFromCrisis() {
-      closeCrisisModal();
-      goToPage("page3");
-    }
+function openCrisisModal(){
+  document.getElementById("crisisOverlay").style.display = "flex";
+}
 
-    function goToPage(id) {
-      document.querySelectorAll(".page").forEach((page) => page.classList.remove("active"));
-      const el = document.getElementById(id);
-      if (el) el.classList.add("active");
-    }
+function closeCrisisModal(){
+  document.getElementById("crisisOverlay").style.display = "none";
+}
 
-    function chooseReason(reason) {
-      selectedReason = reason;
-      goToPage("page2");
-    }
+function continueFromCrisis(){
+  closeCrisisModal();
+  goToPage("page3");
+}
 
-    function chooseUrgency(urgency) {
-      selectedUrgency = urgency;
-      if (urgency === "Crisis") {
-        openCrisisModal();
-        return;
-      }
-      goToPage("page3");
-    }
+function chooseUrgency(u){
+  selectedUrgency = u;
+  if(u === "Crisis"){ openCrisisModal(); return; }
+  goToPage("page3");
+}
 
-    const counselors = [
-      { email: "counselor1@example.com" },
-      { email: "counselor2@example.com" },
-    ];
+/* EXAMPLE COUNSELORS */
+const counselors = [
+  {email:"counselor1@example.com"},
+  {email:"counselor2@example.com"}
+];
 
-    function loadCounselors() {
-      const grid = document.getElementById("counselorGrid");
-      if (!grid) return;
-      grid.innerHTML = "";
-      counselors.forEach((c) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = c.email;
-        btn.addEventListener("click", () => alert("Selected: " + c.email));
-        grid.appendChild(btn);
-      });
-    }
+function loadCounselors(){
+  const grid = document.getElementById("counselorGrid");
+  grid.innerHTML = "";
 
-    window.addEventListener("load", loadCounselors);
+  counselors.forEach(c=>{
+    const btn = document.createElement("button");
+    btn.textContent = c.email;
+    btn.onclick = ()=>alert("Selected: " + c.email);
+    grid.appendChild(btn);
+  });
+}
 
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js").catch(() => {});
-      });
-    }
-  </script>
+window.addEventListener("load", loadCounselors);
+
+/* SERVICE WORKER */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+  });
+}
+</script>
+
 </body>
 </html>
