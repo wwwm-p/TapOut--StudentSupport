@@ -15,12 +15,39 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <!-- Layout + hotspot positions (adjust to match your images) -->
+  <style>
+    .page { display: none; position: relative; text-align: center; }
+    .page.active { display: block; background: #f7f7f7; }
+    .page img { width: 100%; height: auto; display: block; }
+
+    .hotspot {
+      position: absolute;
+      z-index: 10;
+      cursor: pointer;
+      padding: 0;
+      background: rgba(255, 0, 0, 0.2);
+      border: 1px solid rgba(255, 0, 0, 0.85);
+      border-radius: 8px;
+    }
+
+    .academic { top: 10%; left: 10%; width: 120px; height: 50px; }
+    .anxiety { top: 20%; left: 10%; width: 120px; height: 50px; }
+    .depression { top: 30%; left: 10%; width: 120px; height: 50px; }
+    .family { top: 40%; left: 10%; width: 120px; height: 50px; }
+    .relationship { top: 50%; left: 10%; width: 120px; height: 50px; }
+    .bullying { top: 60%; left: 10%; width: 120px; height: 50px; }
+    .talk { top: 70%; left: 10%; width: 120px; height: 50px; }
+    .unsure { top: 80%; left: 10%; width: 120px; height: 50px; }
+
+    .fine { top: 20%; left: 10%; width: 150px; height: 50px; }
+    .littleoff { top: 30%; left: 10%; width: 150px; height: 50px; }
+    .coping { top: 40%; left: 10%; width: 150px; height: 50px; }
+    .crisis { top: 50%; left: 10%; width: 150px; height: 50px; }
+  </style>
 </head>
 <body>
-  <div style="padding:10px;text-align:center;">
-    <button class="install-btn" id="installBtn" type="button">Install App</button>
-  </div>
-
   <!-- PAGE 1 -->
   <div class="page active" id="page1">
     <img src="page1.png" alt="Welcome Page" />
@@ -108,7 +135,8 @@
 
     function goToPage(id) {
       document.querySelectorAll(".page").forEach((page) => page.classList.remove("active"));
-      document.getElementById(id)?.classList.add("active");
+      const el = document.getElementById(id);
+      if (el) el.classList.add("active");
     }
 
     function chooseReason(reason) {
@@ -143,37 +171,13 @@
       });
     }
 
-    window.addEventListener("DOMContentLoaded", loadCounselors);
+    window.addEventListener("load", loadCounselors);
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("service-worker.js").catch(() => {});
       });
     }
-
-    let deferredPrompt = null;
-    const installBtn = document.getElementById("installBtn");
-
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (installBtn) installBtn.style.display = "inline-block";
-    });
-
-    if (installBtn) {
-      installBtn.addEventListener("click", async () => {
-        if (!deferredPrompt) return;
-        installBtn.style.display = "none";
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-      });
-    }
-
-    window.addEventListener("appinstalled", () => {
-      deferredPrompt = null;
-      if (installBtn) installBtn.style.display = "none";
-    });
   </script>
 </body>
 </html>
