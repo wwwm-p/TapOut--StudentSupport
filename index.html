@@ -1,172 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TapOut! - Student</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TapOut! – Student</title>
 
-<link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="style.css" />
 
-<!-- PWA -->
-<link rel="manifest" href="/student-manifest.json">
-<meta name="theme-color" content="#0070c9">
-<meta name="description" content="Student support app">
-<link rel="apple-touch-icon" href="/icons/icon-192-student.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
+  <!-- PWA -->
+  <link rel="manifest" href="student-manifest.json" />
+  <meta name="theme-color" content="#0070c9" />
+  <meta name="description" content="Student support app" />
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{overflow-x:hidden;}
-.page{display:none;position:relative;}
-.page.active{display:block;text-align:center;background:#f7f7f7;}
-.page img{width:100%;height:auto;display:block;}
-
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
-
-.back-button{
-  margin-top:10px;
-  padding:8px 12px;
-  border-radius:12px;
-  border:none;
-  background:#ccc;
-  cursor:pointer;
-}
-
-.counselor-grid{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  margin-top:10px;
-}
-
-.counselor-grid button{
-  padding:8px 12px;
-  border-radius:12px;
-  border:none;
-  background:#0070c9;
-  color:white;
-  cursor:pointer;
-}
-
-.install-btn{
-  padding:6px 10px;
-  border-radius:6px;
-  border:none;
-  background:#0070c9;
-  color:white;
-  cursor:pointer;
-  display:none;
-}
-</style>
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
 </head>
-
 <body>
+  <div style="padding:10px;text-align:center;">
+    <button class="install-btn" id="installBtn" type="button">Install App</button>
+  </div>
 
-<!-- Install button -->
-<div style="padding:10px;text-align:center;">
-  <button id="installBtn" class="install-btn">Install App</button>
-</div>
+  <!-- PAGE 1 -->
+  <div class="page active" id="page1">
+    <img src="page1.png" alt="Welcome Page" />
+    <button class="hotspot academic" type="button" onclick="chooseReason('Academic')"></button>
+    <button class="hotspot anxiety" type="button" onclick="chooseReason('Anxiety')"></button>
+    <button class="hotspot depression" type="button" onclick="chooseReason('Depression')"></button>
+    <button class="hotspot family" type="button" onclick="chooseReason('Family')"></button>
+    <button class="hotspot relationship" type="button" onclick="chooseReason('Relationship')"></button>
+    <button class="hotspot bullying" type="button" onclick="chooseReason('Bullying')"></button>
+    <button class="hotspot talk" type="button" onclick="chooseReason('Talk')"></button>
+    <button class="hotspot unsure" type="button" onclick="chooseReason('Unsure')"></button>
+  </div>
 
-<!-- PAGE 1 -->
-<div class="page active" id="page1">
-  <img src="/page1.png" alt="Welcome Page">
+  <!-- PAGE 2 -->
+  <div class="page" id="page2">
+    <img src="page2.png" alt="Urgency Page" />
+    <button class="hotspot fine" type="button" onclick="chooseUrgency('Fine')"></button>
+    <button class="hotspot littleoff" type="button" onclick="chooseUrgency('Off')"></button>
+    <button class="hotspot coping" type="button" onclick="chooseUrgency('Coping')"></button>
+    <button class="hotspot crisis" type="button" onclick="chooseUrgency('Crisis')"></button>
+    <button class="back-button" type="button" onclick="goToPage('page1')">Back</button>
+  </div>
 
-  <button class="hotspot academic" onclick="chooseReason('Academic')"></button>
-  <button class="hotspot anxiety" onclick="chooseReason('Anxiety')"></button>
-  <button class="hotspot depression" onclick="chooseReason('Depression')"></button>
-  <button class="hotspot family" onclick="chooseReason('Family')"></button>
-  <button class="hotspot relationship" onclick="chooseReason('Relationship')"></button>
-  <button class="hotspot bullying" onclick="chooseReason('Bullying')"></button>
-  <button class="hotspot talk" onclick="chooseReason('Talk')"></button>
-  <button class="hotspot unsure" onclick="chooseReason('Unsure')"></button>
-</div>
+  <!-- PAGE 3 -->
+  <div class="page" id="page3">
+    <img src="page3.png" alt="Counselor Page" />
+    <div class="counselor-grid" id="counselorGrid"></div>
+    <button class="back-button" type="button" onclick="goToPage('page2')">Back</button>
+  </div>
 
-<!-- PAGE 2 -->
-<div class="page" id="page2">
-  <img src="/page2.png" alt="Urgency Page">
+  <!-- Crisis Numbers Modal -->
+  <div class="modal-overlay" id="crisisOverlay" role="dialog" aria-modal="true" aria-labelledby="crisisTitle">
+    <div class="modal crisis-modal">
+      <h2 id="crisisTitle">Immediate Support</h2>
+      <ul class="crisis-list">
+        <li class="crisis-section"><strong>Emergency</strong>911 – Emergency services (police / ambulance / fire) for life-threatening crises.</li>
+        <li class="crisis-section"><strong>Mental Health & Crisis Support</strong>
+          988 Suicide &amp; Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br />
+          National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br />
+          Crisis Text Line – Text HOME to 741741 (24/7).
+        </li>
+        <li class="crisis-section"><strong>Eating Disorder Support</strong>
+          National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br />
+          Text NEDA to 741741.
+        </li>
+        <li class="crisis-section"><strong>Domestic Violence Support</strong>
+          National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br />
+          Text START to 88788.
+        </li>
+        <li class="crisis-section"><strong>Sexual Assault Support</strong>
+          RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
+        </li>
+        <li class="crisis-section"><strong>Substance Abuse &amp; Addiction Support</strong>
+          SAMHSA National Helpline – 1-800-662-HELP (4357).
+        </li>
+        <li class="crisis-section"><strong>LGBTQ Youth Support</strong>
+          The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
+        </li>
+      </ul>
+      <div class="crisis-actions">
+        <button class="secondary" type="button" onclick="closeCrisisModal()">Close</button>
+        <button class="primary" type="button" onclick="continueFromCrisis()">Continue to Counselor</button>
+      </div>
+    </div>
+  </div>
 
-  <button class="hotspot fine" onclick="chooseUrgency('Fine')"></button>
-  <button class="hotspot littleoff" onclick="chooseUrgency('Off')"></button>
-  <button class="hotspot coping" onclick="chooseUrgency('Coping')"></button>
-  <button class="hotspot crisis" onclick="chooseUrgency('Crisis')"></button>
+  <script>
+    let selectedReason = "";
+    let selectedUrgency = "";
 
-  <button class="back-button" onclick="goToPage('page1')">Back</button>
-</div>
+    function openCrisisModal() {
+      const overlay = document.getElementById("crisisOverlay");
+      if (overlay) overlay.style.display = "flex";
+    }
 
-<!-- PAGE 3 -->
-<div class="page" id="page3">
-  <img src="/page3.png" alt="Counselor Page">
+    function closeCrisisModal() {
+      const overlay = document.getElementById("crisisOverlay");
+      if (overlay) overlay.style.display = "none";
+    }
 
-  <div class="counselor-grid" id="counselorGrid"></div>
+    function continueFromCrisis() {
+      closeCrisisModal();
+      goToPage("page3");
+    }
 
-  <button class="back-button" onclick="goToPage('page2')">Back</button>
-</div>
+    function goToPage(id) {
+      document.querySelectorAll(".page").forEach((page) => page.classList.remove("active"));
+      document.getElementById(id)?.classList.add("active");
+    }
 
-<script>
-let selectedReason = "", selectedUrgency = "";
+    function chooseReason(reason) {
+      selectedReason = reason;
+      goToPage("page2");
+    }
 
-/* NAVIGATION */
-function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
+    function chooseUrgency(urgency) {
+      selectedUrgency = urgency;
+      if (urgency === "Crisis") {
+        openCrisisModal();
+        return;
+      }
+      goToPage("page3");
+    }
 
-function chooseReason(r){
-  selectedReason = r;
-  goToPage("page2");
-}
+    const counselors = [
+      { email: "counselor1@example.com" },
+      { email: "counselor2@example.com" },
+    ];
 
-function chooseUrgency(u){
-  selectedUrgency = u;
-  goToPage("page3");
-}
+    function loadCounselors() {
+      const grid = document.getElementById("counselorGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+      counselors.forEach((c) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = c.email;
+        btn.addEventListener("click", () => alert("Selected: " + c.email));
+        grid.appendChild(btn);
+      });
+    }
 
-/* EXAMPLE COUNSELORS */
-const counselors = [
-  {email:"counselor1@example.com"},
-  {email:"counselor2@example.com"}
-];
+    window.addEventListener("DOMContentLoaded", loadCounselors);
 
-function loadCounselors(){
-  const grid = document.getElementById("counselorGrid");
-  grid.innerHTML = "";
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js").catch(() => {});
+      });
+    }
 
-  counselors.forEach(c=>{
-    const btn = document.createElement("button");
-    btn.textContent = c.email;
-    btn.onclick = ()=>alert("Selected: " + c.email);
-    grid.appendChild(btn);
-  });
-}
+    let deferredPrompt = null;
+    const installBtn = document.getElementById("installBtn");
 
-window.addEventListener("load", loadCounselors);
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (installBtn) installBtn.style.display = "inline-block";
+    });
 
-/* SERVICE WORKER */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
-  });
-}
+    if (installBtn) {
+      installBtn.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+        installBtn.style.display = "none";
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      });
+    }
 
-/* INSTALL BUTTON */
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-
-window.addEventListener('beforeinstallprompt', e=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = 'block';
-});
-
-installBtn.onclick = async ()=>{
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  installBtn.style.display = 'none';
-};
-</script>
-
+    window.addEventListener("appinstalled", () => {
+      deferredPrompt = null;
+      if (installBtn) installBtn.style.display = "none";
+    });
+  </script>
 </body>
 </html>
