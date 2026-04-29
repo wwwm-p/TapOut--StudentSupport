@@ -1,11 +1,11 @@
-const API_BASE = "https://YOUR-ADMIN-APP.vercel.app";
+const API_BASE = "https://YOUR-VERCEL-APP.vercel.app";
 
 let selectedReason = "";
 let selectedUrgency = "";
-let selectedCounselor = ""; // THIS IS NOW counselor_id
+let selectedCounselor = "";
 
 // -------------------
-// Page Navigation
+// Navigation
 // -------------------
 function goToPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -22,8 +22,12 @@ function chooseReason(reason) {
 
 function chooseUrgency(urgency) {
   selectedUrgency = urgency;
-  if (urgency === "I’m in Crisis") openCrisisModal();
-  else goToPage("page3");
+
+  if (urgency === "I’m in Crisis") {
+    openCrisisModal();
+  } else {
+    goToPage("page3");
+  }
 }
 
 // -------------------
@@ -32,9 +36,11 @@ function chooseUrgency(urgency) {
 function openCrisisModal() {
   document.getElementById("crisisOverlay").style.display = "flex";
 }
+
 function closeCrisisModal() {
   document.getElementById("crisisOverlay").style.display = "none";
 }
+
 function continueFromCrisis() {
   closeCrisisModal();
   goToPage("page3");
@@ -59,10 +65,15 @@ function closeSuccess() {
 }
 
 // -------------------
-// LOAD COUNSELORS (REAL API)
+// LOAD COUNSELORS (MATCHES users TABLE)
 // -------------------
 async function populateStudentCounselorDropdown() {
-  const school_id = localStorage.getItem("school_id"); // must be set
+  const school_id = localStorage.getItem("school_id");
+
+  if (!school_id) {
+    console.error("Missing school_id");
+    return;
+  }
 
   try {
     const res = await fetch(
@@ -71,38 +82,49 @@ async function populateStudentCounselorDropdown() {
 
     const counselors = await res.json();
 
-    // Dropdown
-    const dropdown = document.getElementById('studentCounselorDropdown');
-    if (dropdown) {
-      dropdown.innerHTML = '';
-      counselors.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.name;
-        dropdown.appendChild(opt);
-      });
+    if (!Array.isArray(counselors)) {
+      console.error("Invalid counselor response", counselors);
+      return;
     }
 
-    // Grid
-    const grid = document.getElementById('counselorGrid');
+    // Dropdown
+    const dropdown = document.getElementById("studentCounselorDropdown");
+    if (dropdown) {
+      dropdown.innerHTML = "";
+
+      counselors
+        .filter(c => c.is_visible !== false)
+        .forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.id; // UUID from users table
+          opt.textContent = c.name;
+          dropdown.appendChild(opt);
+        });
+    }
+
+    // Grid buttons
+    const grid = document.getElementById("counselorGrid");
     if (grid) {
-      grid.innerHTML = '';
-      counselors.forEach(c => {
-        const btn = document.createElement('button');
-        btn.type = "button";
-        btn.textContent = c.name;
-        btn.onclick = () => openModal(c.id);
-        grid.appendChild(btn);
-      });
+      grid.innerHTML = "";
+
+      counselors
+        .filter(c => c.is_visible !== false)
+        .forEach(c => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = c.name;
+          btn.onclick = () => openModal(c.id);
+          grid.appendChild(btn);
+        });
     }
 
   } catch (err) {
-    console.error("Failed to load counselors", err);
+    console.error("Counselor load failed:", err);
   }
 }
 
 // -------------------
-// SUBMIT (REAL SYSTEM)
+// SUBMIT (MATCHES assessments TABLE EXACTLY)
 // -------------------
 async function submitMessage() {
   const first_name = document.getElementById("firstName")?.value.trim();
@@ -112,8 +134,18 @@ async function submitMessage() {
 
   const school_id = localStorage.getItem("school_id");
 
+  if (!school_id) {
+    alert("Missing school ID");
+    return;
+  }
+
   if (!first_name || !last_name || !student_id) {
-    alert("Please fill required fields");
+    alert("Please fill all required fields");
+    return;
+  }
+
+  if (!selectedCounselor) {
+    alert("Please select a counselor");
     return;
   }
 
@@ -126,15 +158,15 @@ async function submitMessage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+          school_id,
+          counselor_id: selectedCounselor,
+          student_id,
           first_name,
           last_name,
-          student_id,
-          counselor_id: selectedCounselor,
-          school_id,
           answers: {
             reason: selectedReason,
             urgency: selectedUrgency,
-            notes
+            notes: notes || ""
           }
         })
       }
@@ -143,7 +175,7 @@ async function submitMessage() {
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.error);
+      alert(data.error || "Submission failed");
       return;
     }
 
@@ -161,7 +193,7 @@ async function submitMessage() {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Submit error:", err);
     alert("Submission failed");
   }
 }
