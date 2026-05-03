@@ -241,11 +241,45 @@ body{overflow-x:hidden;}
   </div>
 
   <script>
-const API_BASE = "https://tap-out-admin-dashboard.vercel.app";
+/*
+  Backend integration:
+  - GET  /api/student/get-counselors?school_id=...
+  - POST /api/student/submit-assessment
+
+  API base resolution:
+  - Default: same-origin (window.location.origin)
+  - Override via: ?api_base=https://your-backend.example
+  - Or localStorage.api_base
+*/
+const API_BASE = (() => {
+  try {
+    const qp = new URLSearchParams(window.location.search);
+    const fromQuery = (qp.get("api_base") || "").trim();
+    if (fromQuery) return fromQuery.replace(/\/+$/, "");
+    const fromStorage = (localStorage.getItem("api_base") || "").trim();
+    if (fromStorage) return fromStorage.replace(/\/+$/, "");
+  } catch {}
+  return "";
+})();
 
 let selectedReason = "";
-let selectedUrgency = "";
+let selectedUrgency = ""; // MUST match dashboard labels exactly
 let selectedCounselor = ""; // MUST be counselor_id (UUID)
+
+function apiUrl(path){
+  try{
+    const base = API_BASE || window.location.origin;
+    return new URL(path, base).toString();
+  }catch{
+    return path;
+  }
+}
+
+async function safeJson(res){
+  const text = await res.text();
+  if(!text) return null;
+  try{ return JSON.parse(text); }catch{ return { raw: text }; }
+}
 
 /* ---------------- NAVIGATION ---------------- */
 function goToPage(id){
@@ -259,7 +293,13 @@ function chooseReason(r){
 }
 
 function chooseUrgency(u){
-  selectedUrgency = u;
+  const map = {
+    Crisis: "I’m in Crisis",
+    Coping: "I’m Not Coping Well",
+    Off: "Feeling a Little Off",
+    Fine: "I’m Doing Fine – Just Curious"
+  };
+  selectedUrgency = map[u] || u;
 
   if(u === "Crisis"){
     openCrisisModal();
@@ -284,6 +324,10 @@ function continueFromCrisis(){
 }
 
 function openModal(counselorId){
+  if(!counselorId){
+    alert("Missing counselor id.");
+    return;
+  }
   selectedCounselor = counselorId;
   document.getElementById("modalOverlay").style.display = "flex";
 }
@@ -304,31 +348,55 @@ function closeSuccess(){
 /* ---------------- LOAD COUNSELORS (REAL) ---------------- */
 async function loadCounselors(){
   const school_id = localStorage.getItem("school_id");
+  const grid = document.getElementById("counselorGrid");
+  grid.innerHTML = "";
 
   if(!school_id){
-    alert("Missing school_id. Set it first.");
+    alert("Missing school_id. Set localStorage.school_id first.");
     return;
   }
 
   try{
+    grid.innerHTML = "<div style=\"width:100%;text-align:center;color:#334155;\">Loading…</div>";
+
     const res = await fetch(
-      `${API_BASE}/api/student/get-counselors?school_id=${school_id}`
+      apiUrl(`/api/student/get-counselors?school_id=${encodeURIComponent(school_id)}`),
+      { method: "GET" }
     );
 
-    const counselors = await res.json();
+    const payload = await safeJson(res);
 
-    const grid = document.getElementById("counselorGrid");
+    if(!res.ok){
+      console.error("Failed to load counselors", res.status, payload);
+      alert(payload?.error || payload?.message || `Failed to load counselors (${res.status})`);
+      grid.innerHTML = "";
+      return;
+    }
+
+    const counselors = Array.isArray(payload)
+      ? payload
+      : (Array.isArray(payload?.counselors) ? payload.counselors : (Array.isArray(payload?.data) ? payload.data : []));
+
     grid.innerHTML = "";
 
-    counselors.forEach(c=>{
-      const btn = document.createElement("button");
-      btn.textContent = c.name || c.email;
-      btn.onclick = ()=>openModal(c.id); // IMPORTANT: use ID
-      grid.appendChild(btn);
-    });
+    if(!counselors.length){
+      grid.innerHTML = "<div style=\"width:100%;text-align:center;color:#334155;\">No counselors available.</div>";
+      return;
+    }
+
+    counselors
+      .filter(c => c && (c.is_visible === undefined || c.is_visible === true))
+      .forEach(c=>{
+        const btn = document.createElement("button");
+        btn.textContent = c.name || c.email;
+        btn.onclick = ()=>openModal(c.id); // IMPORTANT: use ID (UUID)
+        grid.appendChild(btn);
+      });
 
   }catch(err){
     console.error("Failed to load counselors", err);
+    grid.innerHTML = "";
+    alert("Network error loading counselors");
   }
 }
 
@@ -341,6 +409,22 @@ async function submitMessage(){
 
   const school_id = localStorage.getItem("school_id");
 
+  if(!school_id){
+    alert("Missing school_id. Set localStorage.school_id first.");
+    return;
+  }
+  if(!selectedCounselor){
+    alert("Please select a counselor.");
+    return;
+  }
+  if(!selectedReason){
+    alert("Please select a reason first.");
+    return;
+  }
+  if(!selectedUrgency){
+    alert("Please select how you're feeling first.");
+    return;
+  }
   if(!first_name || !last_name || !student_id){
     alert("Please fill in required fields.");
     return;
@@ -348,7 +432,7 @@ async function submitMessage(){
 
   try{
     const res = await fetch(
-      `${API_BASE}/api/student/submit-assessment`,
+      apiUrl("/api/student/submit-assessment"),
       {
         method:"POST",
         headers:{ "Content-Type":"application/json" },
@@ -358,7 +442,7 @@ async function submitMessage(){
           student_id,
           counselor_id: selectedCounselor,
           school_id,
-          answers:{
+          answers: {
             reason: selectedReason,
             urgency: selectedUrgency,
             notes
@@ -367,10 +451,11 @@ async function submitMessage(){
       }
     );
 
-    const data = await res.json();
+    const data = await safeJson(res);
 
     if(!res.ok){
-      alert(data.error || "Submission failed");
+      console.error("Submission failed", res.status, data);
+      alert(data?.error || data?.message || `Submission failed (${res.status})`);
       return;
     }
 
