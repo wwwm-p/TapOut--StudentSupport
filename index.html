@@ -241,35 +241,19 @@ body{overflow-x:hidden;}
   </div>
 
   <script>
-/*
-  Backend integration:
-  - GET  /api/student/get-counselors?school_id=...
-  - POST /api/student/submit-assessment
-
-  API base resolution:
-  - Default: same-origin (window.location.origin)
-  - Override via: ?api_base=https://your-backend.example
-  - Or localStorage.api_base
-*/
-const API_BASE = (() => {
-  try {
-    const qp = new URLSearchParams(window.location.search);
-    const fromQuery = (qp.get("api_base") || "").trim();
-    if (fromQuery) return fromQuery.replace(/\/+$/, "");
-    const fromStorage = (localStorage.getItem("api_base") || "").trim();
-    if (fromStorage) return fromStorage.replace(/\/+$/, "");
-  } catch {}
-  return "";
-})();
+const API_BASE = "https://tap-out-admin-dashboard.vercel.app";
 
 let selectedReason = "";
 let selectedUrgency = ""; // MUST match dashboard labels exactly
 let selectedCounselor = ""; // MUST be counselor_id (UUID)
+let schoolId = "";
+let isSubmitting = false;
 
 function apiUrl(path){
   try{
-    const base = API_BASE || window.location.origin;
-    return new URL(path, base).toString();
+    const base = API_BASE.replace(/\/+$/, "");
+    const p = String(path || "").startsWith("/") ? String(path || "") : `/${String(path || "")}`;
+    return `${base}${p}`;
   }catch{
     return path;
   }
@@ -279,6 +263,74 @@ async function safeJson(res){
   const text = await res.text();
   if(!text) return null;
   try{ return JSON.parse(text); }catch{ return { raw: text }; }
+}
+
+function getSchoolId(){
+  try{
+    const qp = new URLSearchParams(window.location.search);
+    const fromUrl = (qp.get("school_id") || "").trim();
+    if(fromUrl){
+      localStorage.setItem("school_id", fromUrl);
+      return fromUrl;
+    }
+  }catch{}
+  return (localStorage.getItem("school_id") || "").trim();
+}
+
+function ensureInlineMessageEl(container){
+  if(!container) return null;
+  let el = container.querySelector("[data-inline-message='1']");
+  if(el) return el;
+  el = document.createElement("div");
+  el.setAttribute("data-inline-message", "1");
+  el.style.width = "100%";
+  el.style.textAlign = "center";
+  el.style.color = "#334155";
+  el.style.padding = "10px 12px";
+  el.style.borderRadius = "12px";
+  el.style.background = "#f1f5f9";
+  el.style.border = "1px solid #e2e8f0";
+  el.style.margin = "0 auto";
+  container.prepend(el);
+  return el;
+}
+
+function showGridMessage(message){
+  const grid = document.getElementById("counselorGrid");
+  if(!grid) return;
+  grid.innerHTML = "";
+  const el = ensureInlineMessageEl(grid);
+  if(el) el.textContent = message;
+}
+
+function showModalMessage(message){
+  const modal = document.querySelector("#modalOverlay .modal");
+  if(!modal) return;
+  let el = modal.querySelector("[data-modal-message='1']");
+  if(!el){
+    el = document.createElement("div");
+    el.setAttribute("data-modal-message", "1");
+    el.style.textAlign = "center";
+    el.style.color = "#b91c1c";
+    el.style.background = "#fef2f2";
+    el.style.border = "1px solid #fecaca";
+    el.style.borderRadius = "12px";
+    el.style.padding = "10px 12px";
+    el.style.margin = "0 0 12px 0";
+    const h2 = modal.querySelector("h2");
+    if(h2 && h2.nextSibling){
+      modal.insertBefore(el, h2.nextSibling);
+    }else{
+      modal.prepend(el);
+    }
+  }
+  el.textContent = message;
+}
+
+function clearModalMessage(){
+  const modal = document.querySelector("#modalOverlay .modal");
+  const el = modal?.querySelector("[data-modal-message='1']");
+  if(el) el.remove();
 }
 
 /* ---------------- NAVIGATION ---------------- */
@@ -324,15 +376,14 @@ function continueFromCrisis(){
 }
 
 function openModal(counselorId){
-  if(!counselorId){
-    alert("Missing counselor id.");
-    return;
-  }
+  clearModalMessage();
+  if(!counselorId) return;
   selectedCounselor = counselorId;
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
 function closeModal(){
+  clearModalMessage();
   document.getElementById("modalOverlay").style.display = "none";
 }
 
@@ -347,29 +398,26 @@ function closeSuccess(){
 
 /* ---------------- LOAD COUNSELORS (REAL) ---------------- */
 async function loadCounselors(){
-  const school_id = localStorage.getItem("school_id");
   const grid = document.getElementById("counselorGrid");
+  if(!grid) return;
   grid.innerHTML = "";
 
-  if(!school_id){
-    alert("Missing school_id. Set localStorage.school_id first.");
+  if(!schoolId){
+    showGridMessage("Missing school_id. Please open this page from your school link.");
     return;
   }
 
   try{
-    grid.innerHTML = "<div style=\"width:100%;text-align:center;color:#334155;\">Loading…</div>";
+    showGridMessage("Loading…");
 
     const res = await fetch(
-      apiUrl(`/api/student/get-counselors?school_id=${encodeURIComponent(school_id)}`),
+      apiUrl(`/api/student/get-counselors?school_id=${encodeURIComponent(schoolId)}`),
       { method: "GET" }
     );
-
     const payload = await safeJson(res);
-
     if(!res.ok){
       console.error("Failed to load counselors", res.status, payload);
-      alert(payload?.error || payload?.message || `Failed to load counselors (${res.status})`);
-      grid.innerHTML = "";
+      showGridMessage(payload?.error || payload?.message || `Failed to load counselors (${res.status})`);
       return;
     }
 
@@ -380,57 +428,62 @@ async function loadCounselors(){
     grid.innerHTML = "";
 
     if(!counselors.length){
-      grid.innerHTML = "<div style=\"width:100%;text-align:center;color:#334155;\">No counselors available.</div>";
+      showGridMessage("No counselors available.");
       return;
     }
 
-    counselors
-      .filter(c => c && (c.is_visible === undefined || c.is_visible === true))
-      .forEach(c=>{
-        const btn = document.createElement("button");
-        btn.textContent = c.name || c.email;
-        btn.onclick = ()=>openModal(c.id); // IMPORTANT: use ID (UUID)
-        grid.appendChild(btn);
-      });
+    const visible = counselors.filter(c => c && c.is_visible === true);
+    if(!visible.length){
+      showGridMessage("No counselors available.");
+      return;
+    }
+
+    visible.forEach(c=>{
+      if(!c?.id) return;
+      const btn = document.createElement("button");
+      btn.textContent = c.name || c.email || "Counselor";
+      btn.onclick = ()=>openModal(c.id); // IMPORTANT: use ID (UUID)
+      grid.appendChild(btn);
+    });
 
   }catch(err){
     console.error("Failed to load counselors", err);
-    grid.innerHTML = "";
-    alert("Network error loading counselors");
+    showGridMessage("Network error loading counselors.");
   }
 }
 
 /* ---------------- SUBMIT MESSAGE (REAL) ---------------- */
 async function submitMessage(){
+  clearModalMessage();
   const first_name = document.getElementById("firstName").value.trim();
   const last_name = document.getElementById("lastName").value.trim();
   const student_id = document.getElementById("studentId").value.trim();
   const notes = document.getElementById("extraNotes").value.trim();
+  if(isSubmitting) return;
 
-  const school_id = localStorage.getItem("school_id");
-
-  if(!school_id){
-    alert("Missing school_id. Set localStorage.school_id first.");
+  if(!schoolId){
+    showModalMessage("Missing school_id. Please open this page from your school link.");
     return;
   }
   if(!selectedCounselor){
-    alert("Please select a counselor.");
+    showModalMessage("Please select a counselor.");
     return;
   }
   if(!selectedReason){
-    alert("Please select a reason first.");
+    showModalMessage("Please select a reason first.");
     return;
   }
   if(!selectedUrgency){
-    alert("Please select how you're feeling first.");
+    showModalMessage("Please select how you're feeling first.");
     return;
   }
   if(!first_name || !last_name || !student_id){
-    alert("Please fill in required fields.");
+    showModalMessage("Please fill in required fields.");
     return;
   }
 
   try{
+    isSubmitting = true;
     const res = await fetch(
       apiUrl("/api/student/submit-assessment"),
       {
@@ -441,8 +494,8 @@ async function submitMessage(){
           last_name,
           student_id,
           counselor_id: selectedCounselor,
-          school_id,
-          answers: {
+          school_id: schoolId,
+          answers:{
             reason: selectedReason,
             urgency: selectedUrgency,
             notes
@@ -455,7 +508,7 @@ async function submitMessage(){
 
     if(!res.ok){
       console.error("Submission failed", res.status, data);
-      alert(data?.error || data?.message || `Submission failed (${res.status})`);
+      showModalMessage(data?.error || data?.message || `Submission failed (${res.status})`);
       return;
     }
 
@@ -468,12 +521,20 @@ async function submitMessage(){
 
   }catch(err){
     console.error(err);
-    alert("Network error");
+    showModalMessage("Network error. Please try again.");
+  }finally{
+    isSubmitting = false;
   }
 }
 
 /* ---------------- INIT ---------------- */
 window.addEventListener("load", async ()=>{
+  schoolId = getSchoolId();
+  if(!schoolId){
+    goToPage("page3");
+    showGridMessage("Missing school_id. Please open this page from your school link.");
+    return;
+  }
   await loadCounselors();
 });
 
