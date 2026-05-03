@@ -241,10 +241,13 @@ body{overflow-x:hidden;}
   </div>
 
   <script>
-let selectedReason = "", selectedUrgency = "";
-let selectedCounselorEmail = "";
+const API_BASE = "https://tap-out-admin-dashboard.vercel.app";
 
-/* NAVIGATION */
+let selectedReason = "";
+let selectedUrgency = "";
+let selectedCounselor = ""; // MUST be counselor_id (UUID)
+
+/* ---------------- NAVIGATION ---------------- */
 function goToPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -255,6 +258,18 @@ function chooseReason(r){
   goToPage("page2");
 }
 
+function chooseUrgency(u){
+  selectedUrgency = u;
+
+  if(u === "Crisis"){
+    openCrisisModal();
+    return;
+  }
+
+  goToPage("page3");
+}
+
+/* ---------------- MODALS ---------------- */
 function openCrisisModal(){
   document.getElementById("crisisOverlay").style.display = "flex";
 }
@@ -268,14 +283,8 @@ function continueFromCrisis(){
   goToPage("page3");
 }
 
-function chooseUrgency(u){
-  selectedUrgency = u;
-  if(u === "Crisis"){ openCrisisModal(); return; }
-  goToPage("page3");
-}
-
-function openModal(email){
-  selectedCounselorEmail = email || "";
+function openModal(counselorId){
+  selectedCounselor = counselorId;
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
@@ -289,58 +298,101 @@ function openSuccess(){
 
 function closeSuccess(){
   document.getElementById("successOverlay").style.display = "none";
+  goToPage("page1");
 }
 
-function submitMessage(){
-  const firstName = document.getElementById("firstName").value.trim();
-  const lastName = document.getElementById("lastName").value.trim();
-  const grade = document.getElementById("studentGrade").value.trim();
-  const studentId = document.getElementById("studentId").value.trim();
+/* ---------------- LOAD COUNSELORS (REAL) ---------------- */
+async function loadCounselors(){
+  const school_id = localStorage.getItem("school_id");
+
+  if(!school_id){
+    alert("Missing school_id. Set it first.");
+    return;
+  }
+
+  try{
+    const res = await fetch(
+      `${API_BASE}/api/student/get-counselors?school_id=${school_id}`
+    );
+
+    const counselors = await res.json();
+
+    const grid = document.getElementById("counselorGrid");
+    grid.innerHTML = "";
+
+    counselors.forEach(c=>{
+      const btn = document.createElement("button");
+      btn.textContent = c.name || c.email;
+      btn.onclick = ()=>openModal(c.id); // IMPORTANT: use ID
+      grid.appendChild(btn);
+    });
+
+  }catch(err){
+    console.error("Failed to load counselors", err);
+  }
+}
+
+/* ---------------- SUBMIT MESSAGE (REAL) ---------------- */
+async function submitMessage(){
+  const first_name = document.getElementById("firstName").value.trim();
+  const last_name = document.getElementById("lastName").value.trim();
+  const student_id = document.getElementById("studentId").value.trim();
   const notes = document.getElementById("extraNotes").value.trim();
 
-  if(!firstName || !lastName || !grade || !studentId){
+  const school_id = localStorage.getItem("school_id");
+
+  if(!first_name || !last_name || !student_id){
     alert("Please fill in required fields.");
     return;
   }
 
-  // Placeholder submit action (no backend wiring in this simple page).
-  console.log({
-    firstName,
-    lastName,
-    grade,
-    studentId,
-    notes,
-    reason: selectedReason,
-    urgency: selectedUrgency,
-    counselorEmail: selectedCounselorEmail,
-    dateTime: new Date().toISOString()
-  });
+  try{
+    const res = await fetch(
+      `${API_BASE}/api/student/submit-assessment`,
+      {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+          first_name,
+          last_name,
+          student_id,
+          counselor_id: selectedCounselor,
+          school_id,
+          answers:{
+            reason: selectedReason,
+            urgency: selectedUrgency,
+            notes
+          }
+        })
+      }
+    );
 
-  closeModal();
-  openSuccess();
+    const data = await res.json();
+
+    if(!res.ok){
+      alert(data.error || "Submission failed");
+      return;
+    }
+
+    closeModal();
+    openSuccess();
+
+    selectedReason = "";
+    selectedUrgency = "";
+    selectedCounselor = "";
+
+  }catch(err){
+    console.error(err);
+    alert("Network error");
+  }
 }
 
-/* EXAMPLE COUNSELORS */
-const counselors = [
-  {email:"counselor1@example.com"},
-  {email:"counselor2@example.com"}
-];
+/* ---------------- INIT ---------------- */
+window.addEventListener("load", async ()=>{
+  await loadCounselors();
+});
 
-function loadCounselors(){
-  const grid = document.getElementById("counselorGrid");
-  grid.innerHTML = "";
-
-  counselors.forEach(c=>{
-    const btn = document.createElement("button");
-    btn.textContent = c.email;
-    btn.onclick = ()=>openModal(c.email);
-    grid.appendChild(btn);
-  });
-}
-
-window.addEventListener("load", loadCounselors);
-
-/* SERVICE WORKER */
+/* ---------------- SERVICE WORKER ---------------- */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
