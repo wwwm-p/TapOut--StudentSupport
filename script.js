@@ -1,4 +1,4 @@
-const API_BASE = "https://YOUR-VERCEL-APP.vercel.app";
+const API_BASE = "https://sis-api-smoky.vercel.app";
 
 let selectedReason = "";
 let selectedUrgency = "";
@@ -65,7 +65,7 @@ function closeSuccess() {
 }
 
 // -------------------
-// LOAD COUNSELORS (MATCHES users TABLE)
+// LOAD COUNSELORS
 // -------------------
 async function populateStudentCounselorDropdown() {
   const school_id = localStorage.getItem("school_id");
@@ -77,7 +77,7 @@ async function populateStudentCounselorDropdown() {
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/student/get-counselors?school_id=${school_id}`
+      `${API_BASE}/api/admin/get-counselors?school_id=${school_id}`
     );
 
     const counselors = await res.json();
@@ -87,7 +87,6 @@ async function populateStudentCounselorDropdown() {
       return;
     }
 
-    // Dropdown
     const dropdown = document.getElementById("studentCounselorDropdown");
     if (dropdown) {
       dropdown.innerHTML = "";
@@ -96,13 +95,12 @@ async function populateStudentCounselorDropdown() {
         .filter(c => c.is_visible !== false)
         .forEach(c => {
           const opt = document.createElement("option");
-          opt.value = c.id; // UUID from users table
+          opt.value = c.id;
           opt.textContent = c.name;
           dropdown.appendChild(opt);
         });
     }
 
-    // Grid buttons
     const grid = document.getElementById("counselorGrid");
     if (grid) {
       grid.innerHTML = "";
@@ -124,7 +122,7 @@ async function populateStudentCounselorDropdown() {
 }
 
 // -------------------
-// SUBMIT (MATCHES assessments TABLE EXACTLY)
+// SUBMIT ASSESSMENT
 // -------------------
 async function submitMessage() {
   const first_name = document.getElementById("firstName")?.value.trim();
@@ -151,7 +149,7 @@ async function submitMessage() {
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/student/submit-assessment`,
+      `${API_BASE}/api/students/submit-assessment`,
       {
         method: "POST",
         headers: {
@@ -179,7 +177,6 @@ async function submitMessage() {
       return;
     }
 
-    // SUCCESS
     closeModal();
     openSuccess();
 
