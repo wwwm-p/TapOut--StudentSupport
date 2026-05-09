@@ -1,56 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
 <title>TapOut! - Student</title>
 
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/style.css" />
 
 <!-- PWA -->
-<link rel="manifest" href="/student-manifest.json">
-<meta name="theme-color" content="#0070c9">
-<meta name="description" content="Student support app">
-<link rel="apple-touch-icon" href="/icons/icon-192-student.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/student-manifest.json" />
+<meta name="theme-color" content="#0070c9" />
+<meta name="description" content="Student support app" />
+<link rel="apple-touch-icon" href="/icons/icon-192-student.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{overflow-x:hidden;}
-.page{display:none;position:relative;}
-.page.active{display:block;text-align:center;background:#f7f7f7;}
-.page img{width:100%;height:auto;display:block;}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
 
-.hotspot{position:absolute;z-index:10;cursor:pointer;}
+body{
+  overflow-x:hidden;
+  background:#f7f7f7;
+}
+
+.page{
+  display:none;
+  position:relative;
+  min-height:100vh;
+  text-align:center;
+}
+
+.page.active{
+  display:block;
+}
+
+.page img{
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+.hotspot{
+  position:absolute;
+  z-index:10;
+  cursor:pointer;
+  background:transparent;
+  border:none;
+}
 
 .back-button{
-  margin-top:10px;
-  padding:8px 12px;
-  border-radius:12px;
+  margin-top:18px;
+  padding:10px 16px;
+  border-radius:14px;
   border:none;
-  background:#ccc;
+  background:#dbe4ee;
+  color:#0f172a;
   cursor:pointer;
+  font-size:14px;
+  font-weight:600;
 }
 
-.counselor-grid{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  margin-top:10px;
+.continue-wrapper{
+  padding:24px;
 }
 
-.counselor-grid button{
-  padding:8px 12px;
-  border-radius:12px;
+.continue-btn{
+  padding:14px 28px;
   border:none;
+  border-radius:18px;
   background:#0070c9;
   color:white;
   cursor:pointer;
+  font-size:16px;
+  font-weight:700;
 }
 
-/* Crisis modal */
+/* ---------------- MODALS ---------------- */
+
 .modal-overlay{
   position:fixed;
   inset:0;
@@ -61,21 +96,70 @@ body{overflow-x:hidden;}
   z-index:1000;
   padding:18px;
 }
+
 .modal{
   width:min(560px,92vw);
+  max-height:calc(100vh - 48px);
+  overflow:auto;
   background:#fff;
   padding:22px 20px;
   border-radius:18px;
   box-shadow:0 24px 60px rgba(0,0,0,0.22);
   border:1px solid #eef2f7;
 }
-.crisis-modal h2{
+
+.modal h2{
   margin:0 0 14px 0;
   font-size:20px;
   font-weight:700;
   color:#0f172a;
   text-align:center;
 }
+
+.modal input,
+.modal textarea{
+  width:100%;
+  margin:0 0 12px 0;
+  padding:11px 12px;
+  font-size:14px;
+  border-radius:12px;
+  border:1px solid #e6e8ec;
+  background:#f9fafb;
+}
+
+.modal textarea{
+  resize:none;
+  height:100px;
+}
+
+.modal-buttons{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:6px;
+}
+
+.modal-buttons button{
+  padding:10px 18px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:600;
+}
+
+.modal-buttons button:first-child{
+  background:#f1f5f9;
+  color:#334155;
+}
+
+.modal-buttons button:last-child{
+  background:#0070c9;
+  color:#fff;
+}
+
+/* ---------------- CRISIS MODAL ---------------- */
+
 .crisis-list{
   margin:0;
   padding:0;
@@ -86,23 +170,27 @@ body{overflow-x:hidden;}
   font-size:14px;
   color:#0f172a;
 }
+
 .crisis-section{
   background:#f8fafc;
   border:1px solid #e2e8f0;
   border-radius:12px;
   padding:12px;
 }
+
 .crisis-section strong{
   display:block;
   font-size:15px;
   margin-bottom:4px;
 }
+
 .crisis-actions{
   display:flex;
   justify-content:center;
   gap:12px;
   margin-top:14px;
 }
+
 .crisis-actions button{
   padding:10px 18px;
   border-radius:999px;
@@ -111,249 +199,320 @@ body{overflow-x:hidden;}
   font-size:14px;
   font-weight:600;
 }
-.crisis-actions .secondary{background:#f1f5f9;color:#334155;}
-.crisis-actions .primary{background:#0070c9;color:#fff;}
 
-/* Submit modal (reuses modal-overlay) */
-.modal{max-height:calc(100vh - 48px);overflow:auto;}
-.modal h2{margin:0 0 14px 0;font-size:20px;font-weight:700;color:#0f172a;text-align:center;}
-.modal input,.modal textarea{
-  width:100%;
-  margin:0 0 12px 0;
-  padding:11px 12px;
-  font-size:14px;
-  border-radius:12px;
-  border:1px solid #e6e8ec;
-  background:#f9fafb;
+.crisis-actions .secondary{
+  background:#f1f5f9;
+  color:#334155;
 }
-.modal textarea{resize:none;height:90px;}
-.modal-buttons{display:flex;justify-content:center;gap:12px;margin-top:6px;}
-.modal-buttons button{padding:10px 18px;border-radius:999px;border:none;cursor:pointer;font-size:14px;font-weight:600;}
-.modal-buttons button:first-child{background:#f1f5f9;color:#334155;}
-.modal-buttons button:last-child{background:#0070c9;color:#fff;}
 
-/* Success modal */
-.success-modal{width:min(360px,92vw);text-align:center;}
-.success-icon{width:56px;height:56px;border-radius:50%;background:#16a34a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:4px auto 10px auto;}
-.success-text{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:10px;}
-.success-actions button{padding:10px 18px;border-radius:999px;border:none;cursor:pointer;font-size:14px;font-weight:600;background:#0070c9;color:#fff;}
+.crisis-actions .primary{
+  background:#0070c9;
+  color:#fff;
+}
+
+/* ---------------- SUCCESS ---------------- */
+
+.success-modal{
+  width:min(360px,92vw);
+  text-align:center;
+}
+
+.success-icon{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:#16a34a;
+  color:#fff;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  font-weight:700;
+  margin:4px auto 10px auto;
+}
+
+.success-text{
+  font-size:18px;
+  font-weight:700;
+  color:#0f172a;
+  margin-bottom:10px;
+}
+
+.success-actions button{
+  padding:10px 18px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:600;
+  background:#0070c9;
+  color:#fff;
+}
+
+/* ---------------- INLINE MESSAGE ---------------- */
+
+.inline-message{
+  text-align:center;
+  color:#b91c1c;
+  background:#fef2f2;
+  border:1px solid #fecaca;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:12px;
+  font-size:14px;
+}
 </style>
 </head>
+
 <body>
-  <!-- PAGE 1 -->
-  <div class="page active" id="page1">
-    <img src="/page1.png" alt="Welcome Page">
 
-    <button class="hotspot academic" onclick="chooseReason('Academic')"></button>
-    <button class="hotspot anxiety" onclick="chooseReason('Anxiety')"></button>
-    <button class="hotspot depression" onclick="chooseReason('Depression')"></button>
-    <button class="hotspot family" onclick="chooseReason('Family')"></button>
-    <button class="hotspot relationship" onclick="chooseReason('Relationship')"></button>
-    <button class="hotspot bullying" onclick="chooseReason('Bullying')"></button>
-    <button class="hotspot talk" onclick="chooseReason('Talk')"></button>
-    <button class="hotspot unsure" onclick="chooseReason('Unsure')"></button>
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <img src="/page1.png" alt="Welcome Page" />
+
+  <button class="hotspot academic" onclick="chooseReason('Academic')"></button>
+  <button class="hotspot anxiety" onclick="chooseReason('Anxiety')"></button>
+  <button class="hotspot depression" onclick="chooseReason('Depression')"></button>
+  <button class="hotspot family" onclick="chooseReason('Family')"></button>
+  <button class="hotspot relationship" onclick="chooseReason('Relationship')"></button>
+  <button class="hotspot bullying" onclick="chooseReason('Bullying')"></button>
+  <button class="hotspot talk" onclick="chooseReason('Talk')"></button>
+  <button class="hotspot unsure" onclick="chooseReason('Unsure')"></button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <img src="/page2.png" alt="Urgency Page" />
+
+  <button class="hotspot fine" onclick="chooseUrgency('Fine')"></button>
+  <button class="hotspot littleoff" onclick="chooseUrgency('Off')"></button>
+  <button class="hotspot coping" onclick="chooseUrgency('Coping')"></button>
+  <button class="hotspot crisis" onclick="chooseUrgency('Crisis')"></button>
+
+  <button class="back-button" onclick="goToPage('page1')">
+    Back
+  </button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+  <img src="/page3.png" alt="Support Form" />
+
+  <div class="continue-wrapper">
+    <button class="continue-btn" onclick="openModal()">
+      Continue
+    </button>
+
+    <br />
+
+    <button class="back-button" onclick="goToPage('page2')">
+      Back
+    </button>
   </div>
+</div>
 
-  <!-- PAGE 2 -->
-  <div class="page" id="page2">
-    <img src="/page2.png" alt="Urgency Page">
+<!-- CRISIS MODAL -->
+<div class="modal-overlay" id="crisisOverlay">
+  <div class="modal crisis-modal">
 
-    <button class="hotspot fine" onclick="chooseUrgency('Fine')"></button>
-    <button class="hotspot littleoff" onclick="chooseUrgency('Off')"></button>
-    <button class="hotspot coping" onclick="chooseUrgency('Coping')"></button>
-    <button class="hotspot crisis" onclick="chooseUrgency('Crisis')"></button>
+    <h2>Immediate Support</h2>
 
-    <button class="back-button" onclick="goToPage('page1')">Back</button>
-  </div>
+    <ul class="crisis-list">
 
-  <!-- PAGE 3 -->
-  <div class="page" id="page3">
-    <img src="/page3.png" alt="Counselor Page">
+      <li class="crisis-section">
+        <strong>Emergency</strong>
+        911 – Emergency services for life-threatening crises.
+      </li>
 
-    <div class="counselor-grid" id="counselorGrid"></div>
+      <li class="crisis-section">
+        <strong>Mental Health & Crisis Support</strong>
+        988 Suicide & Crisis Lifeline – Call or text 988.
+      </li>
 
-    <button class="back-button" onclick="goToPage('page2')">Back</button>
-  </div>
+      <li class="crisis-section">
+        <strong>Crisis Text Line</strong>
+        Text HOME to 741741.
+      </li>
 
-  <!-- Crisis Numbers Modal -->
-  <div class="modal-overlay" id="crisisOverlay">
-    <div class="modal crisis-modal">
-      <h2>Immediate Support</h2>
-      <ul class="crisis-list">
-        <li class="crisis-section"><strong>Emergency</strong>911 – Emergency services (police / ambulance / fire) for life-threatening crises.</li>
-        <li class="crisis-section"><strong>Mental Health & Crisis Support</strong>
-          988 Suicide &amp; Crisis Lifeline – Call or text 988 (24/7, free, confidential).<br />
-          National Suicide Prevention Lifeline – 1-800-273-TALK (8255).<br />
-          Crisis Text Line – Text HOME to 741741 (24/7).
-        </li>
-        <li class="crisis-section"><strong>Eating Disorder Support</strong>
-          National Eating Disorders Association (NEDA) Helpline – 1-800-931-2237.<br />
-          Text NEDA to 741741.
-        </li>
-        <li class="crisis-section"><strong>Domestic Violence Support</strong>
-          National Domestic Violence Hotline – 1-800-799-7233 (SAFE).<br />
-          Text START to 88788.
-        </li>
-        <li class="crisis-section"><strong>Sexual Assault Support</strong>
-          RAINN – National Sexual Assault Hotline – 1-800-656-4673 (HOPE).
-        </li>
-        <li class="crisis-section"><strong>Substance Abuse &amp; Addiction Support</strong>
-          SAMHSA National Helpline – 1-800-662-HELP (4357).
-        </li>
-        <li class="crisis-section"><strong>LGBTQ Youth Support</strong>
-          The Trevor Project – 1-866-488-7386 or text START to 678-678 (crisis intervention for LGBTQ youth).
-        </li>
-      </ul>
-      <div class="crisis-actions">
-        <button class="secondary" type="button" onclick="closeCrisisModal()">Close</button>
-        <button class="primary" type="button" onclick="continueFromCrisis()">Continue to Counselor</button>
-      </div>
+      <li class="crisis-section">
+        <strong>LGBTQ Youth Support</strong>
+        The Trevor Project – 1-866-488-7386.
+      </li>
+
+    </ul>
+
+    <div class="crisis-actions">
+      <button
+        class="secondary"
+        onclick="closeCrisisModal()"
+      >
+        Close
+      </button>
+
+      <button
+        class="primary"
+        onclick="continueFromCrisis()"
+      >
+        Continue
+      </button>
     </div>
+
   </div>
+</div>
 
-  <!-- MODAL -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <h2>Submit Message</h2>
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
 
-      <input type="text" id="firstName" placeholder="First Name (required)">
-      <input type="text" id="lastName" placeholder="Last Name (required)">
-      <input type="text" id="studentGrade" placeholder="Grade (required)">
-      <input type="text" id="studentId" placeholder="Student ID (required)">
-      <textarea id="extraNotes" placeholder="Additional notes (optional)"></textarea>
+    <h2>Submit Message</h2>
 
-      <div class="modal-buttons">
-        <button type="button" onclick="closeModal()">Cancel</button>
-        <button type="button" onclick="submitMessage()">Submit</button>
-      </div>
+    <div
+      id="modalMessage"
+      class="inline-message"
+      style="display:none;"
+    ></div>
+
+    <input
+      type="text"
+      id="firstName"
+      placeholder="First Name"
+    />
+
+    <input
+      type="text"
+      id="lastName"
+      placeholder="Last Name"
+    />
+
+    <input
+      type="text"
+      id="studentGrade"
+      placeholder="Grade"
+    />
+
+    <input
+      type="text"
+      id="studentId"
+      placeholder="Student ID"
+    />
+
+    <textarea
+      id="extraNotes"
+      placeholder="Additional notes (optional)"
+    ></textarea>
+
+    <div class="modal-buttons">
+
+      <button onclick="closeModal()">
+        Cancel
+      </button>
+
+      <button onclick="submitMessage()">
+        Submit
+      </button>
+
     </div>
-  </div>
 
-  <!-- Success Modal -->
-  <div class="modal-overlay" id="successOverlay">
-    <div class="modal success-modal">
-      <div class="success-icon">✓</div>
-      <div class="success-text">Message sent!</div>
-      <div class="success-actions">
-        <button type="button" onclick="closeSuccess()">OK</button>
-      </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successOverlay">
+  <div class="modal success-modal">
+
+    <div class="success-icon">✓</div>
+
+    <div class="success-text">
+      Message sent successfully
     </div>
-  </div>
 
-  <script>
-const API_BASE = "https://tap-out-admin-dashboard.vercel.app";
+    <div class="success-actions">
+      <button onclick="closeSuccess()">OK</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API_BASE = "https://sis-api-smoky.vercel.app/api";
 
 let selectedReason = "";
-let selectedUrgency = ""; // MUST match dashboard labels exactly
-let selectedCounselor = ""; // MUST be counselor_id (UUID)
+let selectedUrgency = "";
 let schoolId = "";
 let isSubmitting = false;
 
-function apiUrl(path){
-  try{
-    const base = API_BASE.replace(/\/+$/, "");
-    const p = String(path || "").startsWith("/") ? String(path || "") : `/${String(path || "")}`;
-    return `${base}${p}`;
-  }catch{
-    return path;
-  }
-}
+/* ---------------- HELPERS ---------------- */
 
-async function safeJson(res){
-  const text = await res.text();
-  if(!text) return null;
-  try{ return JSON.parse(text); }catch{ return { raw: text }; }
+function apiUrl(path){
+  return `${API_BASE}${path}`;
 }
 
 function getSchoolId(){
   try{
     const qp = new URLSearchParams(window.location.search);
-    const fromUrl = (qp.get("school_id") || "").trim();
+
+    const fromUrl = qp.get("school_id");
+
     if(fromUrl){
       localStorage.setItem("school_id", fromUrl);
       return fromUrl;
     }
   }catch{}
-  return (localStorage.getItem("school_id") || "").trim();
-}
 
-function ensureInlineMessageEl(container){
-  if(!container) return null;
-  let el = container.querySelector("[data-inline-message='1']");
-  if(el) return el;
-  el = document.createElement("div");
-  el.setAttribute("data-inline-message", "1");
-  el.style.width = "100%";
-  el.style.textAlign = "center";
-  el.style.color = "#334155";
-  el.style.padding = "10px 12px";
-  el.style.borderRadius = "12px";
-  el.style.background = "#f1f5f9";
-  el.style.border = "1px solid #e2e8f0";
-  el.style.margin = "0 auto";
-  container.prepend(el);
-  return el;
-}
-
-function showGridMessage(message){
-  const grid = document.getElementById("counselorGrid");
-  if(!grid) return;
-  grid.innerHTML = "";
-  const el = ensureInlineMessageEl(grid);
-  if(el) el.textContent = message;
+  return localStorage.getItem("school_id") || "";
 }
 
 function showModalMessage(message){
-  const modal = document.querySelector("#modalOverlay .modal");
-  if(!modal) return;
-  let el = modal.querySelector("[data-modal-message='1']");
-  if(!el){
-    el = document.createElement("div");
-    el.setAttribute("data-modal-message", "1");
-    el.style.textAlign = "center";
-    el.style.color = "#b91c1c";
-    el.style.background = "#fef2f2";
-    el.style.border = "1px solid #fecaca";
-    el.style.borderRadius = "12px";
-    el.style.padding = "10px 12px";
-    el.style.margin = "0 0 12px 0";
-    const h2 = modal.querySelector("h2");
-    if(h2 && h2.nextSibling){
-      modal.insertBefore(el, h2.nextSibling);
-    }else{
-      modal.prepend(el);
-    }
-  }
+  const el = document.getElementById("modalMessage");
+
+  if(!el) return;
+
+  el.style.display = "block";
   el.textContent = message;
 }
 
 function clearModalMessage(){
-  const modal = document.querySelector("#modalOverlay .modal");
-  const el = modal?.querySelector("[data-modal-message='1']");
-  if(el) el.remove();
+  const el = document.getElementById("modalMessage");
+
+  if(!el) return;
+
+  el.style.display = "none";
+  el.textContent = "";
 }
 
 /* ---------------- NAVIGATION ---------------- */
+
 function goToPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  document
+    .querySelectorAll(".page")
+    .forEach(p => p.classList.remove("active"));
+
+  document
+    .getElementById(id)
+    ?.classList.add("active");
 }
 
-function chooseReason(r){
-  selectedReason = r;
+/* ---------------- REASON ---------------- */
+
+function chooseReason(reason){
+  selectedReason = reason;
   goToPage("page2");
 }
 
-function chooseUrgency(u){
-  const map = {
-    Crisis: "I’m in Crisis",
-    Coping: "I’m Not Coping Well",
-    Off: "Feeling a Little Off",
-    Fine: "I’m Doing Fine – Just Curious"
-  };
-  selectedUrgency = map[u] || u;
+/* ---------------- URGENCY ---------------- */
 
-  if(u === "Crisis"){
+function chooseUrgency(level){
+
+  const map = {
+    Fine: "I’m Doing Fine – Just Curious",
+    Off: "Feeling a Little Off",
+    Coping: "I’m Not Coping Well",
+    Crisis: "I’m in Crisis"
+  };
+
+  selectedUrgency = map[level] || level;
+
+  if(level === "Crisis"){
     openCrisisModal();
     return;
   }
@@ -362,6 +521,7 @@ function chooseUrgency(u){
 }
 
 /* ---------------- MODALS ---------------- */
+
 function openCrisisModal(){
   document.getElementById("crisisOverlay").style.display = "flex";
 }
@@ -375,15 +535,15 @@ function continueFromCrisis(){
   goToPage("page3");
 }
 
-function openModal(counselorId){
+function openModal(){
   clearModalMessage();
-  if(!counselorId) return;
-  selectedCounselor = counselorId;
+
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
 function closeModal(){
   clearModalMessage();
+
   document.getElementById("modalOverlay").style.display = "none";
 }
 
@@ -392,158 +552,172 @@ function openSuccess(){
 }
 
 function closeSuccess(){
+
   document.getElementById("successOverlay").style.display = "none";
+
+  resetForm();
+
   goToPage("page1");
 }
 
-/* ---------------- LOAD COUNSELORS (REAL) ---------------- */
-async function loadCounselors(){
-  const grid = document.getElementById("counselorGrid");
-  if(!grid) return;
-  grid.innerHTML = "";
+/* ---------------- RESET ---------------- */
 
-  if(!schoolId){
-    showGridMessage("Missing school_id. Please open this page from your school link.");
-    return;
-  }
+function resetForm(){
 
-  try{
-    showGridMessage("Loading…");
+  selectedReason = "";
+  selectedUrgency = "";
 
-    const res = await fetch(
-      apiUrl(`/api/student/get-counselors?school_id=${encodeURIComponent(schoolId)}`),
-      { method: "GET" }
-    );
-    const payload = await safeJson(res);
-    if(!res.ok){
-      console.error("Failed to load counselors", res.status, payload);
-      showGridMessage(payload?.error || payload?.message || `Failed to load counselors (${res.status})`);
-      return;
+  [
+    "firstName",
+    "lastName",
+    "studentGrade",
+    "studentId",
+    "extraNotes"
+  ].forEach(id => {
+
+    const el = document.getElementById(id);
+
+    if(el){
+      el.value = "";
     }
-
-    const counselors = Array.isArray(payload)
-      ? payload
-      : (Array.isArray(payload?.counselors) ? payload.counselors : (Array.isArray(payload?.data) ? payload.data : []));
-
-    grid.innerHTML = "";
-
-    if(!counselors.length){
-      showGridMessage("No counselors available.");
-      return;
-    }
-
-    const visible = counselors.filter(c => c && c.is_visible === true);
-    if(!visible.length){
-      showGridMessage("No counselors available.");
-      return;
-    }
-
-    visible.forEach(c=>{
-      if(!c?.id) return;
-      const btn = document.createElement("button");
-      btn.textContent = c.name || c.email || "Counselor";
-      btn.onclick = ()=>openModal(c.id); // IMPORTANT: use ID (UUID)
-      grid.appendChild(btn);
-    });
-
-  }catch(err){
-    console.error("Failed to load counselors", err);
-    showGridMessage("Network error loading counselors.");
-  }
+  });
 }
 
-/* ---------------- SUBMIT MESSAGE (REAL) ---------------- */
+/* ---------------- SUBMIT ---------------- */
+
 async function submitMessage(){
-  clearModalMessage();
-  const first_name = document.getElementById("firstName").value.trim();
-  const last_name = document.getElementById("lastName").value.trim();
-  const student_id = document.getElementById("studentId").value.trim();
-  const notes = document.getElementById("extraNotes").value.trim();
+
   if(isSubmitting) return;
 
+  clearModalMessage();
+
+  const first_name =
+    document.getElementById("firstName")
+      .value
+      .trim();
+
+  const last_name =
+    document.getElementById("lastName")
+      .value
+      .trim();
+
+  const grade =
+    document.getElementById("studentGrade")
+      .value
+      .trim();
+
+  const student_id =
+    document.getElementById("studentId")
+      .value
+      .trim();
+
+  const notes =
+    document.getElementById("extraNotes")
+      .value
+      .trim();
+
   if(!schoolId){
-    showModalMessage("Missing school_id. Please open this page from your school link.");
+    showModalMessage("Missing school ID");
     return;
   }
-  if(!selectedCounselor){
-    showModalMessage("Please select a counselor.");
-    return;
-  }
+
   if(!selectedReason){
-    showModalMessage("Please select a reason first.");
+    showModalMessage("Please select a reason");
     return;
   }
+
   if(!selectedUrgency){
-    showModalMessage("Please select how you're feeling first.");
+    showModalMessage("Please select urgency");
     return;
   }
-  if(!first_name || !last_name || !student_id){
-    showModalMessage("Please fill in required fields.");
+
+  if(
+    !first_name ||
+    !last_name ||
+    !student_id
+  ){
+    showModalMessage("Please fill all required fields");
     return;
   }
 
   try{
+
     isSubmitting = true;
+
     const res = await fetch(
-      apiUrl("/api/student/submit-assessment"),
+      apiUrl("/students/submit-assessment"),
       {
         method:"POST",
-        headers:{ "Content-Type":"application/json" },
+
+        headers:{
+          "Content-Type":"application/json",
+          "x-school-id": schoolId
+        },
+
         body: JSON.stringify({
+          school_id: schoolId,
+          student_id,
           first_name,
           last_name,
-          student_id,
-          counselor_id: selectedCounselor,
-          school_id: schoolId,
-          answers:{
-            reason: selectedReason,
-            urgency: selectedUrgency,
-            notes
-          }
+          grade,
+          reason: selectedReason,
+          urgency: selectedUrgency,
+          notes
         })
       }
     );
 
-    const data = await safeJson(res);
+    const data = await res.json();
 
     if(!res.ok){
-      console.error("Submission failed", res.status, data);
-      showModalMessage(data?.error || data?.message || `Submission failed (${res.status})`);
+      showModalMessage(
+        data.error || "Submission failed"
+      );
       return;
     }
 
     closeModal();
     openSuccess();
 
-    selectedReason = "";
-    selectedUrgency = "";
-    selectedCounselor = "";
-
   }catch(err){
+
     console.error(err);
-    showModalMessage("Network error. Please try again.");
+
+    showModalMessage(
+      "Network error. Please try again."
+    );
+
   }finally{
     isSubmitting = false;
   }
 }
 
 /* ---------------- INIT ---------------- */
-window.addEventListener("load", async ()=>{
+
+window.addEventListener("load", ()=>{
+
   schoolId = getSchoolId();
+
   if(!schoolId){
-    goToPage("page3");
-    showGridMessage("Missing school_id. Please open this page from your school link.");
-    return;
+    alert(
+      "Missing school_id. Open using your school link."
+    );
   }
-  await loadCounselors();
 });
 
 /* ---------------- SERVICE WORKER ---------------- */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+
+if("serviceWorker" in navigator){
+
+  window.addEventListener("load", ()=>{
+
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .catch(()=>{});
+
   });
 }
-  </script>
+</script>
+
 </body>
 </html>
